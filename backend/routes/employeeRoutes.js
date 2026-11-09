@@ -1,12 +1,13 @@
-
 import express from 'express';
 import bcrypt from 'bcrypt';
 import supabase from '../supabase.js';
+import { verifySession, requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Create a new employee
-router.post('/add', async (req, res) => {
+// Only logged-in Administrators can access this endpoint
+router.post('/add', verifySession, requireAdmin, async (req, res) => {
     try {
         const {
             teacher_id,
