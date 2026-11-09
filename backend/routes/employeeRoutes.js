@@ -5,6 +5,33 @@ import { verifySession, requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Get all employees - Administrator only
+router.get('/', verifySession, requireAdmin, async (req, res) => {
+    try {
+        const { data: employees, error } = await supabase
+            .from('employees')
+            .select('id, teacher_id, full_name, designation, is_active')
+            .order('id', { ascending: true });
+
+        if (error) {
+            throw error;
+        }
+
+        return res.status(200).json({
+            success: true,
+            employees
+        });
+
+    } catch (error) {
+        console.error('Fetching employees error:', error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to retrieve employee list.'
+        });
+    }
+});
+
 // Create a new employee
 // Only logged-in Administrators can access this endpoint
 router.post('/add', verifySession, requireAdmin, async (req, res) => {

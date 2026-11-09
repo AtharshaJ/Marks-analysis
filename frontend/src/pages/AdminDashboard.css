@@ -1,0 +1,437 @@
+/* Main Dashboard */
+
+/* Main Dashboard */
+
+.admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+
+    background-image:
+        linear-gradient(
+            rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)
+        ),
+        url('/background.jpg');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    color: #263c56;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 265px;
+    min-width: 265px;
+    min-height: 100vh;
+    background: #173e70;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 18px 20px;
+    box-shadow: 4px 0 18px rgba(16, 45, 80, 0.12);
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.admin-brand-icon {
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: white;
+    color: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.admin-brand h2 {
+    font-size: 19px;
+    margin: 0;
+    color: white;
+}
+
+.admin-brand h2 span {
+    color: #a9d0f5;
+}
+
+.admin-brand p {
+    font-size: 10px;
+    margin: 4px 0 0;
+    color: #d1e1f2;
+}
+
+/* Administrator Profile */
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 25px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #dcecff;
+    color: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.admin-profile h3 {
+    font-size: 14px;
+    margin: 0;
+    color: white;
+}
+
+.admin-profile p {
+    font-size: 11px;
+    margin: 4px 0 0;
+    color: #c4d8ed;
+}
+
+/* Navigation */
+.admin-navigation {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-nav-heading {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    color: #a9c5e2;
+    padding: 0 12px;
+    margin-bottom: 10px;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 13px 12px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #e0ebf7;
+    font-size: 13px;
+    text-align: left;
+    transition: 0.2s ease;
+}
+
+.admin-nav-item span {
+    font-size: 17px;
+}
+
+.admin-nav-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+.admin-nav-item.active {
+    background: white;
+    color: #173e70;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Sidebar Footer */
+.admin-sidebar-footer {
+    margin-top: auto;
+    padding: 20px 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.admin-sidebar-footer p {
+    font-size: 12px;
+    margin: 0 0 5px;
+    color: white;
+}
+
+.admin-sidebar-footer span {
+    font-size: 10px;
+    color: #b8cde3;
+}
+
+/* Main Content */
+.admin-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-topbar {
+    min-height: 100px;
+    padding: 20px 38px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid #dce7f2;
+    backdrop-filter: blur(10px);
+}
+
+.admin-topbar > div:first-child p {
+    font-size: 11px;
+    color: #71849a;
+    margin: 0 0 5px;
+}
+
+.admin-topbar h1 {
+    font-size: 23px;
+    color: #173e70;
+    margin: 0;
+}
+
+.admin-topbar-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #344c68;
+}
+
+.admin-topbar-profile .admin-avatar {
+    width: 36px;
+    height: 36px;
+}
+
+.admin-content {
+    padding: 35px 38px;
+    max-width: 1400px;
+}
+
+.admin-content h2 {
+    font-size: 21px;
+    color: #173e70;
+    margin: 0 0 8px;
+}
+
+.admin-content p {
+    font-size: 13px;
+    color: #71849a;
+    margin: 0;
+}
+
+/* Responsive Layout */
+@media (max-width: 850px) {
+    .admin-sidebar {
+        width: 220px;
+        min-width: 220px;
+        padding: 22px 12px;
+    }
+
+    .admin-topbar {
+        padding: 20px 24px;
+    }
+
+    .admin-content {
+        padding: 28px 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-dashboard {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        min-width: 0;
+        min-height: auto;
+        padding: 16px;
+    }
+
+    .admin-brand {
+        padding-bottom: 15px;
+    }
+
+    .admin-profile {
+        padding: 15px 8px;
+    }
+
+    .admin-navigation {
+        margin-top: 15px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-nav-heading {
+        grid-column: 1 / -1;
+    }
+
+    .admin-nav-item {
+        font-size: 11px;
+        padding: 11px 8px;
+    }
+
+    .admin-sidebar-footer {
+        display: none;
+    }
+
+    .admin-topbar {
+        min-height: 80px;
+        padding: 16px;
+    }
+
+    .admin-topbar h1 {
+        font-size: 19px;
+    }
+
+    .admin-topbar-profile span {
+        display: none;
+    }
+
+    .admin-content {
+        padding: 24px 16px;
+    }
+}
+
+/* Employee account status */
+
+.status-active,
+.status-inactive {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-active {
+    color: #176b45;
+    background: #e2f5eb;
+}
+
+.status-inactive {
+    color: #a33b3b;
+    background: #fdeaea;
+}
+
+/* ================================
+   Employee Table - Improved Design
+================================ */
+
+.teacher-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #dce7f3;
+    box-shadow: 0 4px 15px rgba(23, 62, 112, 0.07);
+}
+
+.teacher-table {
+    width: 100%;
+    min-width: 750px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.teacher-table thead {
+    background: #173e70;
+}
+
+.teacher-table th {
+    padding: 17px 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.teacher-table td {
+    padding: 17px 20px;
+    font-size: 14px;
+    color: #40546b;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.teacher-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.teacher-table tbody tr:hover {
+    background: #f0f6fd;
+}
+
+.teacher-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.employee-id {
+    color: #8292a5 !important;
+    font-weight: 600;
+}
+
+.teacher-id {
+    color: #315b89 !important;
+    font-weight: 600;
+}
+
+.employee-name {
+    color: #243e5c !important;
+    font-weight: 600;
+}
+
+/* Account status */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.status-active {
+    color: #176b45;
+    background: #e2f5eb;
+}
+
+.status-badge.status-inactive {
+    color: #a33b3b;
+    background: #fdeaea;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* Empty employee list */
+
+.empty-teacher-list {
+    text-align: center;
+    padding: 35px !important;
+    color: #8292a5 !important;
+    font-size: 14px;
+}

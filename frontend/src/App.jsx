@@ -9,6 +9,7 @@ import {
 
 import Login from './pages/login'
 import AddEmployee from './pages/AddEmployee'
+import AdminDashboard from './pages/AdminDashboard'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -62,9 +63,7 @@ function ProtectedRoute({ allowedRole, children }) {
   return children
 }
 
-function AdminDashboard() {
-  return <h1>Administrator Dashboard</h1>
-}
+
 
 function EmployeeDashboard() {
   return <h1>Employee Dashboard</h1>

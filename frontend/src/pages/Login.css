@@ -3,24 +3,33 @@
    LOGIN PAGE
 ================================ */
 
+
+/* =================================
+   LOGIN PAGE
+================================= */
+
 .login-page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 15px;
+    min-height: 100vh;
 
-  background:
-    linear-gradient(
-      rgba(8, 36, 71, 0.65),
-      rgba(8, 36, 71, 0.65)
-    ),
-    url('/background.jpg');
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+    padding: 30px 15px;
+
+    background-image:
+        linear-gradient(
+            rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)
+        ),
+        url('/background.jpg');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
+
 
 /* Login Card */
 
