@@ -40,6 +40,34 @@ export async function verifySession(req, res, next) {
             });
         }
 
+        // Check whether an employee account is still active
+        if (session.user_type === 'employee') {
+            const { data: employee, error: employeeError } = await supabase
+                .from('employees')
+                .select('is_active')
+                .eq('id', session.user_id)
+                .maybeSingle();
+
+            if (employeeError) throw employeeError;
+
+            // Reject missing or inactive employee accounts
+            if (!employee || !employee.is_active) {
+
+                // Revoke the employee's current session
+                const { error: deleteError } = await supabase
+                    .from('user_sessions')
+                    .delete()
+                    .eq('id', session.id);
+
+                if (deleteError) throw deleteError;
+
+                return res.status(403).json({
+                    success: false,
+                    message: 'Your account is inactive. Please contact the Administrator.'
+                });
+            }
+        }
+
         req.user = {
             id: session.user_id,
             type: session.user_type

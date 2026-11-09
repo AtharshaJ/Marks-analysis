@@ -709,3 +709,97 @@
         margin-right: 18px;
     }
 }
+
+
+/* Employee account controls */
+
+.account-control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid #e5edf5;
+}
+
+.account-control-row h4 {
+    margin: 0 0 6px;
+    color: #173e70;
+    font-size: 15px;
+}
+
+.account-control-row p {
+    margin: 0;
+    color: #71849a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.modal-action-button {
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border: none;
+    border-radius: 7px;
+    background: #173e70;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modal-action-button:hover:not(:disabled) {
+    background: #102d50;
+}
+
+.modal-action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.danger-action {
+    background: #c0392b;
+}
+
+.danger-action:hover:not(:disabled) {
+    background: #962d22;
+}
+
+.activate-action {
+    background: #21834a;
+}
+
+.activate-action:hover:not(:disabled) {
+    background: #176638;
+}
+
+.account-note {
+    margin: 10px 0;
+    color: #71849a;
+    font-size: 13px;
+}
+
+.account-success {
+    padding: 11px;
+    margin: 14px 0;
+    border-radius: 7px;
+    background: #eaf7ef;
+    color: #21834a;
+    font-size: 13px;
+}
+
+.account-error,
+.error-message {
+    padding: 11px;
+    margin: 14px 0;
+    border-radius: 7px;
+    background: #fff0ef;
+    color: #c0392b;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .account-control-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

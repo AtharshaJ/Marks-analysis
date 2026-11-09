@@ -10,7 +10,7 @@ router.get('/', verifySession, requireAdmin, async (req, res) => {
     try {
         const { data: employees, error } = await supabase
             .from('employees')
-            .select('id, teacher_id, full_name, designation, is_active')
+            .select('id, teacher_id, full_name, designation, is_active, password_reset_enabled')
             .order('id', { ascending: true });
 
         if (error) {
@@ -124,6 +124,132 @@ router.post('/add', verifySession, requireAdmin, async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Unable to create employee.'
+        });
+    }
+});
+
+// Enable or disable password reset for an employee
+// Only logged-in Administrators can access this endpoint
+router.patch('/:id/password-reset', verifySession, requireAdmin, async (req, res) => {
+    try {
+        const employeeId = Number(req.params.id);
+        const { enabled } = req.body;
+
+        if (!Number.isInteger(employeeId) || employeeId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid employee ID.'
+            });
+        }
+
+        if (typeof enabled !== 'boolean') {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide a valid reset status.'
+            });
+        }
+
+        const { data: employee, error } = await supabase
+            .from('employees')
+            .update({ password_reset_enabled: enabled })
+            .eq('id', employeeId)
+            .select('id, teacher_id, full_name, password_reset_enabled')
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (!employee) {
+            return res.status(404).json({
+                success: false,
+                message: 'Employee not found.'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: enabled
+                ? 'Password reset enabled for this employee.'
+                : 'Password reset disabled for this employee.',
+            employee
+        });
+
+    } catch (error) {
+        console.error('Password reset permission error:', error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to update password reset permission.'
+        });
+    }
+});
+
+// Activate or deactivate an employee account
+// Only the Administrator can access this endpoint
+router.patch('/:id/status', verifySession, requireAdmin, async (req, res) => {
+    try {
+        const employeeId = Number(req.params.id);
+        const { is_active } = req.body;
+
+        if (!Number.isInteger(employeeId) || employeeId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid employee ID.'
+            });
+        }
+
+        if (typeof is_active !== 'boolean') {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide a valid account status.'
+            });
+        }
+
+        const updateData = {
+            is_active,
+            ...(is_active ? {} : { password_reset_enabled: false })
+        };
+
+        const { data: employee, error } = await supabase
+            .from('employees')
+            .update(updateData)
+            .eq('id', employeeId)
+            .select('id, teacher_id, full_name, designation, is_active, password_reset_enabled')
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (!employee) {
+            return res.status(404).json({
+                success: false,
+                message: 'Employee not found.'
+            });
+        }
+
+        // Revoke all existing sessions when an account is deactivated
+        if (!is_active) {
+            const { error: sessionError } = await supabase
+                .from('user_sessions')
+                .delete()
+                .eq('user_type', 'employee')
+                .eq('user_id', employeeId);
+
+            if (sessionError) throw sessionError;
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: is_active
+                ? 'Employee account activated successfully.'
+                : 'Employee account deactivated successfully.',
+            employee
+        });
+
+    } catch (error) {
+        console.error('Account status update error:', error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to update employee account status.'
         });
     }
 });

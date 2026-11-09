@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AdminDashboard.css'
@@ -9,6 +10,9 @@ function AdminDashboard() {
     const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
     const [selectedEmployee, setSelectedEmployee] = useState(null)
+    const [actionLoading, setActionLoading] = useState(false)
+    const [actionMessage, setActionMessage] = useState('')
+    const [actionError, setActionError] = useState('')
 
     const navigate = useNavigate()
 
@@ -20,17 +24,17 @@ function AdminDashboard() {
     ]
 
     const filteredEmployees = employees.filter(employee => {
-    const search = searchTerm.toLowerCase().trim()
+        const search = searchTerm.toLowerCase().trim()
 
-    return (
-        employee.full_name.toLowerCase().includes(search) ||
-        employee.teacher_id.toLowerCase().includes(search)
-    )
-})
+        return (
+            employee.full_name.toLowerCase().includes(search) ||
+            employee.teacher_id.toLowerCase().includes(search)
+        )
+    })
 
     const activeItem = menuItems.find(item => item.id === activeSection)
 
-    // Fetch employee list from backend
+    // Fetch employee list
     const fetchEmployees = async () => {
         setLoading(true)
         setErrorMessage('')
@@ -61,6 +65,109 @@ function AdminDashboard() {
     useEffect(() => {
         fetchEmployees()
     }, [])
+
+    // Update an employee in the table and modal
+    const updateEmployeeInDashboard = (updatedEmployee) => {
+        setEmployees(previousEmployees =>
+            previousEmployees.map(employee =>
+                employee.id === updatedEmployee.id
+                    ? { ...employee, ...updatedEmployee }
+                    : employee
+            )
+        )
+
+        setSelectedEmployee(previousEmployee =>
+            previousEmployee
+                ? { ...previousEmployee, ...updatedEmployee }
+                : null
+        )
+    }
+
+    // Enable or disable password reset
+    const handlePasswordReset = async () => {
+        if (!selectedEmployee || actionLoading) return
+
+        const enabled = !selectedEmployee.password_reset_enabled
+
+        setActionLoading(true)
+        setActionMessage('')
+        setActionError('')
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/employees/${selectedEmployee.id}/password-reset`,
+                {
+                    method: 'PATCH',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ enabled })
+                }
+            )
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Unable to update password reset settings.')
+            }
+
+            updateEmployeeInDashboard(result.employee)
+            setActionMessage(result.message)
+
+        } catch (error) {
+            setActionError(error.message || 'Unable to connect to the server.')
+        } finally {
+            setActionLoading(false)
+        }
+    }
+
+    // Activate or deactivate employee account
+    const handleAccountStatus = async () => {
+        if (!selectedEmployee || actionLoading) return
+
+        const is_active = !selectedEmployee.is_active
+
+        const confirmation = window.confirm(
+            is_active
+                ? `Are you sure you want to activate ${selectedEmployee.full_name}'s account?`
+                : `Are you sure you want to deactivate ${selectedEmployee.full_name}'s account?`
+        )
+
+        if (!confirmation) return
+
+        setActionLoading(true)
+        setActionMessage('')
+        setActionError('')
+
+        try {
+            const response = await fetch(
+                `http://localhost:5000/api/employees/${selectedEmployee.id}/status`,
+                {
+                    method: 'PATCH',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active })
+                }
+            )
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Unable to update account status.')
+            }
+
+            updateEmployeeInDashboard(result.employee)
+            setActionMessage(result.message)
+
+        } catch (error) {
+            setActionError(error.message || 'Unable to connect to the server.')
+        } finally {
+            setActionLoading(false)
+        }
+    }
 
     return (
         <div className="admin-dashboard">
@@ -133,163 +240,255 @@ function AdminDashboard() {
                                 <div>
                                     <h2>Teacher Management</h2>
                                     <p>View and manage registered employee accounts.</p>
-
-                                    {selectedEmployee && (
-    <div
-        className="employee-modal-overlay"
-        onClick={() => setSelectedEmployee(null)}
-    >
-        <div
-            className="employee-modal"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="employee-modal-title"
-        >
-            <div className="employee-modal-header">
-                <div>
-                    <h2 id="employee-modal-title">
-                        Employee Account
-                    </h2>
-                    <p>Manage employee details and account settings.</p>
-                </div>
-
-                <button
-                    className="modal-close-button"
-                    onClick={() => setSelectedEmployee(null)}
-                    aria-label="Close"
-                >
-                    ×
-                </button>
-            </div>
-
-            <div className="employee-modal-profile">
-                <h3>{selectedEmployee.full_name}</h3>
-
-                <p>
-                    {selectedEmployee.teacher_id} · {selectedEmployee.designation}
-                </p>
-
-                <span className={`status-badge ${
-                    selectedEmployee.is_active
-                        ? 'status-active'
-                        : 'status-inactive'
-                }`}>
-                    <span className="status-dot"></span>
-                    {selectedEmployee.is_active ? 'Active Account' : 'Inactive Account'}
-                </span>
-            </div>
-
-            <div className="employee-modal-content">
-                <h3>Account Management</h3>
-
-                <div className="modal-action-placeholder">
-                    Password reset and account activation controls will be added here.
-                </div>
-
-                <h3>Class Teacher Management</h3>
-
-                <div className="modal-action-placeholder">
-                    Class assignment details and management controls will be added here.
-                </div>
-            </div>
-        </div>
-    </div>
-)}
                                 </div>
 
                                 <button
-    className="add-teacher-button"
-    onClick={() => navigate('/admin/add-employee')}
->
-    <span className="add-button-icon">+</span>
-    <span>Add Employee</span>
-</button>
+                                    className="add-teacher-button"
+                                    onClick={() => navigate('/admin/add-employee')}
+                                >
+                                    <span className="add-button-icon">+</span>
+                                    <span>Add Employee</span>
+                                </button>
                             </div>
 
                             <div className="teacher-summary">
                                 <div>
                                     <span>Total Teachers</span>
-                                    <strong>{employees.filter(employee => employee.designation === 'Teacher').length}</strong>
+                                    <strong>
+                                        {employees.filter(
+                                            employee => employee.designation === 'Teacher'
+                                        ).length}
+                                    </strong>
                                 </div>
                             </div>
 
-                           
-{!loading && !errorMessage && (
-    <>
-        <div className="teacher-search">
-            <span className="search-icon">⌕</span>
+                            {loading && <p>Loading employees...</p>}
 
-            <input
-                type="text"
-                placeholder="Search by employee name or TR ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-        </div>
+                            {errorMessage && (
+                                <p className="error-message">{errorMessage}</p>
+                            )}
 
-        <div className="teacher-table-wrapper">
-            <table className="teacher-table">
-                <thead>
-                    <tr>
-                        <th>TR ID</th>
-                        <th>Employee Name</th>
-                        <th>Designation</th>
-                        <th>Account Status</th>
-                    </tr>
-                </thead>
+                            {!loading && !errorMessage && (
+                                <>
+                                    <div className="teacher-search">
+                                        <span className="search-icon">⌕</span>
 
-                <tbody>
-                    {filteredEmployees.length > 0 ? (
-                        filteredEmployees.map(employee => (
-                            <tr key={employee.id}>
-                               <td>
-    <button
-        className="employee-link"
-        onClick={() => setSelectedEmployee(employee)}
-    >
-        {employee.teacher_id}
-    </button>
-</td>
+                                        <input
+                                            type="text"
+                                            placeholder="Search by employee name or TR ID..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
 
-<td>
-    <button
-        className="employee-link employee-name"
-        onClick={() => setSelectedEmployee(employee)}
-    >
-        {employee.full_name}
-    </button>
-</td>
-                                <td>{employee.designation}</td>
+                                    <div className="teacher-table-wrapper">
+                                        <table className="teacher-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>TR ID</th>
+                                                    <th>Employee Name</th>
+                                                    <th>Designation</th>
+                                                    <th>Account Status</th>
+                                                </tr>
+                                            </thead>
 
-                                <td>
-                                    <span className={`status-badge ${
-                                        employee.is_active
-                                            ? 'status-active'
-                                            : 'status-inactive'
-                                    }`}>
-                                        <span className="status-dot"></span>
-                                        {employee.is_active ? 'Active' : 'Inactive'}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="4" className="empty-teacher-list">
-                                {searchTerm
-                                    ? 'No employees match your search.'
-                                    : 'No employees have been registered yet.'}
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        </div>
-    </>
-)}
+                                            <tbody>
+                                                {filteredEmployees.length > 0 ? (
+                                                    filteredEmployees.map(employee => (
+                                                        <tr key={employee.id}>
+                                                            <td>
+                                                                <button
+                                                                    className="employee-link"
+                                                                    onClick={() => {
+                                                                        setSelectedEmployee(employee)
+                                                                        setActionMessage('')
+                                                                        setActionError('')
+                                                                    }}
+                                                                >
+                                                                    {employee.teacher_id}
+                                                                </button>
+                                                            </td>
 
-                           
+                                                            <td>
+                                                                <button
+                                                                    className="employee-link employee-name"
+                                                                    onClick={() => {
+                                                                        setSelectedEmployee(employee)
+                                                                        setActionMessage('')
+                                                                        setActionError('')
+                                                                    }}
+                                                                >
+                                                                    {employee.full_name}
+                                                                </button>
+                                                            </td>
+
+                                                            <td>{employee.designation}</td>
+
+                                                            <td>
+                                                                <span className={`status-badge ${
+                                                                    employee.is_active
+                                                                        ? 'status-active'
+                                                                        : 'status-inactive'
+                                                                }`}>
+                                                                    <span className="status-dot"></span>
+                                                                    {employee.is_active ? 'Active' : 'Inactive'}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="4" className="empty-teacher-list">
+                                                            {searchTerm
+                                                                ? 'No employees match your search.'
+                                                                : 'No employees have been registered yet.'}
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Employee Details Modal */}
+                            {selectedEmployee && (
+                                <div
+                                    className="employee-modal-overlay"
+                                    onClick={() => setSelectedEmployee(null)}
+                                >
+                                    <div
+                                        className="employee-modal"
+                                        onClick={(e) => e.stopPropagation()}
+                                        role="dialog"
+                                        aria-modal="true"
+                                        aria-labelledby="employee-modal-title"
+                                    >
+                                        <div className="employee-modal-header">
+                                            <div>
+                                                <h2 id="employee-modal-title">
+                                                    Employee Account
+                                                </h2>
+                                                <p>Manage employee details and account settings.</p>
+                                            </div>
+
+                                            <button
+                                                className="modal-close-button"
+                                                onClick={() => setSelectedEmployee(null)}
+                                                aria-label="Close"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+
+                                        <div className="employee-modal-profile">
+                                            <h3>{selectedEmployee.full_name}</h3>
+
+                                            <p>
+                                                {selectedEmployee.teacher_id} · {selectedEmployee.designation}
+                                            </p>
+
+                                            <span className={`status-badge ${
+                                                selectedEmployee.is_active
+                                                    ? 'status-active'
+                                                    : 'status-inactive'
+                                            }`}>
+                                                <span className="status-dot"></span>
+                                                {selectedEmployee.is_active
+                                                    ? 'Active Account'
+                                                    : 'Inactive Account'}
+                                            </span>
+                                        </div>
+
+                                        <div className="employee-modal-content">
+
+                                            {/* Account Management */}
+                                            <h3>Account Management</h3>
+
+                                            <div className="account-control-row">
+                                                <div>
+                                                    <h4>Password Reset</h4>
+                                                    <p>
+                                                        {selectedEmployee.password_reset_enabled
+                                                            ? 'The employee is currently allowed to reset their password.'
+                                                            : 'Password reset is currently disabled for this employee.'}
+                                                    </p>
+                                                </div>
+
+                                                <button
+                                                    className="modal-action-button"
+                                                    onClick={handlePasswordReset}
+                                                    disabled={
+                                                        actionLoading ||
+                                                        !selectedEmployee.is_active
+                                                    }
+                                                >
+                                                    {selectedEmployee.password_reset_enabled
+                                                        ? 'Disable Reset'
+                                                        : 'Enable Reset'}
+                                                </button>
+                                            </div>
+
+                                            {!selectedEmployee.is_active && (
+                                                <p className="account-note">
+                                                    Activate this account before enabling password reset.
+                                                </p>
+                                            )}
+
+                                            <div className="account-control-row">
+                                                <div>
+                                                    <h4>Account Status</h4>
+                                                    <p>
+                                                        {selectedEmployee.is_active
+                                                            ? 'This employee can log in to the system.'
+                                                            : 'This employee cannot log in to the system.'}
+                                                    </p>
+                                                </div>
+
+                                                <button
+                                                    className={`modal-action-button ${
+                                                        selectedEmployee.is_active
+                                                            ? 'danger-action'
+                                                            : 'activate-action'
+                                                    }`}
+                                                    onClick={handleAccountStatus}
+                                                    disabled={actionLoading}
+                                                >
+                                                    {selectedEmployee.is_active
+                                                        ? 'Deactivate'
+                                                        : 'Activate'}
+                                                </button>
+                                            </div>
+
+                                            {actionLoading && (
+                                                <p className="account-note">
+                                                    Updating account...
+                                                </p>
+                                            )}
+
+                                            {actionMessage && (
+                                                <p className="account-success">
+                                                    {actionMessage}
+                                                </p>
+                                            )}
+
+                                            {actionError && (
+                                                <p className="account-error">
+                                                    {actionError}
+                                                </p>
+                                            )}
+
+                                            {/* Class Teacher Management */}
+                                            <h3>Class Teacher Management</h3>
+
+                                            <div className="modal-action-placeholder">
+                                                Class assignment details and management controls will be added here.
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                         </div>
                     )}

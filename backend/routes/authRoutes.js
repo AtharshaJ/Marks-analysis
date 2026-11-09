@@ -69,9 +69,9 @@ router.post('/login', async (req, res) => {
             // Check Employee account
             const { data: employee, error: employeeError } = await supabase
                 .from('employees')
-                .select('id, teacher_id, full_name, designation, password')
-                .eq('teacher_id', cleanLoginId)
-                .maybeSingle();
+              .select('id, teacher_id, full_name, designation, password, is_active')
+.eq('teacher_id', cleanLoginId)
+.maybeSingle();
 
             if (employeeError) throw employeeError;
 
@@ -81,6 +81,14 @@ router.post('/login', async (req, res) => {
                     message: 'Invalid login credentials.'
                 });
             }
+
+            // Reject inactive employee accounts
+if (!employee.is_active) {
+    return res.status(403).json({
+        success: false,
+        message: 'Your account is inactive. Please contact the Administrator.'
+    });
+}
 
             user = {
                 id: employee.id,
@@ -257,6 +265,118 @@ router.post('/logout', async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Unable to log out.'
+        });
+    }
+});
+
+// Employee password reset
+// The Administrator must enable password reset before this endpoint can be used.
+router.post('/reset-password', async (req, res) => {
+    try {
+        const {
+            teacher_id,
+            newPassword,
+            confirmPassword
+        } = req.body;
+
+        // Validate the submitted details
+        if (
+            typeof teacher_id !== 'string' ||
+            typeof newPassword !== 'string' ||
+            typeof confirmPassword !== 'string' ||
+            !teacher_id.trim() ||
+            !newPassword ||
+            !confirmPassword
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please complete all fields.'
+            });
+        }
+
+        const cleanTeacherId = teacher_id.trim();
+
+        // Check password length
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: 'Your new password must contain at least 8 characters.'
+            });
+        }
+
+        // Check password confirmation
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'The passwords do not match.'
+            });
+        }
+
+        // Find the employee and check reset permission
+        const { data: employee, error: employeeError } = await supabase
+            .from('employees')
+            .select('id, teacher_id, is_active, password_reset_enabled')
+            .eq('teacher_id', cleanTeacherId)
+            .maybeSingle();
+
+        if (employeeError) throw employeeError;
+
+        if (
+            !employee ||
+            !employee.is_active ||
+            !employee.password_reset_enabled
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: 'Password reset is not enabled for this account. Please contact the Administrator.'
+            });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+        // Update password and disable reset permission
+        // The extra condition prevents using the same permission twice.
+        const { data: updatedEmployee, error: updateError } = await supabase
+            .from('employees')
+            .update({
+                password: hashedPassword,
+                password_reset_enabled: false
+            })
+            .eq('id', employee.id)
+            .eq('password_reset_enabled', true)
+            .select('id')
+            .maybeSingle();
+
+        if (updateError) throw updateError;
+
+        if (!updatedEmployee) {
+            return res.status(403).json({
+                success: false,
+                message: 'Password reset is no longer enabled. Please contact the Administrator.'
+            });
+        }
+
+        // Revoke all existing sessions for this employee
+        const { error: sessionError } = await supabase
+            .from('user_sessions')
+            .delete()
+            .eq('user_type', 'employee')
+            .eq('user_id', employee.id);
+
+        if (sessionError) throw sessionError;
+
+        return res.status(200).json({
+            success: true,
+            message: 'Your password has been changed successfully. Please log in using your new password.'
+        });
+
+    } catch (error) {
+        console.error('Password reset error:', error.message);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to reset your password. Please try again.'
         });
     }
 });
