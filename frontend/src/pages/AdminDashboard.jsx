@@ -5,8 +5,10 @@ import './AdminDashboard.css'
 function AdminDashboard() {
     const [activeSection, setActiveSection] = useState('teachers')
     const [employees, setEmployees] = useState([])
+    const [searchTerm, setSearchTerm] = useState('')
     const [loading, setLoading] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
+    const [selectedEmployee, setSelectedEmployee] = useState(null)
 
     const navigate = useNavigate()
 
@@ -16,6 +18,15 @@ function AdminDashboard() {
         { id: 'assignments', label: 'Class Teacher Assignments', icon: '📋' },
         { id: 'settings', label: 'Account Settings', icon: '⚙️' }
     ]
+
+    const filteredEmployees = employees.filter(employee => {
+    const search = searchTerm.toLowerCase().trim()
+
+    return (
+        employee.full_name.toLowerCase().includes(search) ||
+        employee.teacher_id.toLowerCase().includes(search)
+    )
+})
 
     const activeItem = menuItems.find(item => item.id === activeSection)
 
@@ -122,79 +133,161 @@ function AdminDashboard() {
                                 <div>
                                     <h2>Teacher Management</h2>
                                     <p>View and manage registered employee accounts.</p>
+
+                                    {selectedEmployee && (
+    <div
+        className="employee-modal-overlay"
+        onClick={() => setSelectedEmployee(null)}
+    >
+        <div
+            className="employee-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="employee-modal-title"
+        >
+            <div className="employee-modal-header">
+                <div>
+                    <h2 id="employee-modal-title">
+                        Employee Account
+                    </h2>
+                    <p>Manage employee details and account settings.</p>
+                </div>
+
+                <button
+                    className="modal-close-button"
+                    onClick={() => setSelectedEmployee(null)}
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+            </div>
+
+            <div className="employee-modal-profile">
+                <h3>{selectedEmployee.full_name}</h3>
+
+                <p>
+                    {selectedEmployee.teacher_id} · {selectedEmployee.designation}
+                </p>
+
+                <span className={`status-badge ${
+                    selectedEmployee.is_active
+                        ? 'status-active'
+                        : 'status-inactive'
+                }`}>
+                    <span className="status-dot"></span>
+                    {selectedEmployee.is_active ? 'Active Account' : 'Inactive Account'}
+                </span>
+            </div>
+
+            <div className="employee-modal-content">
+                <h3>Account Management</h3>
+
+                <div className="modal-action-placeholder">
+                    Password reset and account activation controls will be added here.
+                </div>
+
+                <h3>Class Teacher Management</h3>
+
+                <div className="modal-action-placeholder">
+                    Class assignment details and management controls will be added here.
+                </div>
+            </div>
+        </div>
+    </div>
+)}
                                 </div>
 
                                 <button
-                                    className="add-teacher-button"
-                                    onClick={() => navigate('/admin/add-employee')}
-                                >
-                                    + Add Teacher
-                                </button>
+    className="add-teacher-button"
+    onClick={() => navigate('/admin/add-employee')}
+>
+    <span className="add-button-icon">+</span>
+    <span>Add Employee</span>
+</button>
                             </div>
 
                             <div className="teacher-summary">
                                 <div>
-                                    <span>Total Employees</span>
-                                    <strong>{employees.length}</strong>
+                                    <span>Total Teachers</span>
+                                    <strong>{employees.filter(employee => employee.designation === 'Teacher').length}</strong>
                                 </div>
                             </div>
 
                            
 {!loading && !errorMessage && (
-    <div className="teacher-table-wrapper">
-        <table className="teacher-table">
-            <thead>
-                <tr>
-                    <th>TR ID</th>
-                    <th>Employee Name</th>
-                    <th>Designation</th>
-                    <th>Account Status</th>
-                </tr>
-            </thead>
+    <>
+        <div className="teacher-search">
+            <span className="search-icon">⌕</span>
 
-            <tbody>
-                {employees.length > 0 ? (
-                    employees.map(employee => (
-                        <tr key={employee.id}>
-                            <td className="teacher-id">
-                                {employee.teacher_id}
-                            </td>
+            <input
+                type="text"
+                placeholder="Search by employee name or TR ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+        </div>
 
-                            <td className="employee-name">
-                                {employee.full_name}
-                            </td>
+        <div className="teacher-table-wrapper">
+            <table className="teacher-table">
+                <thead>
+                    <tr>
+                        <th>TR ID</th>
+                        <th>Employee Name</th>
+                        <th>Designation</th>
+                        <th>Account Status</th>
+                    </tr>
+                </thead>
 
-                            <td>{employee.designation}</td>
+                <tbody>
+                    {filteredEmployees.length > 0 ? (
+                        filteredEmployees.map(employee => (
+                            <tr key={employee.id}>
+                               <td>
+    <button
+        className="employee-link"
+        onClick={() => setSelectedEmployee(employee)}
+    >
+        {employee.teacher_id}
+    </button>
+</td>
 
-                            <td>
-                                <span
-                                    className={`status-badge ${
+<td>
+    <button
+        className="employee-link employee-name"
+        onClick={() => setSelectedEmployee(employee)}
+    >
+        {employee.full_name}
+    </button>
+</td>
+                                <td>{employee.designation}</td>
+
+                                <td>
+                                    <span className={`status-badge ${
                                         employee.is_active
                                             ? 'status-active'
                                             : 'status-inactive'
-                                    }`}
-                                >
-                                    <span className="status-dot"></span>
-
-                                    {employee.is_active
-                                        ? 'Active'
-                                        : 'Inactive'}
-                                </span>
+                                    }`}>
+                                        <span className="status-dot"></span>
+                                        {employee.is_active ? 'Active' : 'Inactive'}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="4" className="empty-teacher-list">
+                                {searchTerm
+                                    ? 'No employees match your search.'
+                                    : 'No employees have been registered yet.'}
                             </td>
                         </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="4" className="empty-teacher-list">
-                            No employees have been registered yet.
-                        </td>
-                    </tr>
-                )}
-            </tbody>
-        </table>
-    </div>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    </>
 )}
-
 
                            
 
