@@ -3,17 +3,40 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import supabase from './supabase.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
 const app = express();
 
 import employeeRoutes from './routes/employeeRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api/employees', employeeRoutes);
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
