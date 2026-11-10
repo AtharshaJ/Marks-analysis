@@ -83,6 +83,42 @@ return res.status(200).json({
 })
 
 
+// Get all class divisions for the Teacher Dashboard
+router.get('/teacher-classes', verifySession, async (req, res) => {
+    try {
+        // Only authenticated employees can access this endpoint
+        if (req.user?.type !== 'employee') {
+            return res.status(403).json({
+                success: false,
+                message: 'Employee access required.'
+            })
+        }
+
+        const { data: classes, error } = await supabase
+            .from('class_divisions')
+            .select('id, grade, division, class_name')
+            .order('grade', { ascending: true })
+            .order('division', { ascending: true })
+
+        if (error) throw error
+
+        return res.status(200).json({
+            success: true,
+            count: classes.length,
+            classes: classes
+        })
+
+    } catch (error) {
+        console.error('Teacher class list error:', error.message)
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to retrieve class divisions.'
+        })
+    }
+})
+
+
 // Add a new class division
 router.post('/', verifySession, requireAdmin, async (req, res) => {
     try {

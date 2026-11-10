@@ -194,26 +194,39 @@ router.get('/me', verifySession, async (req, res) => {
                 role: 'admin'
             };
 
-        } else {
-            const { data, error } = await supabase
-                .from('employees')
-                .select('id, teacher_id, full_name, designation')
-                .eq('id', req.user.id)
-                .maybeSingle();
+       } else {
+    // Step 1: Get employee details
+    const { data, error } = await supabase
+        .from('employees')
+        .select('id, teacher_id, full_name, designation')
+        .eq('id', req.user.id)
+        .maybeSingle();
 
-            if (error) throw error;
-            if (!data) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Account not found.'
-                });
-            }
+    if (error) throw error;
 
-            user = {
-                ...data,
-                role: 'employee'
-            };
-        }
+    if (!data) {
+        return res.status(401).json({
+            success: false,
+            message: 'Account not found.'
+        });
+    }
+
+    // Step 2: Check whether this employee is a Class Teacher
+    const { data: assignedClass, error: classError } = await supabase
+        .from('class_divisions')
+        .select('id, class_name')
+        .eq('class_teacher_id', data.id)
+        .maybeSingle();
+
+    if (classError) throw classError;
+
+    // Step 3: Prepare employee information
+    user = {
+        ...data,
+        role: 'employee',
+        class_assignment: assignedClass || null
+    };
+}
 
         return res.json({
             success: true,

@@ -10,6 +10,7 @@ import {
 import Login from './pages/login'
 import AddEmployee from './pages/AddEmployee'
 import AdminDashboard from './pages/AdminDashboard'
+import EmployeeDashboard from './pages/EmployeeDashboard'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -60,14 +61,14 @@ function ProtectedRoute({ allowedRole, children }) {
     />
   }
 
-  return children
+  return typeof children === 'function'
+  ? children(user)
+  : children
 }
 
 
 
-function EmployeeDashboard() {
-  return <h1>Employee Dashboard</h1>
-}
+
 
 function App() {
   return (
@@ -103,16 +104,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Employee Dashboard */}
-        <Route
-          path="/employee"
-          element={
-            <ProtectedRoute allowedRole="employee">
-              <EmployeeDashboard />
-            </ProtectedRoute>
-          }
-        />
+<Route
+    path="/employee"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <EmployeeDashboard user={user} />}
+        </ProtectedRoute>
+    }
+/>
 
         <Route
           path="*"
