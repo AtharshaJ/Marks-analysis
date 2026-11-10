@@ -6,20 +6,47 @@ import { verifySession, requireAdmin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Get all employees - Administrator only
+// Get all employees with their class assignments
+// Administrator only
 router.get('/', verifySession, requireAdmin, async (req, res) => {
     try {
-        const { data: employees, error } = await supabase
+        // Step 1: Fetch all employees
+        const { data: employees, error: employeeError } = await supabase
             .from('employees')
             .select('id, teacher_id, full_name, designation, is_active, password_reset_enabled')
             .order('id', { ascending: true });
 
-        if (error) {
-            throw error;
-        }
+        if (employeeError) throw employeeError;
 
+        // Step 2: Fetch all class divisions and their assigned teachers
+        const { data: classes, error: classError } = await supabase
+            .from('class_divisions')
+            .select('id, class_name, class_teacher_id');
+
+        if (classError) throw classError;
+
+        // Step 3: Attach class assignment information to each employee
+        const employeesWithClasses = employees.map(employee => {
+            const assignedClass = classes.find(
+                classItem =>
+                    classItem.class_teacher_id === employee.id
+            );
+
+            return {
+                ...employee,
+                class_assignment: assignedClass
+                    ? {
+                        id: assignedClass.id,
+                        class_name: assignedClass.class_name
+                    }
+                    : null
+            };
+        });
+
+        // Step 4: Return employee information
         return res.status(200).json({
             success: true,
-            employees
+            employees: employeesWithClasses
         });
 
     } catch (error) {
@@ -31,7 +58,6 @@ router.get('/', verifySession, requireAdmin, async (req, res) => {
         });
     }
 });
-
 // Create a new employee
 // Only logged-in Administrators can access this endpoint
 router.post('/add', verifySession, requireAdmin, async (req, res) => {

@@ -13,7 +13,34 @@ function AdminDashboard() {
     const [actionLoading, setActionLoading] = useState(false)
     const [actionMessage, setActionMessage] = useState('')
     const [actionError, setActionError] = useState('')
+    const [classes, setClasses] = useState([])
+    const [classLoading, setClassLoading] = useState(false)
+    const [classError, setClassError] = useState('')
+    const [classSearchTerm, setClassSearchTerm] = useState('')
+    const [showAddClass, setShowAddClass] = useState(false)
+const [newClassGrade, setNewClassGrade] = useState('')
+const [newClassDivision, setNewClassDivision] = useState('')
+const [addClassLoading, setAddClassLoading] = useState(false)
+const [addClassError, setAddClassError] = useState('')
+const [addClassMessage, setAddClassMessage] = useState('')
+const [eligibleTeachers, setEligibleTeachers] = useState([])
+const [newClassTeacher, setNewClassTeacher] = useState('')
+const [allActiveTeachers, setAllActiveTeachers] = useState([])
+// Selected class for editing
+const [selectedClass, setSelectedClass] = useState(null)
 
+// Class editing form
+const [editClassGrade, setEditClassGrade] = useState('')
+const [editClassDivision, setEditClassDivision] = useState('')
+const [editClassTeacher, setEditClassTeacher] = useState('')
+
+// Class editing status
+const [classActionLoading, setClassActionLoading] = useState(false)
+const [classActionError, setClassActionError] = useState('')
+const [classActionMessage, setClassActionMessage] = useState('')
+
+// Delete confirmation
+const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
     const navigate = useNavigate()
 
     const menuItems = [
@@ -32,7 +59,73 @@ function AdminDashboard() {
         )
     })
 
+    const filteredClasses = classes.filter(classItem => {
+    const search = classSearchTerm.toLowerCase().trim()
+
+    return (
+        classItem.class_name.toLowerCase().includes(search) ||
+        String(classItem.grade).includes(search) ||
+        (classItem.class_teacher?.full_name || '')
+            .toLowerCase()
+            .includes(search)
+    )
+})
+
     const activeItem = menuItems.find(item => item.id === activeSection)
+
+    // Add a new class division
+const handleAddClass = async (e) => {
+    e.preventDefault()
+
+    if (!newClassGrade) {
+        setAddClassError('Please select a grade.')
+        return
+    }
+
+    setAddClassLoading(true)
+    setAddClassError('')
+    setAddClassMessage('')
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/classes',
+            {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+    grade: Number(newClassGrade),
+    division: newClassDivision.trim(),
+    classTeacherId: newClassTeacher || null
+})
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to add class.')
+        }
+
+        setAddClassMessage(result.message)
+
+        setNewClassGrade('')
+        setNewClassDivision('')
+        setShowAddClass(false)
+        setNewClassTeacher('')
+
+        await fetchClasses()
+
+    } catch (error) {
+        setAddClassError(
+            error.message || 'Unable to connect to the server.'
+        )
+    } finally {
+        setAddClassLoading(false)
+    }
+}
 
     // Fetch employee list
     const fetchEmployees = async () => {
@@ -62,9 +155,146 @@ function AdminDashboard() {
         }
     }
 
+    // Fetch class divisions from backend
+const fetchClasses = async () => {
+    setClassLoading(true)
+    setClassError('')
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/classes',
+            {
+                credentials: 'include'
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to load classes.')
+        }
+
+        setClasses(result.classes || [])
+        setEligibleTeachers(result.eligibleTeachers || [])
+        setAllActiveTeachers(result.allActiveTeachers || [])
+        
+
+    } catch (error) {
+        setClassError(error.message || 'Unable to connect to the server.')
+    } finally {
+        setClassLoading(false)
+    }
+}
+
+
+// Open the class editing popup
+const openClassEditor = (classItem) => {
+    setSelectedClass(classItem)
+
+    setEditClassGrade(String(classItem.grade))
+    setEditClassDivision(classItem.division || '')
+    setEditClassTeacher(
+        classItem.class_teacher_id
+            ? String(classItem.class_teacher_id)
+            : ''
+    )
+
+    setClassActionError('')
+    setClassActionMessage('')
+    setShowDeleteClassConfirm(false)
+}
+
+// Save edited class details
+const handleUpdateClass = async (e) => {
+    e.preventDefault()
+
+    if (!selectedClass) return
+
+    setClassActionLoading(true)
+    setClassActionError('')
+    setClassActionMessage('')
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/classes/${selectedClass.id}`,
+            {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    grade: Number(editClassGrade),
+                    division: editClassDivision.trim(),
+                    classTeacherId: editClassTeacher || null
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to update class.')
+        }
+
+        setClassActionMessage(result.message)
+
+        await fetchClasses()
+
+        setSelectedClass(null)
+
+    } catch (error) {
+        setClassActionError(error.message)
+    } finally {
+        setClassActionLoading(false)
+    }
+}
+
+// Delete the selected class
+const handleDeleteClass = async () => {
+    if (!selectedClass) return
+
+    setClassActionLoading(true)
+    setClassActionError('')
+    setClassActionMessage('')
+
+    try {
+        const response = await fetch(
+            `http://localhost:5000/api/classes/${selectedClass.id}`,
+            {
+                method: 'DELETE',
+                credentials: 'include'
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to delete class.')
+        }
+
+        setClassActionMessage(result.message)
+        setShowDeleteClassConfirm(false)
+        setSelectedClass(null)
+
+        await fetchClasses()
+
+    } catch (error) {
+        setClassActionError(error.message)
+    } finally {
+        setClassActionLoading(false)
+    }
+}
+
     useEffect(() => {
         fetchEmployees()
     }, [])
+
+    useEffect(() => {
+    if (activeSection === 'classes') {
+        fetchClasses()
+    }
+}, [activeSection])
 
     // Update an employee in the table and modal
     const updateEmployeeInDashboard = (updatedEmployee) => {
@@ -295,31 +525,27 @@ function AdminDashboard() {
                                             <tbody>
                                                 {filteredEmployees.length > 0 ? (
                                                     filteredEmployees.map(employee => (
-                                                        <tr key={employee.id}>
+                                                        <tr
+    key={employee.id}
+    className="clickable-employee-row"
+    onClick={() => {
+        setSelectedEmployee(employee)
+        setActionMessage('')
+        setActionError('')
+    }}
+    title="Click to manage this employee"
+>
                                                             <td>
-                                                                <button
-                                                                    className="employee-link"
-                                                                    onClick={() => {
-                                                                        setSelectedEmployee(employee)
-                                                                        setActionMessage('')
-                                                                        setActionError('')
-                                                                    }}
-                                                                >
-                                                                    {employee.teacher_id}
-                                                                </button>
+                                                               
+                                                                    
+                                                                    <strong>{employee.teacher_id}</strong>
+                                                              
                                                             </td>
 
                                                             <td>
-                                                                <button
-                                                                    className="employee-link employee-name"
-                                                                    onClick={() => {
-                                                                        setSelectedEmployee(employee)
-                                                                        setActionMessage('')
-                                                                        setActionError('')
-                                                                    }}
-                                                                >
+                                                               
                                                                     {employee.full_name}
-                                                                </button>
+                                                               
                                                             </td>
 
                                                             <td>{employee.designation}</td>
@@ -478,12 +704,34 @@ function AdminDashboard() {
                                                 </p>
                                             )}
 
-                                            {/* Class Teacher Management */}
-                                            <h3>Class Teacher Management</h3>
+                                            {/* Class Teacher Information */}
+<h3>Class Teacher Information</h3>
 
-                                            <div className="modal-action-placeholder">
-                                                Class assignment details and management controls will be added here.
-                                            </div>
+<div className="class-teacher-info">
+    <div className="class-teacher-info-label">
+        <span>Assigned Class</span>
+        <span className="class-teacher-icon">🏫</span>
+    </div>
+
+    {selectedEmployee.designation === 'Teacher' ? (
+        selectedEmployee.class_assignment ? (
+            <div className="class-assignment-details">
+                <strong>
+                    {selectedEmployee.class_assignment.class_name}
+                </strong>
+                <span>Currently assigned as Class Teacher</span>
+            </div>
+        ) : (
+            <div className="class-not-assigned">
+                Not Assigned
+            </div>
+        )
+    ) : (
+        <div className="class-not-assigned">
+            Not Applicable
+        </div>
+    )}
+</div>
 
                                         </div>
                                     </div>
@@ -493,13 +741,236 @@ function AdminDashboard() {
                         </div>
                     )}
 
-                    {/* Class Divisions */}
-                    {activeSection === 'classes' && (
-                        <div>
-                            <h2>Class Divisions</h2>
-                            <p>Create and manage school class divisions.</p>
-                        </div>
-                    )}
+                   
+{/* Class Divisions */}
+{activeSection === 'classes' && (
+    <div className="teacher-management">
+
+        <div className="teacher-section-heading">
+            <div>
+                <h2>Class Divisions</h2>
+                <p>View and manage the school's class divisions.</p>
+            </div>
+
+            <button
+    className="add-teacher-button"
+    onClick={() => {
+        setShowAddClass(true)
+        setAddClassError('')
+        setAddClassMessage('')
+    }}
+>
+    <span className="add-button-icon">+</span>
+    <span>Add Class</span>
+</button>
+        </div>
+
+        {/* Add Class Form */}
+{showAddClass && (
+    <div className="employee-modal-overlay">
+        <div className="employee-modal add-class-modal">
+            <div className="employee-modal-header">
+                <div>
+                    <h2>Add Class Division</h2>
+                    <p>Create a new school class division.</p>
+                </div>
+
+                <button
+                    className="modal-close-button"
+                    onClick={() => setShowAddClass(false)}
+                    aria-label="Close"
+                >
+                    ×
+                </button>
+            </div>
+
+            <form onSubmit={handleAddClass} className="add-class-form">
+
+                <label htmlFor="class-grade">Grade</label>
+
+                <select
+                    id="class-grade"
+                    value={newClassGrade}
+                    onChange={(e) => setNewClassGrade(e.target.value)}
+                    required
+                >
+                    <option value="">Select Grade</option>
+
+                    {Array.from({ length: 13 }, (_, index) => index + 1).map(grade => (
+                        <option key={grade} value={grade}>
+                            Grade {grade}
+                        </option>
+                    ))}
+                </select>
+
+                <label htmlFor="class-division">
+                    Division <span>(Optional)</span>
+                </label>
+
+                <input
+                    id="class-division"
+                    type="text"
+                    placeholder="e.g. A, B or C"
+                    value={newClassDivision}
+                    onChange={(e) => setNewClassDivision(e.target.value.toUpperCase())}
+                    maxLength={10}
+                />
+
+                <label htmlFor="class-teacher">
+    Class Teacher <span>(Optional)</span>
+</label>
+
+<select
+    id="class-teacher"
+    value={newClassTeacher}
+    onChange={(e) => setNewClassTeacher(e.target.value)}
+>
+    <option value="">No class teacher assigned</option>
+
+    {eligibleTeachers.map((teacher) => (
+        <option key={teacher.id} value={teacher.id}>
+            {teacher.full_name} ({teacher.teacher_id})
+        </option>
+    ))}
+</select>
+
+                <div className="class-name-preview">
+                    <span>Class Name Preview</span>
+
+                    <strong>
+                        {newClassGrade
+                            ? `Grade ${newClassGrade}${
+                                newClassDivision.trim()
+                                    ? `-${newClassDivision.trim().toUpperCase()}`
+                                    : ''
+                            }`
+                            : 'Select a grade'}
+                    </strong>
+                </div>
+
+                {addClassError && (
+                    <p className="account-error">{addClassError}</p>
+                )}
+
+                <div className="add-class-actions">
+                    <button
+                        type="button"
+                        className="modal-action-button"
+                        onClick={() => setShowAddClass(false)}
+                        disabled={addClassLoading}
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        className="add-teacher-button"
+                        disabled={addClassLoading}
+                    >
+                        {addClassLoading ? 'Saving...' : 'Save Class'}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+)}
+
+        <div className="teacher-summary">
+            <div>
+                <span>Total Class Divisions</span>
+                <strong>{classes.length}</strong>
+            </div>
+        </div>
+
+        {classLoading && <p>Loading classes...</p>}
+
+        {classError && (
+            <p className="error-message">{classError}</p>
+        )}
+
+        {!classLoading && !classError && (
+            <>
+                <div className="teacher-search">
+                    <span className="search-icon">⌕</span>
+
+                    <input
+                        type="text"
+                        placeholder="Search by class, grade or class teacher..."
+                        value={classSearchTerm}
+                        onChange={(e) => setClassSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <div className="teacher-table-wrapper">
+                    <table className="teacher-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Grade</th>
+                                <th>Division</th>
+                                <th>Class Teacher</th>
+                                <th>Assignment Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+{filteredClasses.length > 0 ? (
+    filteredClasses.map(classItem => (
+        <tr
+            key={classItem.id}
+            onClick={() => openClassEditor(classItem)}
+            className="clickable-class-row"
+            title="Click to manage this class"
+        >
+            <td>
+                <strong>{classItem.class_name}</strong>
+            </td>
+
+            <td>{classItem.grade}</td>
+
+            <td>
+                {classItem.division || '—'}
+            </td>
+
+            <td>
+                {classItem.class_teacher
+                    ? classItem.class_teacher.full_name
+                    : '—'}
+            </td>
+
+            <td>
+                <span className={`status-badge ${
+                    classItem.class_teacher
+                        ? 'status-active'
+                        : 'status-inactive'
+                }`}>
+                    <span className="status-dot"></span>
+                    {classItem.class_teacher
+                        ? 'Assigned'
+                        : 'Not Assigned'}
+                </span>
+            </td>
+        </tr>
+    ))
+) : (
+    <tr>
+        <td colSpan="5" className="empty-teacher-list">
+            {classSearchTerm
+                ? 'No classes match your search.'
+                : 'No class divisions have been created yet.'}
+        </td>
+    </tr>
+)}
+                        </tbody>
+                    </table>
+                </div>
+            </>
+        )}
+
+    </div>
+)}
+
 
                     {/* Class Teacher Assignments */}
                     {activeSection === 'assignments' && (
@@ -518,6 +989,195 @@ function AdminDashboard() {
                     )}
 
                 </section>
+
+            {/* Edit Class Modal */}
+            {selectedClass && (
+                <div className="class-edit-overlay">
+                    <div className="class-edit-modal">
+
+                        <div className="class-edit-header">
+                            <div>
+                                <h2>Edit Class</h2>
+                                <p>Manage class details and class teacher.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="class-edit-close"
+                                onClick={() => setSelectedClass(null)}
+                                disabled={classActionLoading}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleUpdateClass}>
+
+                            {classActionError && (
+                                <div className="class-action-error">
+                                    {classActionError}
+                                </div>
+                            )}
+
+                            <label htmlFor="edit-class-grade">
+                                Grade
+                            </label>
+
+                            <select
+                                id="edit-class-grade"
+                                value={editClassGrade}
+                                onChange={(e) => setEditClassGrade(e.target.value)}
+                                required
+                            >
+                                <option value="">Select Grade</option>
+                                {Array.from({ length: 13 }, (_, i) => i + 1).map(grade => (
+                                    <option key={grade} value={grade}>
+                                        Grade {grade}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <label htmlFor="edit-class-division">
+                                Division
+                            </label>
+
+                            <input
+                                id="edit-class-division"
+                                type="text"
+                                value={editClassDivision}
+                                onChange={(e) => setEditClassDivision(e.target.value.toUpperCase())}
+                                placeholder="e.g. A, B or C"
+                            />
+
+                            <label htmlFor="edit-class-teacher">
+                                Class Teacher
+                            </label>
+
+                            <select
+                                id="edit-class-teacher"
+                                value={editClassTeacher}
+                                onChange={(e) => setEditClassTeacher(e.target.value)}
+                            >
+                                <option value="">
+                                    No class teacher assigned
+                                </option>
+
+                                {allActiveTeachers.map(teacher => (
+                                    <option
+                                        key={teacher.id}
+                                        value={teacher.id}
+                                    >
+                                        {teacher.full_name} ({teacher.teacher_id})
+                                    </option>
+                                ))}
+                            </select>
+
+                            {editClassTeacher && (() => {
+    const assignedClass = classes.find(
+        classItem =>
+            String(classItem.class_teacher_id) === editClassTeacher &&
+            classItem.id !== selectedClass.id
+    );
+
+    if (!assignedClass) return null;
+
+    return (
+        <div className="teacher-assignment-warning">
+            <strong>
+                <span>⚠</span> Teacher Already Assigned
+            </strong>
+
+            <p>
+                This teacher is already assigned as the class teacher
+                of <strong>{assignedClass.class_name}</strong>.
+            </p>
+
+            <p>
+                Please review the existing assignment before proceeding.
+            </p>
+        </div>
+    );
+})()}
+
+                            <div className="class-edit-preview">
+                                <span>Updated Class Name</span>
+                                <strong>
+                                    Grade {editClassGrade || '?'}
+                                    {editClassDivision.trim()
+                                        ? `-${editClassDivision.trim().toUpperCase()}`
+                                        : ''}
+                                </strong>
+                            </div>
+
+                            
+
+                            <div className="class-edit-actions">
+    <button
+        type="submit"
+        className="class-save-button"
+        disabled={classActionLoading}
+    >
+        {classActionLoading ? 'Saving...' : 'Save Changes'}
+    </button>
+</div>
+                        </form>
+
+                        <div className="class-delete-section">
+                            <div>
+                                <strong>Delete this class?</strong>
+                                <p>This action cannot be undone.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="class-delete-button"
+                                onClick={() => {
+                                    setClassActionError('')
+                                    setShowDeleteClassConfirm(true)
+                                }}
+                                disabled={classActionLoading}
+                            >
+                                Delete Class
+                            </button>
+                        </div>
+
+                        {/* Delete Confirmation */}
+                        {showDeleteClassConfirm && (
+                            <div className="class-delete-confirm">
+                                <h3>Confirm Deletion</h3>
+
+                                <p>
+                                    Are you sure you want to permanently
+                                    delete <strong>{selectedClass.class_name}</strong>?
+                                </p>
+
+                                <div className="class-edit-actions">
+                                    <button
+                                        type="button"
+                                        className="class-cancel-button"
+                                        onClick={() => setShowDeleteClassConfirm(false)}
+                                        disabled={classActionLoading}
+                                    >
+                                        Keep Class
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="class-delete-button"
+                                        onClick={handleDeleteClass}
+                                        disabled={classActionLoading}
+                                    >
+                                        {classActionLoading
+                                            ? 'Deleting...'
+                                            : 'Yes, Delete'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            )}
 
             </main>
 
