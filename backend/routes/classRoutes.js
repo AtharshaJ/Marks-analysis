@@ -433,4 +433,410 @@ router.delete('/:id', verifySession, requireAdmin, async (req, res) => {
     }
 })
 
+
+// Add a student to the logged-in Class Teacher's assigned class
+
+// Register a student with the required basket subject selections
+
+router.post('/students', verifySession, async (req, res) => {
+    try {
+        if (req.user?.type !== 'employee') {
+            return res.status(403).json({
+                success: false,
+                message: 'Employee access required.'
+            })
+        }
+
+        const {
+            indexNumber,
+            studentName,
+            selectedSubjects,
+            alStreamId,
+            alSubjectNumbers
+        } = req.body
+
+        const cleanIndexNumber = String(indexNumber || '').trim()
+        const cleanStudentName = String(studentName || '').trim()
+
+        if (!cleanIndexNumber || cleanIndexNumber.length > 30) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter a valid student index number.'
+            })
+        }
+
+        if (!cleanStudentName || cleanStudentName.length > 150) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter a valid student name.'
+            })
+        }
+
+        // Find the Class Teacher's assigned class
+        const { data: assignedClass, error: classError } = await supabase
+            .from('class_divisions')
+            .select('id, class_name, grade')
+            .eq('class_teacher_id', req.user.id)
+            .maybeSingle()
+
+        if (classError) throw classError
+
+        if (!assignedClass) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not assigned as a Class Teacher.'
+            })
+        }
+
+        const grade = assignedClass.grade
+
+        // A/L student registration: Grades 12 and 13
+        if (grade === 12 || grade === 13) {
+            const streamId = Number(alStreamId)
+
+            if (!Number.isInteger(streamId) || streamId <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please select an A/L stream.'
+                })
+            }
+
+            if (
+                !Array.isArray(alSubjectNumbers) ||
+                alSubjectNumbers.length !== 3
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please select exactly three A/L subjects.'
+                })
+            }
+
+            const subjectNumbers = alSubjectNumbers.map(
+                subjectNo => String(subjectNo || '').trim()
+            )
+
+            if (
+                subjectNumbers.some(subjectNo => !subjectNo) ||
+                new Set(subjectNumbers).size !== 3
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please select three different A/L subjects.'
+                })
+            }
+
+            const { data: newStudent, error: registerError } =
+                await supabase.rpc(
+                    'register_al_student_with_subjects',
+                    {
+                        p_index_number: cleanIndexNumber,
+                        p_student_name: cleanStudentName,
+                        p_class_id: assignedClass.id,
+                        p_stream_id: streamId,
+                        p_subject_nos: subjectNumbers
+                    }
+                )
+
+            if (registerError) {
+                if (registerError.code === '23505') {
+                    return res.status(409).json({
+                        success: false,
+                        message: 'A student with this index number already exists.'
+                    })
+                }
+
+                if (registerError.code === 'P0001') {
+                    return res.status(400).json({
+                        success: false,
+                        message: registerError.message
+                    })
+                }
+
+                throw registerError
+            }
+
+            return res.status(201).json({
+                success: true,
+                message: `${cleanStudentName} added to ${assignedClass.class_name} successfully.`,
+                student: {
+                    ...newStudent,
+                    class_name: assignedClass.class_name
+                }
+            })
+        }
+
+        // Existing registration for Grades 1–11
+        if (
+            !selectedSubjects ||
+            typeof selectedSubjects !== 'object' ||
+            Array.isArray(selectedSubjects)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid basket subject selections.'
+            })
+        }
+
+        let subjectGroup = null
+
+        if (grade >= 6 && grade <= 9) {
+            subjectGroup = 'Junior Secondary'
+        } else if (grade >= 10 && grade <= 11) {
+            subjectGroup = 'OL'
+        }
+
+        let availableSubjects = []
+
+        if (subjectGroup) {
+            const { data, error: subjectsError } = await supabase
+                .from('subjects')
+                .select('id, subject_name, basket_name')
+                .eq('subject_group', subjectGroup)
+                .not('basket_name', 'is', null)
+
+            if (subjectsError) throw subjectsError
+
+            availableSubjects = data || []
+        }
+
+        const basketNames = [
+            ...new Set(
+                availableSubjects.map(subject => subject.basket_name)
+            )
+        ].sort()
+
+        if (grade >= 6 && grade <= 9) {
+            if (
+                basketNames.length !== 1 ||
+                basketNames[0] !== 'Aesthetics'
+            ) {
+                throw new Error(
+                    'The Aesthetics basket is not configured correctly.'
+                )
+            }
+        } else if (grade >= 10 && grade <= 11) {
+            if (basketNames.length !== 3) {
+                throw new Error(
+                    `Grade ${grade} requires exactly three configured baskets.`
+                )
+            }
+        }
+
+        const selectedBasketNames = Object.keys(selectedSubjects).sort()
+
+        if (
+            JSON.stringify(selectedBasketNames) !==
+            JSON.stringify(basketNames)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please select one subject from every required basket.'
+            })
+        }
+
+        const selectionsForDatabase = []
+
+        for (const basketName of basketNames) {
+            const subjectId = String(
+                selectedSubjects[basketName] || ''
+            )
+
+            if (!/^\d+$/.test(subjectId) || Number(subjectId) <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Please select a valid subject from ${basketName}.`
+                })
+            }
+
+            const matchingSubject = availableSubjects.find(
+                subject =>
+                    String(subject.id) === subjectId &&
+                    subject.basket_name === basketName
+            )
+
+            if (!matchingSubject) {
+                return res.status(400).json({
+                    success: false,
+                    message: `The selected subject does not belong to ${basketName}.`
+                })
+            }
+
+            selectionsForDatabase.push({
+                basket_name: basketName,
+                subject_id: subjectId
+            })
+        }
+
+        const { data: newStudent, error: registerError } =
+            await supabase.rpc(
+                'register_student_with_basket_subjects',
+                {
+                    p_index_number: cleanIndexNumber,
+                    p_student_name: cleanStudentName,
+                    p_class_id: assignedClass.id,
+                    p_selected_subjects: selectionsForDatabase
+                }
+            )
+
+        if (registerError) {
+            if (registerError.code === '23505') {
+                return res.status(409).json({
+                    success: false,
+                    message: 'A student with this index number already exists.'
+                })
+            }
+
+            throw registerError
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: `${cleanStudentName} added to ${assignedClass.class_name} successfully.`,
+            student: {
+                ...newStudent,
+                class_name: assignedClass.class_name
+            }
+        })
+
+    } catch (error) {
+        console.error('Add student error:', error)
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to add the student. Please try again.'
+        })
+    }
+})
+
+
+
+// Get basket subjects according to the Class Teacher's assigned grade
+
+router.get('/student-subject-options', verifySession, async (req, res) => {
+    try {
+        if (req.user?.type !== 'employee') {
+            return res.status(403).json({
+                success: false,
+                message: 'Employee access required.'
+            })
+        }
+
+        // Find the Class Teacher's assigned class
+        const { data: assignedClass, error: classError } = await supabase
+            .from('class_divisions')
+            .select('id, class_name, grade')
+            .eq('class_teacher_id', req.user.id)
+            .maybeSingle()
+
+        if (classError) throw classError
+
+        if (!assignedClass) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not assigned as a Class Teacher.'
+            })
+        }
+
+        const grade = assignedClass.grade
+
+        // A/L subject and stream options for Grades 12 and 13
+        if (grade === 12 || grade === 13) {
+            const [
+                { data: streams, error: streamError },
+                { data: subjects, error: subjectError }
+            ] = await Promise.all([
+                supabase
+                    .from('al_streams')
+                    .select('id, stream_name')
+                    .order('stream_name'),
+
+                supabase
+                    .from('al_subjects')
+                    .select('subject_no, subject_name, subject_type')
+                    .order('subject_name')
+            ])
+
+            if (streamError) throw streamError
+            if (subjectError) throw subjectError
+
+            return res.status(200).json({
+                success: true,
+                grade,
+                class_name: assignedClass.class_name,
+                registration_type: 'AL',
+                streams: streams || [],
+                alSubjects: subjects || [],
+                baskets: []
+            })
+        }
+
+        // Existing basket subject options for other grades
+        let subjectGroup = null
+
+        if (grade >= 6 && grade <= 9) {
+            subjectGroup = 'Junior Secondary'
+        } else if (grade >= 10 && grade <= 11) {
+            subjectGroup = 'OL'
+        }
+
+        // Grades 1–5 do not require basket selections
+        if (!subjectGroup) {
+            return res.status(200).json({
+                success: true,
+                grade,
+                class_name: assignedClass.class_name,
+                registration_type: 'STANDARD',
+                baskets: []
+            })
+        }
+
+        const { data: subjects, error: subjectsError } = await supabase
+            .from('subjects')
+            .select('id, subject_name, subject_group, basket_name')
+            .eq('subject_group', subjectGroup)
+            .not('basket_name', 'is', null)
+            .order('basket_name', { ascending: true })
+            .order('subject_name', { ascending: true })
+
+        if (subjectsError) throw subjectsError
+
+        const basketMap = {}
+
+        subjects.forEach(subject => {
+            if (!basketMap[subject.basket_name]) {
+                basketMap[subject.basket_name] = []
+            }
+
+            basketMap[subject.basket_name].push({
+                id: subject.id,
+                subject_name: subject.subject_name
+            })
+        })
+
+        const baskets = Object.entries(basketMap).map(
+            ([basket_name, options]) => ({
+                basket_name,
+                subjects: options
+            })
+        )
+
+        return res.status(200).json({
+            success: true,
+            grade,
+            class_name: assignedClass.class_name,
+            registration_type: 'STANDARD',
+            subject_group: subjectGroup,
+            baskets
+        })
+
+    } catch (error) {
+        console.error('Student subject options error:', error)
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to retrieve subject options.'
+        })
+    }
+})
+
 export default router

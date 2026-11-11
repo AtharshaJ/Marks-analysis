@@ -13,6 +13,7 @@ function EmployeeDashboard({ user }) {
     const [classes, setClasses] = useState([])
     const [classesLoading, setClassesLoading] = useState(false)
     const [classesError, setClassesError] = useState('')
+    
 
     const navigationItems = [
         { name: 'Grade 5 Scholarship', icon: '🎓' },
@@ -62,6 +63,8 @@ function EmployeeDashboard({ user }) {
             fetchClasses()
         }
     }
+
+
 
     // Handle logout
     const handleLogout = async () => {
@@ -239,6 +242,31 @@ function EmployeeDashboard({ user }) {
 
                         </div>
                     </section>
+
+{/* Class Teacher Student Management */}
+{user.class_assignment && (
+    <section className="teacher-profile-card student-management-card">
+
+        <div className="student-management-heading">
+            <div>
+                <h3>Student Management</h3>
+                <p>
+                    Manage students in your assigned class:
+                    {' '}
+                    <strong>{user.class_assignment.class_name}</strong>
+                </p>
+            </div>
+
+            <button
+                className="teacher-refresh-btn"
+                onClick={() => navigate('/employee/add-student')}
+            >
+                + Add Student
+            </button>
+        </div>
+
+    </section>
+)}
 
                     {/* Selected Examination */}
                     <section className="teacher-section-content">

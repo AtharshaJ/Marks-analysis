@@ -11,6 +11,8 @@ import Login from './pages/login'
 import AddEmployee from './pages/AddEmployee'
 import AdminDashboard from './pages/AdminDashboard'
 import EmployeeDashboard from './pages/EmployeeDashboard'
+import AddStudent from './pages/AddStudent'
+import SubjectManagement from './pages/SubjectManagement'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -104,6 +106,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+{/* Subject Management - Administrator only */}
+<Route
+  path="/admin/subject-management"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <SubjectManagement />
+    </ProtectedRoute>
+  }
+/>
+
 <Route
     path="/employee"
     element={
@@ -111,6 +124,20 @@ function App() {
             {user => <EmployeeDashboard user={user} />}
         </ProtectedRoute>
     }
+/>
+
+{/* Add Student - Class Teacher only */}
+<Route
+  path="/employee/add-student"
+  element={
+    <ProtectedRoute allowedRole="employee">
+      {user => (
+        user.class_assignment
+          ? <AddStudent user={user} />
+          : <Navigate to="/employee" replace />
+      )}
+    </ProtectedRoute>
+  }
 />
 
         <Route

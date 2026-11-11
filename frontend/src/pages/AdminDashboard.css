@@ -1360,7 +1360,7 @@
 }
 
 .clickable-employee-row {
-    cursor: pointer;
+   cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
@@ -1371,3 +1371,4 @@
 .clickable-employee-row:active {
     background-color: #dce9f8;
 }
+

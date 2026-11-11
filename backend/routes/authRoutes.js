@@ -214,7 +214,7 @@ router.get('/me', verifySession, async (req, res) => {
     // Step 2: Check whether this employee is a Class Teacher
     const { data: assignedClass, error: classError } = await supabase
         .from('class_divisions')
-        .select('id, class_name')
+        .select('id, class_name, grade')
         .eq('class_teacher_id', data.id)
         .maybeSingle();
 

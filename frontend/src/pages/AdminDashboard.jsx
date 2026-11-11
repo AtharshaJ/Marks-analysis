@@ -46,7 +46,7 @@ const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
     const menuItems = [
         { id: 'teachers', label: 'Teacher Management', icon: '👩‍🏫' },
         { id: 'classes', label: 'Class Divisions', icon: '🏫' },
-        { id: 'assignments', label: 'Class Teacher Assignments', icon: '📋' },
+        { id: 'subject-management', label: 'Subject Management', icon: '📚' },
         { id: 'settings', label: 'Account Settings', icon: '⚙️' }
     ]
 
@@ -430,7 +430,13 @@ const handleDeleteClass = async () => {
                             className={`admin-nav-item ${
                                 activeSection === item.id ? 'active' : ''
                             }`}
-                            onClick={() => setActiveSection(item.id)}
+                            onClick={() => {
+    if (item.id === 'subject-management') {
+        navigate('/admin/subject-management')
+    } else {
+        setActiveSection(item.id)
+    }
+}}
                         >
                             <span>{item.icon}</span>
                             {item.label}

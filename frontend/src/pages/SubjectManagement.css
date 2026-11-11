@@ -1,0 +1,416 @@
+
+/* ================================
+   SUBJECT MANAGEMENT PAGE
+================================ */
+
+.subject-management-page {
+    min-height: 100vh;
+    padding: 32px;
+    background: #f4f7fb;
+    color: #1e293b;
+    font-family: inherit;
+}
+
+.subject-page-header {
+    margin-bottom: 28px;
+}
+
+.subject-page-header h1 {
+    margin: 16px 0 8px;
+    color: #142b4a;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.subject-page-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.subject-back-button {
+    border: none;
+    background: transparent;
+    color: #087e8b;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.subject-back-button:hover {
+    color: #075e68;
+}
+
+/* ================================
+   PANELS
+================================ */
+
+.subject-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+}
+
+.subject-panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.subject-panel-heading h2 {
+    margin: 0 0 6px;
+    color: #142b4a;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.subject-panel-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ================================
+   GROUP SELECTION
+================================ */
+
+.subject-group-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.subject-group-button {
+    min-width: 130px;
+    padding: 12px 20px;
+    border: 1px solid #dbe4ee;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.subject-group-button:hover {
+    border-color: #0b8793;
+    color: #087e8b;
+}
+
+.subject-group-button.selected {
+    background: #e5f5f5;
+    border-color: #087e8b;
+    color: #087e8b;
+}
+
+/* ================================
+   STREAM MANAGEMENT
+================================ */
+
+.stream-management-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+}
+
+.stream-management-row select,
+.create-stream-form input {
+    min-height: 43px;
+    padding: 10px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 14px;
+    outline: none;
+}
+
+.stream-management-row select {
+    min-width: 190px;
+}
+
+.create-stream-form {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.create-stream-form input {
+    flex: 1;
+    min-width: 180px;
+}
+
+.stream-management-row select:focus,
+.create-stream-form input:focus,
+.subject-form-field input:focus,
+.subject-form-field select:focus {
+    border-color: #087e8b;
+    box-shadow: 0 0 0 3px rgba(8, 126, 139, 0.1);
+}
+
+.create-stream-form button {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 7px;
+    background: #142b4a;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.create-stream-form button:hover {
+    background: #203e64;
+}
+
+.stream-info {
+    margin: 16px 0 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ================================
+   ADD SUBJECT FORM
+================================ */
+
+.add-subject-form {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+}
+
+.subject-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.subject-form-field label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-form-field input,
+.subject-form-field select {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 14px;
+    outline: none;
+}
+
+.add-subject-button {
+    min-height: 43px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 7px;
+    background: #087e8b;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.add-subject-button:hover {
+    background: #066773;
+}
+
+.add-subject-button:disabled,
+.create-stream-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ================================
+   SUBJECT LISTS
+================================ */
+
+.subject-list-section {
+    margin-top: 26px;
+}
+
+.subject-list-section h3 {
+    margin: 0 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #087e8b;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.subject-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 10px;
+}
+
+.subject-item {
+    min-height: 52px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    font-size: 14px;
+}
+
+.subject-item span {
+    color: #334155;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.subject-item > button,
+.subject-edit-row button {
+    flex-shrink: 0;
+    padding: 7px 11px;
+    border: 1px solid #b9dfe1;
+    border-radius: 6px;
+    background: #eaf7f7;
+    color: #087e8b;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.subject-item > button:hover,
+.subject-edit-row button:hover {
+    background: #d5eeee;
+}
+
+.subject-edit-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 7px;
+}
+
+.subject-edit-row input {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px;
+    border: 1px solid #087e8b;
+    border-radius: 6px;
+    outline: none;
+    font-size: 13px;
+}
+
+.subject-edit-row .subject-cancel-button {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.subject-empty {
+    margin: 0;
+    padding: 12px 0;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+/* ================================
+   MESSAGES
+================================ */
+
+.subject-message {
+    padding: 13px 16px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.subject-error {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.subject-success {
+    border: 1px solid #a7f3d0;
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.subject-loading {
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 768px) {
+    .subject-management-page {
+        padding: 20px 14px;
+    }
+
+    .subject-panel {
+        padding: 18px;
+    }
+
+    .add-subject-form {
+        grid-template-columns: 1fr;
+    }
+
+    .add-subject-button {
+        width: 100%;
+    }
+
+    .stream-management-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .stream-management-row select {
+        width: 100%;
+    }
+
+    .create-stream-form {
+        flex-direction: column;
+    }
+
+    .create-stream-form button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .subject-page-header h1 {
+        font-size: 23px;
+    }
+
+    .subject-group-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .subject-group-button {
+        min-width: 0;
+        padding: 11px 8px;
+    }
+
+    .subject-list {
+        grid-template-columns: 1fr;
+    }
+}
