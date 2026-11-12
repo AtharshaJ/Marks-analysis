@@ -15,6 +15,7 @@ import AddStudent from './pages/AddStudent'
 import SubjectManagement from './pages/SubjectManagement'
 import StudentList from './pages/StudentList'
 import StudentMarks from './pages/StudentMarks'
+import SubjectMarks from './pages/SubjectMarks'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -136,6 +137,7 @@ function App() {
     </ProtectedRoute>
   }
 />
+
 <Route
   path="/employee/term-tests/:classId/students/:studentId"
   element={
@@ -143,6 +145,15 @@ function App() {
       {user => <StudentMarks user={user} />}
     </ProtectedRoute>
   }
+/>
+
+<Route
+    path="/employee/term-tests/:classId/subjects"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <SubjectMarks user={user} />}
+        </ProtectedRoute>
+    }
 />
 
 

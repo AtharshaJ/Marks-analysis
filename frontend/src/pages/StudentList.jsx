@@ -119,6 +119,17 @@ function StudentList() {
                                 : 'Student information'}
                         </p>
 
+                        <div className="student-list-actions">
+    <button
+        className="student-list-subjects-btn"
+        onClick={() =>
+            navigate(`/employee/term-tests/${classId}/subjects`)
+        }
+    >
+        View Subjects →
+    </button>
+</div>
+
                         {loading ? (
                             <div className="student-list-message">
                                 Loading student records...

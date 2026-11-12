@@ -361,3 +361,25 @@
 .student-clickable-row:hover {
     background-color: #e3f2f8 !important;
 }
+
+.student-list-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 0;
+}
+
+.student-list-subjects-btn {
+    padding: 11px 20px;
+    border: none;
+    border-radius: 7px;
+    background: #168b91;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.student-list-subjects-btn:hover {
+    background: #173e70;
+}

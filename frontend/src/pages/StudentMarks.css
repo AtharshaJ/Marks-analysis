@@ -390,3 +390,62 @@
         width: 100%;
     }
 }
+
+.student-mark-input {
+    width: 130px;
+    padding: 10px 12px;
+    border: 1px solid #d6dfeb;
+    border-radius: 7px;
+    background: #fff;
+    color: #263445;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+.student-mark-input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 3px rgba(22, 139, 145, 0.1);
+}
+
+.student-marks-save-section {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.student-marks-save-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 7px;
+    background: #173e70;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.student-marks-save-btn:hover:not(:disabled) {
+    background: #168b91;
+}
+
+.student-marks-save-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.student-marks-save-success {
+    color: #16804a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.student-marks-save-error {
+    color: #c03939;
+    font-size: 13px;
+    font-weight: 600;
+}

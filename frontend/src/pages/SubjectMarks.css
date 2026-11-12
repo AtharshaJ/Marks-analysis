@@ -1,0 +1,409 @@
+/* PAGE */
+.subject-marks-page {
+    min-height: 100vh;
+    width: 100%;
+    background-image:
+        linear-gradient(
+            rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)
+        ),
+        url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #263c56;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+.subject-marks-page * {
+    box-sizing: border-box;
+}
+
+/* HEADER */
+.subject-marks-header {
+    min-height: 85px;
+    padding: 15px 6%;
+    background: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.subject-marks-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.subject-marks-brand-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #fff;
+    color: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.subject-marks-brand h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 22px;
+}
+
+.subject-marks-brand h2 span {
+    color: #77d6d0;
+}
+
+.subject-marks-brand p {
+    margin: 4px 0 0;
+    color: #d6e3f2;
+    font-size: 12px;
+}
+
+.subject-marks-back-btn {
+    padding: 11px 18px;
+    border: 1px solid rgba(255,255,255,.5);
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.subject-marks-back-btn:hover {
+    background: #fff;
+    color: #173e70;
+}
+
+/* MAIN */
+.subject-marks-main {
+    width: 90%;
+    max-width: 1100px;
+    margin: 45px auto;
+}
+
+/* TITLE */
+.subject-marks-title {
+    margin-bottom: 25px;
+}
+
+.subject-marks-title > span {
+    color: #168b91;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.subject-marks-title h1 {
+    margin: 10px 0;
+    color: #173e70;
+    font-size: 30px;
+}
+
+.subject-marks-title p {
+    margin: 0;
+    color: #718096;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* CLASS INFORMATION */
+.subject-marks-class-card {
+    padding: 28px 32px;
+    margin-bottom: 25px;
+    background: #fff;
+    border: 1px solid #e5ebf3;
+    border-radius: 14px;
+    box-shadow: 0 5px 25px rgba(25,55,90,.06);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.subject-marks-class-card h2 {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: #173e70;
+    font-size: 19px;
+}
+
+.subject-marks-class-card div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.subject-marks-class-card span {
+    color: #8491a3;
+    font-size: 12px;
+}
+
+.subject-marks-class-card strong {
+    color: #263c56;
+    font-size: 15px;
+}
+
+/* SUBJECT CONTENT */
+.subject-marks-content {
+    padding: 35px;
+    background: #fff;
+    border: 1px solid #e5ebf3;
+    border-radius: 14px;
+    box-shadow: 0 5px 25px rgba(25,55,90,.06);
+}
+
+.subject-marks-content > h2 {
+    margin: 0 0 25px;
+    color: #173e70;
+    font-size: 19px;
+}
+
+/* SELECTORS */
+.subject-marks-selectors {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.subject-marks-selectors > div {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.subject-marks-selectors label {
+    color: #34445a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-marks-selectors select {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 13px;
+    border: 1px solid #d6dfeb;
+    border-radius: 7px;
+    background: #fff;
+    color: #263445;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+.subject-marks-selectors select:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 3px rgba(22,139,145,.1);
+}
+
+.subject-marks-selectors select:disabled {
+    background: #f1f4f8;
+    cursor: not-allowed;
+}
+
+/* PLACEHOLDER */
+.subject-marks-placeholder {
+    padding: 30px 20px;
+    text-align: center;
+    border: 1px dashed #cbd8e6;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.subject-marks-placeholder h3 {
+    margin: 0 0 10px;
+    color: #173e70;
+    font-size: 16px;
+}
+
+.subject-marks-placeholder p {
+    margin: 0;
+    color: #718096;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* MESSAGES */
+.subject-marks-message {
+    padding: 18px;
+    background: #f1f6fb;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.subject-marks-error {
+    padding: 13px 16px;
+    margin: 20px 0;
+    border-radius: 8px;
+    background: #fff0f0;
+    border: 1px solid #ffd2d2;
+    color: #c03939;
+    font-size: 13px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+    .subject-marks-header {
+        padding: 15px 5%;
+    }
+
+    .subject-marks-brand h2 {
+        font-size: 18px;
+    }
+
+    .subject-marks-main {
+        width: 92%;
+        margin: 30px auto;
+    }
+
+    .subject-marks-title h1 {
+        font-size: 25px;
+    }
+
+    .subject-marks-class-card,
+    .subject-marks-selectors {
+        grid-template-columns: 1fr;
+    }
+
+    .subject-marks-content,
+    .subject-marks-class-card {
+        padding: 22px 18px;
+    }
+
+    .subject-marks-class-card h2 {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 420px) {
+    .subject-marks-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .subject-marks-back-btn {
+        width: 100%;
+    }
+}
+
+/* Subject Marks Table */
+
+.subject-marks-table-section {
+    margin-top: 25px;
+    padding: 25px;
+    background: #ffffff;
+    border: 1px solid #e1eaf2;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(23, 62, 112, 0.06);
+}
+
+.subject-marks-table-section h3 {
+    color: #173e70;
+    font-size: 19px;
+    margin-bottom: 20px;
+}
+
+.subject-marks-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.subject-marks-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+.subject-marks-table th {
+    background: #173e70;
+    color: #ffffff;
+    padding: 14px 12px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-marks-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e7edf3;
+    color: #34495e;
+    font-size: 13px;
+}
+
+.subject-marks-table tbody tr:nth-child(even) {
+    background: #f3f8fc;
+}
+
+.subject-marks-table tbody tr:hover {
+    background: #eaf5f8;
+}
+
+.subject-marks-table input {
+    width: 110px;
+    padding: 9px 10px;
+    border: 1px solid #cbd8e5;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.subject-marks-table input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.12);
+}
+
+.subject-marks-student-count {
+    margin-top: 15px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.subject-marks-save-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+
+.subject-marks-save-btn {
+    padding: 12px 26px;
+    border: none;
+    border-radius: 7px;
+    background: #168b91;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.subject-marks-save-btn:hover:not(:disabled) {
+    background: #173e70;
+}
+
+.subject-marks-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.subject-marks-success {
+    color: #16834a;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+}
+

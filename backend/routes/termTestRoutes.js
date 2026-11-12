@@ -347,6 +347,260 @@ router.get('/:classId/students/:studentId/subjects', verifySession, async (req, 
     }
 })
 
+// Get all unique subjects studied by active students in a class
+router.get('/:classId/subjects', verifySession, async (req, res) => {
+    try {
+        if (req.user?.type !== 'employee') {
+            return res.status(403).json({
+                success: false,
+                message: 'Employee access required.'
+            })
+        }
+
+        const classId = Number(req.params.classId)
+
+        if (!Number.isInteger(classId) || classId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid class selection.'
+            })
+        }
+
+        // Get class information
+        const { data: selectedClass, error: classError } = await supabase
+            .from('class_divisions')
+            .select('id, class_name, grade, division')
+            .eq('id', classId)
+            .maybeSingle()
+
+        if (classError) throw classError
+
+        if (!selectedClass) {
+            return res.status(404).json({
+                success: false,
+                message: 'Selected class does not exist.'
+            })
+        }
+
+        // Get active students in this class
+        const { data: students, error: studentError } = await supabase
+            .from('students')
+            .select('id, index_number, student_name')
+            .eq('class_id', classId)
+            .eq('is_active', true)
+
+        if (studentError) throw studentError
+
+        const studentIds = (students || []).map(student => student.id)
+
+        const grade = Number(selectedClass.grade)
+        let subjects = []
+
+        if (studentIds.length > 0) {
+
+            // Grades 1–5: All Primary subjects
+            if (grade >= 1 && grade <= 5) {
+                const { data, error } = await supabase
+                    .from('subjects')
+                    .select('id, subject_name')
+                    .eq('subject_group', 'Primary')
+                    .order('subject_name')
+
+                if (error) throw error
+
+                subjects = (data || []).map(subject => ({
+                    subject_id: subject.id,
+                    al_subject_no: null,
+                    subject_name: subject.subject_name,
+                    subject_type: 'regular',
+                    registered_student_ids: studentIds
+                }))
+            }
+
+            // Grades 6–9: Core + selected basket subjects
+            else if (grade >= 6 && grade <= 9) {
+                const { data: coreSubjects, error: coreError } = await supabase
+                    .from('subjects')
+                    .select('id, subject_name')
+                    .eq('subject_group', 'Junior Secondary')
+                    .is('basket_id', null)
+
+                if (coreError) throw coreError
+
+                const { data: selections, error: selectionError } = await supabase
+                    .from('student_basket_subjects')
+                    .select('student_id, subject_id')
+                    .in('student_id', studentIds)
+
+                if (selectionError) throw selectionError
+
+                const subjectIds = [
+                    ...new Set((selections || []).map(item => item.subject_id))
+                ]
+
+                let basketSubjects = []
+
+                if (subjectIds.length > 0) {
+                    const { data, error } = await supabase
+                        .from('subjects')
+                        .select('id, subject_name')
+                        .eq('subject_group', 'Junior Secondary')
+                        .in('id', subjectIds)
+
+                    if (error) throw error
+
+                    basketSubjects = data || []
+                }
+
+                subjects = [
+                    ...(coreSubjects || []).map(subject => ({
+                        subject_id: subject.id,
+                        al_subject_no: null,
+                        subject_name: subject.subject_name,
+                        subject_type: 'regular',
+                        registered_student_ids: studentIds
+                    })),
+                    ...basketSubjects.map(subject => ({
+                        subject_id: subject.id,
+                        al_subject_no: null,
+                        subject_name: subject.subject_name,
+                        subject_type: 'regular',
+                        registered_student_ids: (selections || [])
+                            .filter(item => item.subject_id === subject.id)
+                            .map(item => item.student_id)
+                    }))
+                ]
+            }
+
+            // Grades 10–11: O/L core + selected basket subjects
+            else if (grade >= 10 && grade <= 11) {
+                const { data: coreSubjects, error: coreError } = await supabase
+                    .from('subjects')
+                    .select('id, subject_name')
+                    .eq('subject_group', 'OL')
+                    .is('basket_id', null)
+
+                if (coreError) throw coreError
+
+                const { data: selections, error: selectionError } = await supabase
+                    .from('student_basket_subjects')
+                    .select('student_id, subject_id')
+                    .in('student_id', studentIds)
+
+                if (selectionError) throw selectionError
+
+                const subjectIds = [
+                    ...new Set((selections || []).map(item => item.subject_id))
+                ]
+
+                let basketSubjects = []
+
+                if (subjectIds.length > 0) {
+                    const { data, error } = await supabase
+                        .from('subjects')
+                        .select('id, subject_name')
+                        .eq('subject_group', 'OL')
+                        .in('id', subjectIds)
+
+                    if (error) throw error
+
+                    basketSubjects = data || []
+                }
+
+                subjects = [
+                    ...(coreSubjects || []).map(subject => ({
+                        subject_id: subject.id,
+                        al_subject_no: null,
+                        subject_name: subject.subject_name,
+                        subject_type: 'regular',
+                        registered_student_ids: studentIds
+                    })),
+                    ...basketSubjects.map(subject => ({
+                        subject_id: subject.id,
+                        al_subject_no: null,
+                        subject_name: subject.subject_name,
+                        subject_type: 'regular',
+                        registered_student_ids: (selections || [])
+                            .filter(item => item.subject_id === subject.id)
+                            .map(item => item.student_id)
+                    }))
+                ]
+            }
+
+            // Grades 12–13: A/L subjects selected by students
+            else if (grade >= 12 && grade <= 13) {
+                const { data: selections, error: selectionError } = await supabase
+                    .from('al_student_subjects')
+                    .select('student_id, subject_no')
+                    .in('student_id', studentIds)
+
+                if (selectionError) throw selectionError
+
+                const subjectNumbers = [
+                    ...new Set(
+                        (selections || []).map(item =>
+                            String(item.subject_no).trim()
+                        )
+                    )
+                ]
+
+                if (subjectNumbers.length > 0) {
+                    const { data, error } = await supabase
+                        .from('al_subjects')
+                        .select('subject_no, subject_name')
+                        .in('subject_no', subjectNumbers)
+
+                    if (error) throw error
+
+                    subjects = (data || []).map(subject => ({
+                        subject_id: null,
+                        al_subject_no: subject.subject_no,
+                        subject_name: subject.subject_name,
+                        subject_type: 'al',
+                        registered_student_ids: (selections || [])
+                            .filter(item =>
+                                String(item.subject_no).trim() ===
+                                String(subject.subject_no).trim()
+                            )
+                            .map(item => item.student_id)
+                    }))
+                }
+            }
+
+            else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Unsupported class grade.'
+                })
+            }
+        } else if (grade < 1 || grade > 13) {
+            return res.status(400).json({
+                success: false,
+                message: 'Unsupported class grade.'
+            })
+        }
+
+        subjects.sort((a, b) =>
+            a.subject_name.localeCompare(b.subject_name)
+        )
+
+        return res.status(200).json({
+            success: true,
+            class: selectedClass,
+            studentCount: studentIds.length,
+            count: subjects.length,
+            subjects
+        })
+
+    } catch (error) {
+        console.error('Class subjects retrieval error:', error)
+
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to retrieve class subjects.'
+        })
+    }
+})
 
 
 // Get a student's marks for a selected academic term
@@ -516,6 +770,112 @@ router.post('/:classId/students/:studentId/marks', verifySession, async (req, re
             })
         }
 
+
+// Verify the student's registered subjects
+const { data: classInfo, error: classInfoError } = await supabase
+    .from('class_divisions')
+    .select('grade')
+    .eq('id', classId)
+    .maybeSingle()
+
+if (classInfoError) throw classInfoError
+
+if (!classInfo) {
+    return res.status(404).json({
+        success: false,
+        message: 'Class not found.'
+    })
+}
+
+const grade = Number(classInfo.grade)
+
+const allowedRegularSubjectIds = new Set()
+const allowedALSubjectNos = new Set()
+
+if (grade >= 1 && grade <= 5) {
+
+    // Primary subjects
+    const { data, error } = await supabase
+        .from('subjects')
+        .select('id')
+        .eq('subject_group', 'Primary')
+
+    if (error) throw error
+
+    data.forEach(subject => {
+        allowedRegularSubjectIds.add(Number(subject.id))
+    })
+
+} else if (grade >= 6 && grade <= 11) {
+
+    const subjectGroup = grade <= 9
+        ? 'Junior Secondary'
+        : 'OL'
+
+    // Get compulsory/core subjects
+    const { data: coreSubjects, error: coreError } = await supabase
+        .from('subjects')
+        .select('id')
+        .eq('subject_group', subjectGroup)
+        .is('basket_id', null)
+
+    if (coreError) throw coreError
+
+    coreSubjects.forEach(subject => {
+        allowedRegularSubjectIds.add(Number(subject.id))
+    })
+
+    // Get subjects selected by this student
+    const { data: selectedSubjects, error: selectedError } =
+        await supabase
+            .from('student_basket_subjects')
+            .select('subject_id')
+            .eq('student_id', studentId)
+
+    if (selectedError) throw selectedError
+
+    const selectedSubjectIds = selectedSubjects.map(
+        subject => subject.subject_id
+    )
+
+    if (selectedSubjectIds.length > 0) {
+
+        const { data: validSelectedSubjects, error: validError } =
+            await supabase
+                .from('subjects')
+                .select('id')
+                .in('id', selectedSubjectIds)
+                .eq('subject_group', subjectGroup)
+
+        if (validError) throw validError
+
+        validSelectedSubjects.forEach(subject => {
+            allowedRegularSubjectIds.add(Number(subject.id))
+        })
+    }
+
+} else if (grade >= 12 && grade <= 13) {
+
+    // Get the student's three registered A/L subjects
+    const { data, error } = await supabase
+        .from('al_student_subjects')
+        .select('subject_no')
+        .eq('student_id', studentId)
+
+    if (error) throw error
+
+    data.forEach(subject => {
+        allowedALSubjectNos.add(String(subject.subject_no).trim())
+    })
+
+} else {
+    return res.status(400).json({
+        success: false,
+        message: 'Unsupported student grade.'
+    })
+}
+
+
         // Validate all entries before saving anything
         const seenSubjects = new Set()
         const entriesToSave = []
@@ -567,6 +927,27 @@ router.post('/:classId/students/:studentId/marks', verifySession, async (req, re
                     message: 'Invalid A/L subject number.'
                 })
             }
+
+            // Reject subjects not registered for this student
+if (
+    hasRegularSubject &&
+    !allowedRegularSubjectIds.has(identifier)
+) {
+    return res.status(400).json({
+        success: false,
+        message: 'This regular subject is not registered for the student.'
+    })
+}
+
+if (
+    hasALSubject &&
+    !allowedALSubjectNos.has(identifier)
+) {
+    return res.status(400).json({
+        success: false,
+        message: 'This A/L subject is not registered for the student.'
+    })
+}
 
             // Explicit clear action
             if (entry.clear === true) {
