@@ -14,6 +14,7 @@ import authRoutes from './routes/authRoutes.js';
 import classRoutes from './routes/classRoutes.js'
 import subjectRoutes from './routes/subjectRoutes.js';
 import termTestRoutes from './routes/termTestRoutes.js'
+import subjectSettingsRoutes from './routes/subjectSettings.js'
 
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes)
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/term-tests', termTestRoutes)
+app.use('/api/subject-settings', subjectSettingsRoutes)
 
 const PORT = process.env.PORT || 5000;
 

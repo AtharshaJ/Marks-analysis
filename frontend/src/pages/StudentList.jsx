@@ -12,6 +12,15 @@ function StudentList() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [search, setSearch] = useState('')
+    const [subjectSettings, setSubjectSettings] = useState([])
+
+const [showSubjectSettings, setShowSubjectSettings] = useState(false)    
+const [classSubjects, setClassSubjects] = useState([])
+const [isClassTeacher, setIsClassTeacher] = useState(false)
+const [requiresManualSelection, setRequiresManualSelection] = useState(false)
+const [settingsLoading, setSettingsLoading] = useState(true)
+const [settingsError, setSettingsError] = useState('')
+const [updatingSubjectId, setUpdatingSubjectId] = useState(null)
 
     const API_BASE_URL =
         import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -38,12 +47,49 @@ function StudentList() {
                 setStudents(result.students || [])
                 setSelectedClass(result.class)
 
+                // Fetch subject inclusion settings
+const settingsResponse = await fetch(
+    `${API_BASE_URL}/api/subject-settings/${classId}`,
+    { credentials: 'include' }
+)
+
+const settingsResult = await settingsResponse.json()
+
+if (!settingsResponse.ok) {
+    throw new Error(
+        settingsResult.message || 'Unable to retrieve subject settings.'
+    )
+}
+
+setSubjectSettings(settingsResult.settings || [])
+setIsClassTeacher(settingsResult.isClassTeacher || false)
+setRequiresManualSelection(
+    settingsResult.requiresManualSelection
+)
+
+// Fetch subjects registered in this class
+const subjectsResponse = await fetch(
+    `${API_BASE_URL}/api/term-tests/${classId}/subjects`,
+    { credentials: 'include' }
+)
+
+const subjectsResult = await subjectsResponse.json()
+
+if (!subjectsResponse.ok) {
+    throw new Error(
+        subjectsResult.message || 'Unable to retrieve class subjects.'
+    )
+}
+
+setClassSubjects(subjectsResult.subjects || [])
+
             } catch (error) {
                 console.error('Student list error:', error)
                 setError(error.message)
             } finally {
-                setLoading(false)
-            }
+    setLoading(false)
+    setSettingsLoading(false)
+}
         }
 
         fetchStudents()
@@ -62,6 +108,53 @@ function StudentList() {
                 .includes(searchText)
         )
     })
+
+    const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
+    if (!isClassTeacher) return
+
+    setUpdatingSubjectId(subject.subject_id)
+    setSettingsError('')
+
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/api/subject-settings/${classId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    subjectId: subject.subject_id,
+                    includeInTotal
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(
+                result.message || 'Unable to update subject setting.'
+            )
+        }
+
+        setSubjectSettings(previousSettings =>
+            previousSettings.map(setting =>
+                Number(setting.subject_id) === Number(subject.subject_id)
+                    ? {
+                        ...setting,
+                        include_in_total: result.setting.include_in_total
+                    }
+                    : setting
+            )
+        )
+    } catch (error) {
+        setSettingsError(error.message)
+    } finally {
+        setUpdatingSubjectId(null)
+    }
+}
 
     return (
         <div className="student-list-page">
@@ -130,6 +223,83 @@ function StudentList() {
     </button>
 </div>
 
+{/* Subject Inclusion Settings Dropdown */}
+{requiresManualSelection && !loading && !error && (
+    <div className="student-inclusion-settings">
+
+        <button
+            type="button"
+            className="student-inclusion-toggle"
+            onClick={() =>
+                setShowSubjectSettings(previous => !previous)
+            }
+        >
+            <span>
+                <strong>Subject Inclusion Settings</strong>
+                <small>
+                    Manage subjects included in totals and averages
+                </small>
+            </span>
+
+            <span className="student-inclusion-arrow">
+                {showSubjectSettings ? '▲' : '▼'}
+            </span>
+        </button>
+
+        {showSubjectSettings && (
+            <div className="student-inclusion-panel">
+
+                {settingsLoading ? (
+                    <p>Loading subject settings...</p>
+                ) : settingsError ? (
+                    <p className="student-inclusion-error">
+                        {settingsError}
+                    </p>
+                ) : (
+                    <>
+                        <div className="student-inclusion-list">
+                            {classSubjects.map(subject => {
+                                const setting = subjectSettings.find(item =>
+                                    Number(item.subject_id) === Number(subject.subject_id)
+                                )
+
+                                return (
+                                    <label
+                                        key={subject.subject_id}
+                                        className="student-inclusion-item"
+                                    >
+                                        <span>{subject.subject_name}</span>
+
+                                        <input
+                                            type="checkbox"
+                                            checked={setting?.include_in_total ?? true}
+                                            disabled={
+                                                !isClassTeacher ||
+                                                updatingSubjectId === subject.subject_id
+                                            }
+                                            onChange={event =>
+                                                handleToggleSubjectInclusion(
+                                                    subject,
+                                                    event.target.checked
+                                                )
+                                            }
+                                        />
+                                    </label>
+                                )
+                            })}
+                        </div>
+
+                        {!isClassTeacher && (
+                            <p className="student-inclusion-note">
+                                Only the assigned Class Teacher can change these settings.
+                            </p>
+                        )}
+                    </>
+                )}
+            </div>
+        )}
+    </div>
+)}
                         {loading ? (
                             <div className="student-list-message">
                                 Loading student records...

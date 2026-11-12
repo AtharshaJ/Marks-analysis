@@ -19,6 +19,13 @@ function SubjectMarks({ user }) {
     const [selectedSubject, setSelectedSubject] = useState('')
 
     const [classSubjects, setClassSubjects] = useState([])
+    // Subject inclusion settings
+const [subjectSettings, setSubjectSettings] = useState([])
+const [isClassTeacher, setIsClassTeacher] = useState(false)
+const [requiresManualSelection, setRequiresManualSelection] = useState(true)
+const [settingsLoading, setSettingsLoading] = useState(false)
+const [settingsError, setSettingsError] = useState('')
+const [updatingSubjectId, setUpdatingSubjectId] = useState(null)
 
     const [subjectMarks, setSubjectMarks] = useState({})
 const [marksLoading, setMarksLoading] = useState(false)
@@ -88,9 +95,35 @@ if (!subjectsResponse.ok) {
 
 setClassSubjects(subjectsResult.subjects || [])
 
+// Load subject inclusion settings
+setSettingsLoading(true)
+
+const settingsResponse = await fetch(
+    `${API_BASE_URL}/api/subject-settings/${classId}`,
+    { credentials: 'include' }
+)
+
+const settingsResult = await settingsResponse.json()
+
+if (!settingsResponse.ok) {
+    throw new Error(
+        settingsResult.message || 'Unable to load subject settings.'
+    )
+}
+
+setSubjectSettings(settingsResult.settings || [])
+setIsClassTeacher(settingsResult.isClassTeacher || false)
+setRequiresManualSelection(
+    settingsResult.requiresManualSelection
+)
+
+setSettingsLoading(false)
+
             } catch (error) {
                 console.error('Subject marks page error:', error)
                 setError(error.message)
+                setSettingsError('Unable to load subject inclusion settings.')
+setSettingsLoading(false)
             } finally {
                 setLoading(false)
             }
@@ -251,6 +284,53 @@ const handleSaveSubjectMarks = async () => {
     }
 }
 
+const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
+    if (!isClassTeacher) return
+
+    setUpdatingSubjectId(subject.subject_id)
+    setSettingsError('')
+
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/api/subject-settings/${classId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    subjectId: subject.subject_id,
+                    includeInTotal
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(
+                result.message || 'Unable to update subject setting.'
+            )
+        }
+
+        setSubjectSettings(previousSettings =>
+            previousSettings.map(setting =>
+                Number(setting.subject_id) === Number(subject.subject_id)
+                    ? {
+                        ...setting,
+                        include_in_total: result.setting.include_in_total
+                    }
+                    : setting
+            )
+        )
+    } catch (error) {
+        setSettingsError(error.message)
+    } finally {
+        setUpdatingSubjectId(null)
+    }
+}
+
     return (
         <div className="subject-marks-page">
 
@@ -391,9 +471,9 @@ const handleSaveSubjectMarks = async () => {
 
 
                          
+<div className="subject-marks-table-section">
 
-                            <div className="subject-marks-table-section">
-
+                            
     <h3>Student Marks</h3>
 
     {!selectedYearId || !selectedTermId || !selectedSubject ? (

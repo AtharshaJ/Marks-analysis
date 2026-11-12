@@ -383,3 +383,114 @@
 .student-list-subjects-btn:hover {
     background: #173e70;
 }
+
+/* Subject Inclusion Settings Dropdown */
+.student-inclusion-settings {
+    margin: 22px 0;
+    border: 1px solid #dce7f2;
+    border-radius: 12px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.student-inclusion-toggle {
+    width: 100%;
+    padding: 17px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    background: #f5f9fd;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease;
+}
+
+.student-inclusion-toggle:hover {
+    background: #edf5fa;
+}
+
+.student-inclusion-toggle span:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.student-inclusion-toggle strong {
+    color: #173e70;
+    font-size: 15px;
+}
+
+.student-inclusion-toggle small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.student-inclusion-arrow {
+    color: #168b91;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.student-inclusion-panel {
+    padding: 20px;
+    border-top: 1px solid #e1eaf2;
+}
+
+.student-inclusion-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.student-inclusion-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border: 1px solid #e1eaf2;
+    border-radius: 8px;
+    color: #334155;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.student-inclusion-item:hover {
+    border-color: #168b91;
+}
+
+.student-inclusion-item input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: #168b91;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.student-inclusion-item input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+}
+
+.student-inclusion-note {
+    margin: 15px 0 0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.student-inclusion-error {
+    color: #dc2626;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .student-inclusion-list {
+        grid-template-columns: 1fr;
+    }
+
+    .student-inclusion-panel {
+        padding: 14px;
+    }
+}

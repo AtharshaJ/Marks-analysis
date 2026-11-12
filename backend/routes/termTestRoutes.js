@@ -404,7 +404,7 @@ router.get('/:classId/subjects', verifySession, async (req, res) => {
         // Get class information
         const { data: selectedClass, error: classError } = await supabase
             .from('class_divisions')
-            .select('id, class_name, grade, division')
+            .select('id, class_name, grade, division, class_teacher_id')
             .eq('id', classId)
             .maybeSingle()
 
