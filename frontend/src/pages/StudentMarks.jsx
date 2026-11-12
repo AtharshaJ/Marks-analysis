@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './StudentMarks.css'
+import CustomDropdown from '../components/CustomDropdown'
+
 
 function StudentMarks({ user }) {
     const { classId, studentId } = useParams()
@@ -339,51 +341,32 @@ useEffect(() => {
                                 <div>
                                     <label>Academic Year</label>
 
-                                    <select
-                                        value={selectedYearId}
-                                        onChange={e => {
-                                            setSelectedYearId(e.target.value)
-                                            setSelectedTermId('')
-                                        }}
-                                    >
-                                        <option value="">
-                                            Select Academic Year
-                                        </option>
-
-                                        {academicYears.map(year => (
-                                            <option
-                                                key={year.id}
-                                                value={year.id}
-                                            >
-                                                {year.year}
-                                            </option>
-                                        ))}
-                                    </select>
+                                   <CustomDropdown
+    value={selectedYearId}
+    placeholder="Select Academic Year"
+    options={academicYears.map(year => ({
+        value: String(year.id),
+        label: String(year.year)
+    }))}
+    onChange={value => {
+        setSelectedYearId(value)
+        setSelectedTermId('')
+    }}
+/>
                                 </div>
 
                                 <div>
                                     <label>Term</label>
-
-                                    <select
-                                        value={selectedTermId}
-                                        onChange={e =>
-                                            setSelectedTermId(e.target.value)
-                                        }
-                                        disabled={!selectedYearId}
-                                    >
-                                        <option value="">
-                                            Select Term
-                                        </option>
-
-                                        {availableTerms.map(term => (
-                                            <option
-                                                key={term.id}
-                                                value={term.id}
-                                            >
-                                                {term.term_name}
-                                            </option>
-                                        ))}
-                                    </select>
+<CustomDropdown
+    value={selectedTermId}
+    placeholder="Select Term"
+    disabled={!selectedYearId}
+    options={availableTerms.map(term => ({
+        value: String(term.id),
+        label: term.term_name
+    }))}
+    onChange={value => setSelectedTermId(value)}
+/>
                                 </div>
 
                             </div>
