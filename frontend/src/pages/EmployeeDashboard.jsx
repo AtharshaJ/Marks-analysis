@@ -13,7 +13,8 @@ function EmployeeDashboard({ user }) {
     const [classes, setClasses] = useState([])
     const [classesLoading, setClassesLoading] = useState(false)
     const [classesError, setClassesError] = useState('')
-    
+    const [selectedClassId, setSelectedClassId] = useState('')
+    const [classSearch, setClassSearch] = useState('')
 
     const navigationItems = [
         { name: 'Grade 5 Scholarship', icon: '🎓' },
@@ -60,11 +61,21 @@ function EmployeeDashboard({ user }) {
         setActiveSection(section)
 
         if (section === 'Term Tests') {
+            setSelectedClassId('')
+            setClassSearch('')
             fetchClasses()
         }
     }
 
+    // Search for students in the selected class
+    const handleClassSearch = () => {
+        if (!selectedClassId) {
+            alert('Please select a class first.')
+            return
+        }
 
+        navigate(`/employee/term-tests/${selectedClassId}/students`)
+    }
 
     // Handle logout
     const handleLogout = async () => {
@@ -94,6 +105,13 @@ function EmployeeDashboard({ user }) {
             setLoggingOut(false)
         }
     }
+
+    // Filter classes according to the search text
+    const filteredClasses = classes.filter(classItem =>
+        classItem.class_name
+            ?.toLowerCase()
+            .includes(classSearch.toLowerCase())
+    )
 
     return (
         <div className="teacher-dashboard">
@@ -243,30 +261,30 @@ function EmployeeDashboard({ user }) {
                         </div>
                     </section>
 
-{/* Class Teacher Student Management */}
-{user.class_assignment && (
-    <section className="teacher-profile-card student-management-card">
+                    {/* Class Teacher Student Management */}
+                    {user.class_assignment && (
+                        <section className="teacher-profile-card student-management-card">
 
-        <div className="student-management-heading">
-            <div>
-                <h3>Student Management</h3>
-                <p>
-                    Manage students in your assigned class:
-                    {' '}
-                    <strong>{user.class_assignment.class_name}</strong>
-                </p>
-            </div>
+                            <div className="student-management-heading">
+                                <div>
+                                    <h3>Student Management</h3>
+                                    <p>
+                                        Manage students in your assigned class:
+                                        {' '}
+                                        <strong>{user.class_assignment.class_name}</strong>
+                                    </p>
+                                </div>
 
-            <button
-                className="teacher-refresh-btn"
-                onClick={() => navigate('/employee/add-student')}
-            >
-                + Add Student
-            </button>
-        </div>
+                                <button
+                                    className="teacher-refresh-btn"
+                                    onClick={() => navigate('/employee/add-student')}
+                                >
+                                    + Add Student
+                                </button>
+                            </div>
 
-    </section>
-)}
+                        </section>
+                    )}
 
                     {/* Selected Examination */}
                     <section className="teacher-section-content">
@@ -324,38 +342,70 @@ function EmployeeDashboard({ user }) {
                                     </div>
 
                                 ) : (
-                                    <>
-                                        <div className="term-test-intro">
-                                            <h3>Select a Class</h3>
-                                            <p>
-                                                Choose a class division to access its term test records.
-                                            </p>
-                                        </div>
+                                    <div className="term-test-intro">
+                                        <h3>Select a Class</h3>
 
-                                        <div className="term-test-class-grid">
-                                            {classes.map(classItem => (
-                                                <button
-                                                    key={classItem.id}
-                                                    className="term-test-class-card"
-                                                    onClick={() => {
-                                                        console.log('Selected class:', classItem)
-                                                    }}
-                                                >
-                                                    <span className="term-test-class-icon">
-                                                        🏫
-                                                    </span>
+                                        <p>
+                                            Search for and select a class division
+                                            to view its students and term test records.
+                                        </p>
 
-                                                    <span className="term-test-class-name">
-                                                        {classItem.class_name}
-                                                    </span>
+                                        <div style={{
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap',
+    marginTop: '20px',
+    alignItems: 'center'
+}}>
+    <input
+        type="text"
+        list="term-test-classes"
+        placeholder="Type or select a class..."
+        value={classSearch}
+        onChange={(e) => {
+            const value = e.target.value
+            setClassSearch(value)
 
-                                                    <span className="term-test-class-arrow">
-                                                        →
-                                                    </span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </>
+            const matchedClass = classes.find(
+                classItem =>
+                    classItem.class_name.toLowerCase() === value.toLowerCase()
+            )
+
+            setSelectedClassId(matchedClass ? String(matchedClass.id) : '')
+        }}
+        style={{
+            padding: '12px',
+            minWidth: '220px',
+            flex: '1',
+            border: '1px solid #ccc',
+            borderRadius: '8px'
+        }}
+    />
+
+    <datalist id="term-test-classes">
+        {filteredClasses.map(classItem => (
+            <option
+                key={classItem.id}
+                value={classItem.class_name}
+            />
+        ))}
+    </datalist>
+
+    <button
+        className="teacher-refresh-btn"
+        onClick={handleClassSearch}
+        disabled={!selectedClassId}
+    >
+        Search
+    </button>
+</div>
+
+{filteredClasses.length === 0 && classSearch && (
+    <p style={{ marginTop: '12px' }}>
+        No matching classes found.
+    </p>
+)}
+                                    </div>
                                 )}
 
                             </div>

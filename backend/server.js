@@ -13,6 +13,7 @@ import employeeRoutes from './routes/employeeRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import classRoutes from './routes/classRoutes.js'
 import subjectRoutes from './routes/subjectRoutes.js';
+import termTestRoutes from './routes/termTestRoutes.js'
 
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -27,6 +28,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes)
 app.use('/api/subjects', subjectRoutes);
+app.use('/api/term-tests', termTestRoutes)
 
 const PORT = process.env.PORT || 5000;
 

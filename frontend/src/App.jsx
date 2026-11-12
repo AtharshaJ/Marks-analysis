@@ -13,6 +13,8 @@ import AdminDashboard from './pages/AdminDashboard'
 import EmployeeDashboard from './pages/EmployeeDashboard'
 import AddStudent from './pages/AddStudent'
 import SubjectManagement from './pages/SubjectManagement'
+import StudentList from './pages/StudentList'
+import StudentMarks from './pages/StudentMarks'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -125,6 +127,24 @@ function App() {
         </ProtectedRoute>
     }
 />
+
+<Route
+  path="/employee/term-tests/:classId/students"
+  element={
+    <ProtectedRoute allowedRole="employee">
+      {user => <StudentList user={user} />}
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/employee/term-tests/:classId/students/:studentId"
+  element={
+    <ProtectedRoute allowedRole="employee">
+      {user => <StudentMarks user={user} />}
+    </ProtectedRoute>
+  }
+/>
+
 
 {/* Add Student - Class Teacher only */}
 <Route
