@@ -589,14 +589,45 @@ router.post('/students', verifySession, async (req, res) => {
 
         if (subjectGroup) {
             const { data, error: subjectsError } = await supabase
-                .from('subjects')
-                .select('id, subject_name, basket_name')
-                .eq('subject_group', subjectGroup)
-                .not('basket_name', 'is', null)
+    .from('subjects')
+    .select('id, subject_name, basket_id')
+    .eq('subject_group', subjectGroup)
+    .not('basket_id', 'is', null)
 
-            if (subjectsError) throw subjectsError
+if (subjectsError) throw subjectsError
 
-            availableSubjects = data || []
+availableSubjects = data || []
+
+// Fetch basket names using basket IDs
+const basketIds = [
+    ...new Set(
+        availableSubjects.map(subject => subject.basket_id)
+    )
+]
+
+let basketMap = {}
+
+if (basketIds.length > 0) {
+    const { data: basketRecords, error: basketError } = await supabase
+        .from('subject_baskets')
+        .select('id, basket_name')
+        .in('id', basketIds)
+
+    if (basketError) throw basketError
+
+    basketMap = Object.fromEntries(
+        basketRecords.map(basket => [
+            basket.id,
+            basket.basket_name
+        ])
+    )
+}
+
+// Attach basket names to the available subjects
+availableSubjects = availableSubjects.map(subject => ({
+    ...subject,
+    basket_name: basketMap[subject.basket_id]
+}))
         }
 
         const basketNames = [
@@ -712,6 +743,7 @@ router.post('/students', verifySession, async (req, res) => {
 
 // Get basket subjects according to the Class Teacher's assigned grade
 
+
 router.get('/student-subject-options', verifySession, async (req, res) => {
     try {
         if (req.user?.type !== 'employee') {
@@ -737,13 +769,13 @@ router.get('/student-subject-options', verifySession, async (req, res) => {
             })
         }
 
-        const grade = assignedClass.grade
+        const grade = Number(assignedClass.grade)
 
-        // A/L subject and stream options for Grades 12 and 13
+        // Grades 12–13: A/L subject and stream options
         if (grade === 12 || grade === 13) {
             const [
                 { data: streams, error: streamError },
-                { data: subjects, error: subjectError }
+                { data: alSubjects, error: subjectError }
             ] = await Promise.all([
                 supabase
                     .from('al_streams')
@@ -765,12 +797,12 @@ router.get('/student-subject-options', verifySession, async (req, res) => {
                 class_name: assignedClass.class_name,
                 registration_type: 'AL',
                 streams: streams || [],
-                alSubjects: subjects || [],
+                alSubjects: alSubjects || [],
                 baskets: []
             })
         }
 
-        // Existing basket subject options for other grades
+        // Determine the subject group for Grades 6–11
         let subjectGroup = null
 
         if (grade >= 6 && grade <= 9) {
@@ -790,30 +822,58 @@ router.get('/student-subject-options', verifySession, async (req, res) => {
             })
         }
 
+        // Fetch subjects using their basket IDs
         const { data: subjects, error: subjectsError } = await supabase
             .from('subjects')
-            .select('id, subject_name, subject_group, basket_name')
+            .select('id, subject_name, subject_group, basket_id')
             .eq('subject_group', subjectGroup)
-            .not('basket_name', 'is', null)
-            .order('basket_name', { ascending: true })
+            .not('basket_id', 'is', null)
             .order('subject_name', { ascending: true })
 
         if (subjectsError) throw subjectsError
 
-        const basketMap = {}
+        // Fetch the corresponding basket names
+        const basketIds = [
+            ...new Set(subjects.map(subject => subject.basket_id))
+        ]
+
+        let basketMap = {}
+
+        if (basketIds.length > 0) {
+            const { data: basketRecords, error: basketError } = await supabase
+                .from('subject_baskets')
+                .select('id, basket_name')
+                .in('id', basketIds)
+
+            if (basketError) throw basketError
+
+            basketMap = Object.fromEntries(
+                basketRecords.map(basket => [
+                    basket.id,
+                    basket.basket_name
+                ])
+            )
+        }
+
+        // Group subjects by basket name
+        const groupedBaskets = {}
 
         subjects.forEach(subject => {
-            if (!basketMap[subject.basket_name]) {
-                basketMap[subject.basket_name] = []
+            const basketName = basketMap[subject.basket_id]
+
+            if (!basketName) return
+
+            if (!groupedBaskets[basketName]) {
+                groupedBaskets[basketName] = []
             }
 
-            basketMap[subject.basket_name].push({
+            groupedBaskets[basketName].push({
                 id: subject.id,
                 subject_name: subject.subject_name
             })
         })
 
-        const baskets = Object.entries(basketMap).map(
+        const groupedBasketOptions = Object.entries(groupedBaskets).map(
             ([basket_name, options]) => ({
                 basket_name,
                 subjects: options
@@ -826,7 +886,7 @@ router.get('/student-subject-options', verifySession, async (req, res) => {
             class_name: assignedClass.class_name,
             registration_type: 'STANDARD',
             subject_group: subjectGroup,
-            baskets
+            baskets: groupedBasketOptions
         })
 
     } catch (error) {

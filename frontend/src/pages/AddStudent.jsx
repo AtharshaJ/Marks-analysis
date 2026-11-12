@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AddStudent.css'
+import CustomDropdown from '../components/CustomDropdown'
 
 // Searchable A/L subject selector
 function SearchableSubjectSelect({
@@ -430,31 +431,24 @@ function AddStudent({ user }) {
                                             {basket.basket_name}
                                         </label>
 
-                                        <select
-                                            value={
-                                                selectedSubjects[basket.basket_name] || ''
-                                            }
-                                            onChange={e =>
-                                                handleSubjectChange(
-                                                    basket.basket_name,
-                                                    e.target.value
-                                                )
-                                            }
-                                            required
-                                        >
-                                            <option value="">
-                                                Select a subject
-                                            </option>
+                                        
+<CustomDropdown
+    value={selectedSubjects[basket.basket_name] || ''}
+    options={basket.subjects.map(subject => ({
+        value: String(subject.id),
+        label: subject.subject_name
+    }))}
+    onChange={value =>
+        handleSubjectChange(
+            basket.basket_name,
+            value
+        )
+    }
+    placeholder="Select a subject"
+    searchable={true}
+    searchPlaceholder="Search subjects..."
+/>
 
-                                            {basket.subjects.map(subject => (
-                                                <option
-                                                    key={subject.id}
-                                                    value={subject.id}
-                                                >
-                                                    {subject.subject_name}
-                                                </option>
-                                            ))}
-                                        </select>
                                     </div>
                                 ))}
 
