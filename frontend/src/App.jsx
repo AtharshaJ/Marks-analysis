@@ -16,6 +16,7 @@ import SubjectManagement from './pages/SubjectManagement'
 import StudentList from './pages/StudentList'
 import StudentMarks from './pages/StudentMarks'
 import SubjectMarks from './pages/SubjectMarks'
+import SystemManagement from './pages/SystemManagement'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -116,6 +117,16 @@ function App() {
   element={
     <ProtectedRoute allowedRole="admin">
       <SubjectManagement />
+    </ProtectedRoute>
+  }
+/>
+
+{/* System Management - Administrator only */}
+<Route
+  path="/admin/system-management"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <SystemManagement />
     </ProtectedRoute>
   }
 />

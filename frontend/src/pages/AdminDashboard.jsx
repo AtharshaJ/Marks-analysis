@@ -43,11 +43,13 @@ const [classActionMessage, setClassActionMessage] = useState('')
 const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
     const navigate = useNavigate()
 
-    const menuItems = [
-        { id: 'teachers', label: 'Teacher Management', icon: '👩‍🏫' },
-        { id: 'classes', label: 'Class Divisions', icon: '🏫' },
-        { id: 'subject-management', label: 'Subject Management', icon: '📚' },
-        { id: 'settings', label: 'Account Settings', icon: '⚙️' }
+    
+     const menuItems = [
+        { id: 'teachers', label: 'Teacher Management', icon: '👩‍🏫', path: '/admin' },
+        { id: 'classes', label: 'Class Divisions', icon: '🏫', path: '/admin' },
+        { id: 'subject-management', label: 'Subject Management', icon: '📚', path: '/admin/subject-management' },
+        { id: 'settings', label: 'Account Settings', icon: '⚙️', path: '/admin' },
+        { id: 'system-management', label: 'Academic Year Management', icon: '📅', path: '/admin/system-management' }
     ]
 
     const filteredEmployees = employees.filter(employee => {
@@ -430,9 +432,11 @@ const handleDeleteClass = async () => {
                             className={`admin-nav-item ${
                                 activeSection === item.id ? 'active' : ''
                             }`}
-                            onClick={() => {
+                           onClick={() => {
     if (item.id === 'subject-management') {
         navigate('/admin/subject-management')
+    } else if (item.id === 'system-management') {
+        navigate('/admin/system-management')
     } else {
         setActiveSection(item.id)
     }
