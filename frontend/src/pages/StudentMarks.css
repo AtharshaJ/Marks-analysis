@@ -449,3 +449,61 @@
     font-size: 13px;
     font-weight: 600;
 }
+
+/* ================================
+   STUDENT PERFORMANCE SUMMARY
+================================ */
+
+.student-performance-summary {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 14px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(15, 42, 75, 0.07);
+}
+
+.student-performance-summary h2 {
+    color: #163b65;
+    font-size: 21px;
+    margin-bottom: 20px;
+}
+
+.student-performance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.student-performance-card {
+    background: #f0f6fc;
+    border: 1px solid #dce9f5;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.student-performance-card span {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.student-performance-card strong {
+    color: #163b65;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .student-performance-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 450px) {
+    .student-performance-grid {
+        grid-template-columns: 1fr;
+    }
+}

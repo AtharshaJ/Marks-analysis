@@ -24,6 +24,10 @@ function StudentMarks({ user }) {
     const [marksLoading, setMarksLoading] = useState(false)
     const [marksError, setMarksError] = useState('')
 
+    const [performanceSummary, setPerformanceSummary] = useState(null)
+    const [summaryLoading, setSummaryLoading] = useState(false)
+    const [summaryError, setSummaryError] = useState('')
+
     const [saving, setSaving] = useState(false)
     const [saveMessage, setSaveMessage] = useState('')
 
@@ -174,6 +178,46 @@ useEffect(() => {
     fetchMarks()
 }, [classId, studentId, selectedTermId])
 
+// Load performance summary whenever the selected term changes
+useEffect(() => {
+    const fetchPerformanceSummary = async () => {
+        if (!selectedTermId) {
+            setPerformanceSummary(null)
+            setSummaryError('')
+            return
+        }
+
+        try {
+            setSummaryLoading(true)
+            setSummaryError('')
+
+            const response = await fetch(
+                `${API_BASE_URL}/api/student-performance/${classId}/students/${studentId}/summary?termId=${selectedTermId}`,
+                { credentials: 'include' }
+            )
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || 'Unable to load performance summary.'
+                )
+            }
+
+            setPerformanceSummary(result.summary)
+
+        } catch (error) {
+            console.error('Error loading performance summary:', error)
+            setSummaryError(error.message)
+            setPerformanceSummary(null)
+        } finally {
+            setSummaryLoading(false)
+        }
+    }
+
+    fetchPerformanceSummary()
+}, [classId, studentId, selectedTermId])
+
     const selectedYear = academicYears.find(
         year => String(year.id) === selectedYearId
     )
@@ -230,6 +274,24 @@ useEffect(() => {
         }
 
         setSaveMessage('Marks saved successfully!')
+setSummaryLoading(true)
+setSummaryError('')
+        // Refresh performance summary after saving marks
+const summaryResponse = await fetch(
+    `${API_BASE_URL}/api/student-performance/${classId}/students/${studentId}/summary?termId=${selectedTermId}`,
+    { credentials: 'include' }
+)
+setSummaryLoading(false)
+
+const summaryResult = await summaryResponse.json()
+
+if (summaryResponse.ok) {
+    setPerformanceSummary(summaryResult.summary)
+} else {
+    setSummaryError(
+        summaryResult.message || 'Unable to refresh performance summary.'
+    )
+}
 
         // Reload the saved marks from the database
         const marksResponse = await fetch(
@@ -331,6 +393,52 @@ useEffect(() => {
                             </div>
 
                         </section>
+
+                        <section className="student-performance-summary">
+
+    <h2>Performance Summary</h2>
+
+    {!selectedTermId ? (
+        <p>Please select an academic term to view the summary.</p>
+    ) : summaryLoading ? (
+        <p>Calculating performance summary...</p>
+    ) : summaryError ? (
+        <p className="student-marks-error">{summaryError}</p>
+    ) : performanceSummary?.status === 'pending' ? (
+        <p>
+            Pending — Marks entered for{' '}
+            {performanceSummary.completedSubjectCount} of{' '}
+            {performanceSummary.requiredSubjectCount} required subjects.
+        </p>
+    ) : performanceSummary?.status === 'complete' ? (
+        <div className="student-performance-grid">
+
+            <div className="student-performance-card">
+                <span>Total</span>
+                <strong>{performanceSummary.total}</strong>
+            </div>
+
+            <div className="student-performance-card">
+                <span>Average</span>
+                <strong>{performanceSummary.average}</strong>
+            </div>
+
+            <div className="student-performance-card">
+                <span>Class Rank</span>
+                <strong>{performanceSummary.classRank}</strong>
+            </div>
+
+            <div className="student-performance-card">
+                <span>Division Rank</span>
+                <strong>{performanceSummary.divisionRank}</strong>
+            </div>
+
+        </div>
+    ) : (
+        <p>Performance summary is not available.</p>
+    )}
+
+</section>
 
                         <section className="student-marks-entry">
 
