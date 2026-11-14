@@ -1,7 +1,8 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './EmployeeDashboard.css'
+import CustomDropdown from '../components/CustomDropdown'
 
 function EmployeeDashboard({ user }) {
     const navigate = useNavigate()
@@ -9,12 +10,11 @@ function EmployeeDashboard({ user }) {
     const [activeSection, setActiveSection] = useState('Grade 5 Scholarship')
     const [loggingOut, setLoggingOut] = useState(false)
 
-    // Term Test classes
+    // Class information
     const [classes, setClasses] = useState([])
     const [classesLoading, setClassesLoading] = useState(false)
     const [classesError, setClassesError] = useState('')
     const [selectedClassId, setSelectedClassId] = useState('')
-    const [classSearch, setClassSearch] = useState('')
 
     const navigationItems = [
         { name: 'Grade 5 Scholarship', icon: '🎓' },
@@ -23,7 +23,7 @@ function EmployeeDashboard({ user }) {
         { name: 'Term Tests', icon: '📝' }
     ]
 
-    // Fetch class divisions for Term Tests
+    // Fetch class divisions
     const fetchClasses = async () => {
         try {
             setClassesLoading(true)
@@ -56,18 +56,26 @@ function EmployeeDashboard({ user }) {
         }
     }
 
+    // Automatically load classes when dashboard opens
+    useEffect(() => {
+        fetchClasses()
+    }, [])
+
     // Handle navigation between examination sections
     const handleSectionChange = (section) => {
         setActiveSection(section)
 
-        if (section === 'Term Tests') {
-            setSelectedClassId('')
-            setClassSearch('')
+        setSelectedClassId('')
+
+        if (
+            section === 'Term Tests' ||
+            section === 'Grade 5 Scholarship'
+        ) {
             fetchClasses()
         }
     }
 
-    // Search for students in the selected class
+    // Search for students in Term Tests
     const handleClassSearch = () => {
         if (!selectedClassId) {
             alert('Please select a class first.')
@@ -75,6 +83,16 @@ function EmployeeDashboard({ user }) {
         }
 
         navigate(`/employee/term-tests/${selectedClassId}/students`)
+    }
+
+    // Search for Grade 5 Scholarship students
+    const handleScholarshipClassSearch = () => {
+        if (!selectedClassId) {
+            alert('Please select a Grade 5 class first.')
+            return
+        }
+
+        navigate(`/employee/scholarship/${selectedClassId}/students`)
     }
 
     // Handle logout
@@ -106,11 +124,9 @@ function EmployeeDashboard({ user }) {
         }
     }
 
-    // Filter classes according to the search text
-    const filteredClasses = classes.filter(classItem =>
-        classItem.class_name
-            ?.toLowerCase()
-            .includes(classSearch.toLowerCase())
+    // Filter Grade 5 classes
+    const scholarshipClasses = classes.filter(
+        classItem => Number(classItem.grade) === 5
     )
 
     return (
@@ -271,7 +287,9 @@ function EmployeeDashboard({ user }) {
                                     <p>
                                         Manage students in your assigned class:
                                         {' '}
-                                        <strong>{user.class_assignment.class_name}</strong>
+                                        <strong>
+                                            {user.class_assignment.class_name}
+                                        </strong>
                                     </p>
                                 </div>
 
@@ -295,7 +313,10 @@ function EmployeeDashboard({ user }) {
                                 <h2>{activeSection}</h2>
                             </div>
 
-                            {activeSection === 'Term Tests' && (
+                            {(
+                                activeSection === 'Term Tests' ||
+                                activeSection === 'Grade 5 Scholarship'
+                            ) && (
                                 <button
                                     className="teacher-refresh-btn"
                                     onClick={fetchClasses}
@@ -306,10 +327,13 @@ function EmployeeDashboard({ user }) {
                             )}
                         </div>
 
+                        {/* Term Tests */}
                         {activeSection === 'Term Tests' ? (
+
                             <div className="term-test-content">
 
                                 {classesLoading ? (
+
                                     <div className="teacher-empty-state">
                                         <div className="teacher-empty-icon">⏳</div>
                                         <h3>Loading Classes...</h3>
@@ -319,6 +343,7 @@ function EmployeeDashboard({ user }) {
                                     </div>
 
                                 ) : classesError ? (
+
                                     <div className="teacher-empty-state">
                                         <div className="teacher-empty-icon">⚠️</div>
                                         <h3>Unable to Load Classes</h3>
@@ -333,6 +358,7 @@ function EmployeeDashboard({ user }) {
                                     </div>
 
                                 ) : classes.length === 0 ? (
+
                                     <div className="teacher-empty-state">
                                         <div className="teacher-empty-icon">🏫</div>
                                         <h3>No Classes Available</h3>
@@ -342,7 +368,9 @@ function EmployeeDashboard({ user }) {
                                     </div>
 
                                 ) : (
+
                                     <div className="term-test-intro">
+
                                         <h3>Select a Class</h3>
 
                                         <p>
@@ -350,67 +378,122 @@ function EmployeeDashboard({ user }) {
                                             to view its students and term test records.
                                         </p>
 
-                                        <div style={{
-    display: 'flex',
-    gap: '12px',
-    flexWrap: 'wrap',
-    marginTop: '20px',
-    alignItems: 'center'
-}}>
-    <input
-        type="text"
-        list="term-test-classes"
-        placeholder="Type or select a class..."
-        value={classSearch}
-        onChange={(e) => {
-            const value = e.target.value
-            setClassSearch(value)
+                                        <div className="teacher-class-selector">
 
-            const matchedClass = classes.find(
-                classItem =>
-                    classItem.class_name.toLowerCase() === value.toLowerCase()
-            )
+                                            <div className="teacher-class-dropdown">
+                                                <CustomDropdown
+                                                    value={selectedClassId}
+                                                    options={classes.map(classItem => ({
+                                                        value: String(classItem.id),
+                                                        label: classItem.class_name
+                                                    }))}
+                                                    onChange={setSelectedClassId}
+                                                    placeholder="Select a class..."
+                                                    searchable={true}
+                                                    searchPlaceholder="Search classes..."
+                                                />
+                                            </div>
 
-            setSelectedClassId(matchedClass ? String(matchedClass.id) : '')
-        }}
-        style={{
-            padding: '12px',
-            minWidth: '220px',
-            flex: '1',
-            border: '1px solid #ccc',
-            borderRadius: '8px'
-        }}
-    />
+                                            <button
+                                                className="teacher-refresh-btn"
+                                                onClick={handleClassSearch}
+                                                disabled={!selectedClassId}
+                                            >
+                                                Search
+                                            </button>
 
-    <datalist id="term-test-classes">
-        {filteredClasses.map(classItem => (
-            <option
-                key={classItem.id}
-                value={classItem.class_name}
-            />
-        ))}
-    </datalist>
+                                        </div>
 
-    <button
-        className="teacher-refresh-btn"
-        onClick={handleClassSearch}
-        disabled={!selectedClassId}
-    >
-        Search
-    </button>
-</div>
+                                    </div>
+                                )}
 
-{filteredClasses.length === 0 && classSearch && (
-    <p style={{ marginTop: '12px' }}>
-        No matching classes found.
-    </p>
-)}
+                            </div>
+
+                        ) : activeSection === 'Grade 5 Scholarship' ? (
+
+                            /* Grade 5 Scholarship */
+                            <div className="term-test-content">
+
+                                {classesLoading ? (
+
+                                    <div className="teacher-empty-state">
+                                        <div className="teacher-empty-icon">⏳</div>
+                                        <h3>Loading Grade 5 Classes...</h3>
+                                        <p>
+                                            Please wait while we retrieve the class divisions.
+                                        </p>
+                                    </div>
+
+                                ) : classesError ? (
+
+                                    <div className="teacher-empty-state">
+                                        <div className="teacher-empty-icon">⚠️</div>
+                                        <h3>Unable to Load Classes</h3>
+                                        <p>{classesError}</p>
+
+                                        <button
+                                            className="teacher-refresh-btn"
+                                            onClick={fetchClasses}
+                                        >
+                                            Try Again
+                                        </button>
+                                    </div>
+
+                                ) : scholarshipClasses.length === 0 ? (
+
+                                    <div className="teacher-empty-state">
+                                        <div className="teacher-empty-icon">🏫</div>
+                                        <h3>No Grade 5 Classes Available</h3>
+                                        <p>
+                                            No Grade 5 class divisions have been created yet.
+                                        </p>
+                                    </div>
+
+                                ) : (
+
+                                    <div className="term-test-intro">
+
+                                        <h3>Select a Grade 5 Class</h3>
+
+                                        <p>
+                                            Select a Grade 5 class division to view students
+                                            and enter their Scholarship Examination marks.
+                                        </p>
+
+                                        <div className="teacher-class-selector">
+
+                                            <div className="teacher-class-dropdown">
+                                                <CustomDropdown
+                                                    value={selectedClassId}
+                                                    options={scholarshipClasses.map(classItem => ({
+                                                        value: String(classItem.id),
+                                                        label: classItem.class_name
+                                                    }))}
+                                                    onChange={setSelectedClassId}
+                                                    placeholder="Select a Grade 5 class..."
+                                                    searchable={true}
+                                                    searchPlaceholder="Search Grade 5 classes..."
+                                                />
+                                            </div>
+
+                                            <button
+                                                className="teacher-refresh-btn"
+                                                onClick={handleScholarshipClassSearch}
+                                                disabled={!selectedClassId}
+                                            >
+                                                Search
+                                            </button>
+
+                                        </div>
+
                                     </div>
                                 )}
 
                             </div>
 
                         ) : (
+
+                            /* Other Examination Sections */
                             <div className="teacher-empty-state">
                                 <div className="teacher-empty-icon">📋</div>
                                 <h3>{activeSection}</h3>
@@ -418,6 +501,7 @@ function EmployeeDashboard({ user }) {
                                     The student records and marks management section will appear here.
                                 </p>
                             </div>
+
                         )}
 
                     </section>

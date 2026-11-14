@@ -19,10 +19,12 @@ router.get('/preview/:group', verifySession, requireAdmin, async (req, res) => {
             })
         }
 
-        const { data, error } = await supabase.rpc(
-            'preview_student_promotion',
-            { p_group: group }
-        )
+       const { data, error } = await supabase.rpc(
+    'preview_student_promotion',
+    {
+        p_group: group
+    }
+)
 
         if (error) throw error
 
@@ -42,7 +44,7 @@ router.get('/preview/:group', verifySession, requireAdmin, async (req, res) => {
 // Execute promotion
 router.post('/execute', verifySession, requireAdmin, async (req, res) => {
     try {
-        const { group } = req.body
+       const { group, examYear } = req.body
 
         if (!validGroups.includes(group)) {
             return res.status(400).json({
@@ -50,6 +52,19 @@ router.post('/execute', verifySession, requireAdmin, async (req, res) => {
                 message: 'Invalid promotion group.'
             })
         }
+
+        const currentYear = new Date().getFullYear()
+
+if (
+    !Number.isInteger(examYear) ||
+    examYear < currentYear - 2 ||
+    examYear > currentYear
+) {
+    return res.status(400).json({
+        success: false,
+        message: 'Invalid examination year.'
+    })
+}
 
         const { data, error } = await supabase.rpc(
             'execute_student_promotion',

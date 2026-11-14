@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AdminDashboard.css'
 import './SystemManagement.css'
+import CustomDropdown from '../components/CustomDropdown'
+
 
 function SystemManagement() {
     const navigate = useNavigate()
@@ -16,11 +18,19 @@ const [error, setError] = useState('')
 
 const [executing, setExecuting] = useState(false)
 const [executionResult, setExecutionResult] = useState(null)
+
+const [olExamYear, setOlExamYear] = useState(new Date().getFullYear())
+const [alExamYear, setAlExamYear] = useState(new Date().getFullYear())
+const [selectedExamYear, setSelectedExamYear] = useState(null)
+
 const handlePreview = async (group) => {
     setLoading(true)
     setError('')
     setPreview(null)
     setSelectedGroup(group)
+
+    const examYear = group === '1-11' ? olExamYear : alExamYear
+setSelectedExamYear(examYear)
 
     try {
         const response = await fetch(
@@ -46,12 +56,18 @@ const handlePreview = async (group) => {
 
 const handleExecute = async () => {
     if (!selectedGroup) return
+    if (!selectedExamYear) {
+    setError('Please select an examination year.')
+    return
+}
 
         const confirmed = window.confirm(
-        `WARNING: You are about to permanently execute the promotion for Grades ${selectedGroup}.\n\n` +
-        `This will delete student marks, graduating students, inactive students, and deactivated teacher accounts.\n\n` +
-        `This action cannot be undone. Do you want to continue?`
-    )
+    `WARNING: You are about to permanently execute the promotion for Grades ${selectedGroup}.\n\n` +
+    `Examination Year: ${selectedExamYear}\n\n` +
+    `Eligible graduating students' examination records will be preserved before their student records are deleted.\n\n` +
+    `This will also delete student marks, inactive students, and deactivated teacher accounts.\n\n` +
+    `This action cannot be undone. Do you want to continue?`
+)
 
     if (!confirmed) return
 
@@ -69,8 +85,9 @@ const handleExecute = async () => {
                 },
                 credentials: 'include',
                 body: JSON.stringify({
-                    group: selectedGroup
-                })
+    group: selectedGroup,
+    examYear: selectedExamYear
+})
             }
         )
 
@@ -175,14 +192,39 @@ const handleExecute = async () => {
                 remove graduating students and clear their marks.
             </p>
 
-            <button
-                onClick={() => handlePreview('1-11')}
-               disabled={loading || executing}
-            >
-                {loading && selectedGroup === '1-11'
-                    ? 'Loading Preview...'
-                    : 'Preview Promotion'}
-            </button>
+          <div className="promotion-action-row">
+
+    <div className="promotion-year-field">
+        <label>O/L Examination Year</label>
+
+        <CustomDropdown
+            value={String(olExamYear)}
+            placeholder="Select O/L Examination Year"
+            options={Array.from(
+                { length: 3 },
+                (_, i) => {
+                    const year = new Date().getFullYear() - i
+                    return {
+                        value: String(year),
+                        label: String(year)
+                    }
+                }
+            )}
+            onChange={value => setOlExamYear(Number(value))}
+        />
+    </div>
+
+    <button
+        className="promotion-preview-button"
+        onClick={() => handlePreview('1-11')}
+        disabled={loading || executing}
+    >
+        {loading && selectedGroup === '1-11'
+            ? 'Loading Preview...'
+            : 'Preview Promotion'}
+    </button>
+
+</div>
         </div>
 
         <div className="promotion-card">
@@ -191,15 +233,39 @@ const handleExecute = async () => {
                 Promote eligible students from Grade 12 to Grade 13,
                 remove graduating students and clear their marks.
             </p>
+<div className="promotion-action-row">
 
-            <button
-                onClick={() => handlePreview('12-13')}
-                disabled={loading || executing}
-            >
-                {loading && selectedGroup === '12-13'
-                    ? 'Loading Preview...'
-                    : 'Preview Promotion'}
-            </button>
+    <div className="promotion-year-field">
+        <label>A/L Examination Year</label>
+
+        <CustomDropdown
+            value={String(alExamYear)}
+            placeholder="Select A/L Examination Year"
+            options={Array.from(
+                { length: 3 },
+                (_, i) => {
+                    const year = new Date().getFullYear() - i
+                    return {
+                        value: String(year),
+                        label: String(year)
+                    }
+                }
+            )}
+            onChange={value => setAlExamYear(Number(value))}
+        />
+    </div>
+
+    <button
+        className="promotion-preview-button"
+        onClick={() => handlePreview('12-13')}
+        disabled={loading || executing}
+    >
+        {loading && selectedGroup === '12-13'
+            ? 'Loading Preview...'
+            : 'Preview Promotion'}
+    </button>
+
+</div>
         </div>
     </div>
 
@@ -212,10 +278,39 @@ const handleExecute = async () => {
         <h3>
             Promotion Preview: Grades {selectedGroup}
         </h3>
-
         <p>Please review the following changes before proceeding.</p>
 
+        <div className="exam-preview-info">
+            <div>
+                <span>Selected Examination Year</span>
+                <strong>{selectedExamYear}</strong>
+            </div>
+
+            {selectedGroup === '1-11' && (
+                <div>
+                    <span>O/L Records to Preserve</span>
+                    <strong>{preview.ol_results_to_preserve}</strong>
+                </div>
+            )}
+
+            {selectedGroup === '12-13' && (
+                <div>
+                    <span>A/L Records to Preserve</span>
+                    <strong>{preview.al_results_to_preserve}</strong>
+                </div>
+            )}
+        </div>
+
+        <p className={
+            preview.exam_subjects_valid
+                ? 'exam-validation-success'
+                : 'exam-validation-error'
+        }>
+            {preview.exam_validation_message}
+        </p>
+
         <div className="preview-details">
+
             <div>
                 <span>Students to promote</span>
                 <strong>{preview.students_to_promote}</strong>
@@ -253,10 +348,14 @@ const handleExecute = async () => {
             No changes have been made yet.
         </p>
 
-        <button
+       <button
     className="execute-promotion-button"
     onClick={handleExecute}
-    disabled={executing}
+    disabled={
+        executing ||
+        !preview.exam_subjects_valid ||
+        !selectedExamYear
+    }
 >
     {executing ? 'Processing Promotion...' : 'Execute Promotion'}
 </button>
@@ -265,9 +364,27 @@ const handleExecute = async () => {
 
 {executionResult && (
     <div className="promotion-result">
-        <h3>Promotion Completed Successfully!</h3>
+    <h3>Promotion Completed Successfully!</h3>
 
-        <div className="preview-details">
+    <p>Examination Year: <strong>{executionResult.exam_year}</strong></p>
+
+    <div className="exam-preview-info">
+        {executionResult.promotion_group === '1-11' && (
+            <div>
+                <span>O/L Records Preserved</span>
+                <strong>{executionResult.ol_results_preserved}</strong>
+            </div>
+        )}
+
+        {executionResult.promotion_group === '12-13' && (
+            <div>
+                <span>A/L Records Preserved</span>
+                <strong>{executionResult.al_results_preserved}</strong>
+            </div>
+        )}
+    </div>
+
+    <div className="preview-details">
             <div>
                 <span>Students promoted</span>
                 <strong>{executionResult.students_promoted}</strong>

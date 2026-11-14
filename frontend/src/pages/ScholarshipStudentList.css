@@ -1,0 +1,60 @@
+/* Scholarship Student List */
+
+.scholarship-student-list-page {
+    width: 100%;
+}
+
+
+/* Scholarship Marks Entry */
+
+.student-list-table td input[type="number"] {
+    width: 120px;
+    padding: 9px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+    font-size: 14px;
+    color: #173e70;
+    background: #ffffff;
+}
+
+.student-list-table td input[type="number"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.student-list-table td button {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #173e70;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.student-list-table td button:hover {
+    background: #245b96;
+}
+
+.student-list-table td button:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.scholarship-save-success {
+    margin-top: 6px;
+    color: #15803d;
+    font-size: 12px;
+}
+
+.scholarship-save-error {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+
+/* Reuse the existing StudentList styling */

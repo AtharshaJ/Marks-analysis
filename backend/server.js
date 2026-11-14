@@ -17,6 +17,7 @@ import termTestRoutes from './routes/termTestRoutes.js'
 import subjectSettingsRoutes from './routes/subjectSettings.js'
 import studentPerformanceRoutes from './routes/studentPerformance.js'
 import promotionRoutes from './routes/promotion.js'
+import scholarshipRoutes from './routes/scholarship.js'
 
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -35,6 +36,7 @@ app.use('/api/term-tests', termTestRoutes)
 app.use('/api/subject-settings', subjectSettingsRoutes)
 app.use('/api/student-performance', studentPerformanceRoutes)
 app.use('/api/promotion', promotionRoutes)
+app.use('/api/scholarship', scholarshipRoutes)
 
 const PORT = process.env.PORT || 5000;
 
