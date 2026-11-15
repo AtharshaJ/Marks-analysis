@@ -5,6 +5,7 @@ import './EmployeeDashboard.css'
 import CustomDropdown from '../components/CustomDropdown'
 import OLResults from './OLResults'
 import ScholarshipStudentList from './ScholarshipStudentList'
+import ALResults from './ALResults'
 
 function EmployeeDashboard({ user }) {
     const navigate = useNavigate()
@@ -499,9 +500,10 @@ function EmployeeDashboard({ user }) {
 
                             </div>
     )
-
-                        ) : activeSection === 'Grade 11 O/L' ? (
+) : activeSection === 'Grade 11 O/L' ? (
     <OLResults user={user} />
+) : activeSection === 'Grade 13 A/L' ? (
+    <ALResults user={user} />
 ) : (
     <div className="teacher-empty-state">
         <h3>{activeSection}</h3>
