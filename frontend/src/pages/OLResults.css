@@ -1,0 +1,501 @@
+
+/* O/L Results Page */
+
+.ol-results-page {
+    width: 100%;
+    min-height: auto;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+    color: #173e70;
+}
+
+
+/* Main content */
+
+.ol-results-content {
+    width: 100%;
+}
+
+.ol-results-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.ol-results-summary > div {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(23, 62, 112, 0.05);
+}
+
+.ol-results-summary span {
+    display: block;
+    margin-bottom: 8px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.ol-results-summary strong {
+    font-size: 25px;
+    color: #173e70;
+}
+
+/* Student section */
+
+.ol-student-section {
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(23, 62, 112, 0.05);
+}
+
+.ol-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ol-section-heading h2 {
+    margin: 0 0 5px;
+    font-size: 19px;
+}
+
+.ol-section-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.ol-refresh-button {
+    padding: 9px 16px;
+    border: 1px solid #2878b5;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #2878b5;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ol-refresh-button:hover:not(:disabled) {
+    background: #2878b5;
+    color: #ffffff;
+}
+
+.ol-refresh-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Filters */
+
+.ol-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ol-filters > input {
+    flex: 1;
+    min-width: 180px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    color: #173e70;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.ol-filters > input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.1);
+}
+
+.ol-filter-dropdown {
+    width: 190px;
+    flex-shrink: 0;
+}
+
+/* Student table */
+
+.ol-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.ol-student-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.ol-student-table th {
+    padding: 13px 12px;
+    background: #edf4fb;
+    color: #173e70;
+    text-align: left;
+    font-weight: 700;
+}
+
+.ol-student-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e8edf3;
+    color: #334155;
+}
+
+.ol-student-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.ol-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.ol-status.completed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.ol-status.pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+.ol-enter-button {
+    padding: 8px 13px;
+    border: none;
+    border-radius: 6px;
+    background: #173e70;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ol-enter-button:hover {
+    background: #245b96;
+}
+
+/* Empty and error states */
+
+.ol-empty-state {
+    padding: 45px 15px;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.ol-empty-state > div {
+    font-size: 30px;
+}
+
+.ol-empty-state h3 {
+    margin: 12px 0 6px;
+    color: #173e70;
+}
+
+.ol-empty-state p {
+    margin: 0;
+}
+
+.ol-error-message,
+.ol-save-success {
+    margin: 14px 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.ol-error-message {
+    background: #fff0ef;
+    color: #c0392b;
+}
+
+.ol-save-success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* Results popup */
+
+.ol-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.ol-results-modal {
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+}
+
+.ol-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 22px 25px;
+    background: #173e70;
+    color: #ffffff;
+}
+
+.ol-modal-header span {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    color: #b8d9f5;
+}
+
+.ol-modal-header h2 {
+    margin: 7px 0;
+    font-size: 20px;
+}
+
+.ol-modal-header p {
+    margin: 0;
+    color: #dbeafe;
+    font-size: 12px;
+}
+
+.ol-close-button {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.ol-modal-body {
+    padding: 22px 25px;
+    overflow-y: auto;
+}
+
+.ol-modal-body > label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.ol-modal-body > input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    color: #173e70;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.ol-modal-body > input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.1);
+}
+
+.ol-subject-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 25px 0 12px;
+}
+
+.ol-subject-heading h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.ol-subject-heading span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.ol-subject-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 13px 0;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.ol-subject-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ol-subject-details > span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.ol-subject-details strong {
+    display: block;
+    color: #173e70;
+    font-size: 13px;
+}
+
+.ol-subject-details small {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.ol-grade-dropdown {
+    width: 145px;
+    flex-shrink: 0;
+}
+
+.ol-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 25px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.ol-modal-footer button {
+    padding: 10px 16px;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ol-save-button {
+    border: 1px solid #173e70;
+    background: #173e70;
+    color: #ffffff;
+}
+
+.ol-save-button:hover:not(:disabled) {
+    background: #245b96;
+}
+
+.ol-next-button {
+    border: 1px solid #2878b5;
+    background: #ffffff;
+    color: #2878b5;
+}
+
+.ol-next-button:hover:not(:disabled) {
+    background: #2878b5;
+    color: #ffffff;
+}
+
+.ol-modal-close-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.ol-modal-footer button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive layout */
+
+@media (max-width: 800px) {
+    .ol-filters {
+        flex-wrap: wrap;
+    }
+
+    .ol-filters > input {
+        flex-basis: 100%;
+    }
+
+    .ol-filter-dropdown {
+        flex: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    
+    .ol-results-summary {
+        gap: 8px;
+    }
+
+    .ol-results-summary > div {
+        padding: 13px;
+    }
+
+    .ol-results-summary span {
+        font-size: 11px;
+    }
+
+    .ol-results-summary strong {
+        font-size: 20px;
+    }
+
+    .ol-student-section {
+        padding: 14px;
+    }
+
+    .ol-section-heading {
+        align-items: flex-start;
+    }
+
+    .ol-filter-dropdown {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .ol-modal-overlay {
+        padding: 10px;
+    }
+
+    .ol-modal-header,
+    .ol-modal-body {
+        padding: 17px;
+    }
+
+    .ol-modal-footer {
+        flex-wrap: wrap;
+        padding: 13px 17px;
+    }
+
+    .ol-modal-footer button {
+        flex: 1;
+    }
+
+    .ol-subject-row {
+        gap: 8px;
+    }
+
+    .ol-grade-dropdown {
+        width: 120px;
+    }
+}

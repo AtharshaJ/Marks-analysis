@@ -1,60 +1,307 @@
-/* Scholarship Student List */
 
-.scholarship-student-list-page {
+/* Grade 5 Scholarship Results Page */
+
+.scholarship-results-page {
     width: 100%;
+    min-height: auto;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+    color: #173e70;
 }
 
+/* Summary Cards */
 
-/* Scholarship Marks Entry */
+.scholarship-results-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+}
 
-.student-list-table td input[type="number"] {
+.scholarship-results-summary > div {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(23, 62, 112, 0.05);
+}
+
+.scholarship-results-summary span {
+    display: block;
+    margin-bottom: 8px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.scholarship-results-summary strong {
+    font-size: 25px;
+    color: #173e70;
+}
+
+/* Student Records Section */
+
+.scholarship-student-section {
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(23, 62, 112, 0.05);
+}
+
+.scholarship-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.scholarship-section-heading h2 {
+    margin: 0 0 5px;
+    font-size: 19px;
+}
+
+.scholarship-section-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Refresh Button */
+
+.scholarship-refresh-button {
+    padding: 9px 16px;
+    border: 1px solid #2878b5;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #2878b5;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.scholarship-refresh-button:hover:not(:disabled) {
+    background: #2878b5;
+    color: #ffffff;
+}
+
+.scholarship-refresh-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Filters */
+
+.scholarship-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.scholarship-filters > input {
+    flex: 1;
+    min-width: 180px;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    color: #173e70;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.scholarship-filters > input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.1);
+}
+
+.scholarship-filter-dropdown {
+    width: 190px;
+    flex-shrink: 0;
+}
+
+/* Student Table */
+
+.scholarship-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.scholarship-student-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.scholarship-student-table th {
+    padding: 13px 12px;
+    background: #edf4fb;
+    color: #173e70;
+    text-align: left;
+    font-weight: 700;
+}
+
+.scholarship-student-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e8edf3;
+    color: #334155;
+}
+
+.scholarship-student-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+/* Marks Input */
+
+.scholarship-student-table td input[type="number"] {
     width: 120px;
+    box-sizing: border-box;
     padding: 9px 10px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     outline: none;
-    font-size: 14px;
+    font-size: 13px;
+    font-family: inherit;
     color: #173e70;
     background: #ffffff;
 }
 
-.student-list-table td input[type="number"]:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+.scholarship-student-table td input[type="number"]:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.1);
 }
 
-.student-list-table td button {
-    padding: 9px 18px;
+/* Status */
+
+.scholarship-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.scholarship-status.completed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.scholarship-status.pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+/* Save Button */
+
+.scholarship-save-button {
+    padding: 8px 13px;
     border: none;
     border-radius: 6px;
     background: #173e70;
     color: #ffffff;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    font-family: inherit;
 }
 
-.student-list-table td button:hover {
+.scholarship-save-button:hover:not(:disabled) {
     background: #245b96;
 }
 
-.student-list-table td button:disabled {
+.scholarship-save-button:disabled {
     background: #94a3b8;
     cursor: not-allowed;
 }
 
-.scholarship-save-success {
+.scholarship-save-success,
+.scholarship-save-error {
     margin-top: 6px;
-    color: #15803d;
     font-size: 12px;
+}
+
+.scholarship-save-success {
+    color: #15803d;
 }
 
 .scholarship-save-error {
-    margin-top: 6px;
     color: #dc2626;
-    font-size: 12px;
 }
 
+/* Empty and Error States */
 
-/* Reuse the existing StudentList styling */
+.scholarship-empty-state {
+    padding: 45px 15px;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.scholarship-empty-state h3 {
+    margin: 12px 0 6px;
+    color: #173e70;
+}
+
+.scholarship-empty-state p {
+    margin: 0;
+}
+
+.scholarship-error-message {
+    margin: 14px 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #fff0ef;
+    color: #c0392b;
+    font-size: 13px;
+}
+
+/* Responsive Layout */
+
+@media (max-width: 800px) {
+    .scholarship-filters {
+        flex-wrap: wrap;
+    }
+
+    .scholarship-filters > input {
+        flex-basis: 100%;
+    }
+
+    .scholarship-filter-dropdown {
+        flex: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .scholarship-results-summary {
+        gap: 8px;
+    }
+
+    .scholarship-results-summary > div {
+        padding: 13px;
+    }
+
+    .scholarship-results-summary span {
+        font-size: 11px;
+    }
+
+    .scholarship-results-summary strong {
+        font-size: 20px;
+    }
+
+    .scholarship-student-section {
+        padding: 14px;
+    }
+
+    .scholarship-section-heading {
+        align-items: flex-start;
+    }
+
+    .scholarship-filter-dropdown {
+        width: 100%;
+        flex-basis: 100%;
+    }
+}

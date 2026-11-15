@@ -1,14 +1,11 @@
 
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import CustomDropdown from '../components/CustomDropdown'
 import './ScholarshipStudentList.css'
 
 function ScholarshipStudentList() {
-    const { classId } = useParams()
-    const navigate = useNavigate()
-
     const [students, setStudents] = useState([])
-    const [selectedClass, setSelectedClass] = useState(null)
+    const [selectedDivision, setSelectedDivision] = useState('All')
     const [marks, setMarks] = useState({})
     const [saving, setSaving] = useState({})
     const [saveMessages, setSaveMessages] = useState({})
@@ -19,53 +16,47 @@ function ScholarshipStudentList() {
     const API_BASE_URL =
         import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-    useEffect(() => {
-        const fetchStudents = async () => {
-            try {
-                setLoading(true)
-                setError('')
+    const fetchStudents = async () => {
+        try {
+            setLoading(true)
+            setError('')
 
-                const response = await fetch(
-                    `${API_BASE_URL}/api/scholarship/${classId}/students`,
-                    { credentials: 'include' }
+            const response = await fetch(
+                `${API_BASE_URL}/api/scholarship/students`,
+                { credentials: 'include' }
+            )
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || 'Unable to retrieve students.'
                 )
-
-                const result = await response.json()
-
-                if (!response.ok) {
-                    throw new Error(
-                        result.message || 'Unable to retrieve students.'
-                    )
-                }
-
-                if (Number(result.class?.grade) !== 5) {
-                    throw new Error(
-                        'Scholarship results are only available for Grade 5.'
-                    )
-                }
-
-                setStudents(result.students || [])
-                setSelectedClass(result.class)
-
-                const initialMarks = {}
-
-                ;(result.students || []).forEach(student => {
-                    initialMarks[student.id] =
-                        student.marks === null ? '' : String(student.marks)
-                })
-
-                setMarks(initialMarks)
-
-            } catch (error) {
-                console.error('Scholarship student list error:', error)
-                setError(error.message)
-            } finally {
-                setLoading(false)
             }
-        }
 
+            const studentList = result.students || []
+
+            setStudents(studentList)
+
+            const initialMarks = {}
+
+            studentList.forEach(student => {
+                initialMarks[student.id] =
+                    student.marks == null ? '' : String(student.marks)
+            })
+
+            setMarks(initialMarks)
+        } catch (error) {
+            console.error('Scholarship student list error:', error)
+            setError(error.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
         fetchStudents()
-    }, [classId])
+    }, [])
 
     const handleMarksChange = (studentId, value) => {
         setMarks(previous => ({
@@ -105,6 +96,10 @@ function ScholarshipStudentList() {
             return
         }
 
+        const student = students.find(item => item.id === studentId)
+
+        if (!student) return
+
         try {
             setSaving(previous => ({
                 ...previous,
@@ -117,7 +112,7 @@ function ScholarshipStudentList() {
             }))
 
             const response = await fetch(
-                `${API_BASE_URL}/api/scholarship/${classId}/students/${studentId}/marks`,
+                `${API_BASE_URL}/api/scholarship/${student.class_id}/students/${studentId}/marks`,
                 {
                     method: 'POST',
                     headers: {
@@ -139,10 +134,10 @@ function ScholarshipStudentList() {
             }
 
             setStudents(previous =>
-                previous.map(student =>
-                    student.id === studentId
-                        ? { ...student, marks: result.result.marks }
-                        : student
+                previous.map(item =>
+                    item.id === studentId
+                        ? { ...item, marks: result.result.marks }
+                        : item
                 )
             )
 
@@ -155,7 +150,6 @@ function ScholarshipStudentList() {
                 ...previous,
                 [studentId]: 'Marks saved successfully.'
             }))
-
         } catch (error) {
             console.error('Scholarship marks saving error:', error)
 
@@ -171,174 +165,213 @@ function ScholarshipStudentList() {
         }
     }
 
+    const divisions = [
+        'All',
+        ...new Set(
+            students.map(student => String(student.division))
+        )
+    ]
+
     const filteredStudents = students.filter(student => {
         const searchText = search.toLowerCase()
 
-        return (
+        const matchesDivision =
+            selectedDivision === 'All' ||
+            String(student.division) === selectedDivision
+
+        const matchesSearch =
             String(student.index_number).toLowerCase().includes(searchText) ||
             student.student_name.toLowerCase().includes(searchText)
-        )
+
+        return matchesDivision && matchesSearch
     })
 
+    const completedCount = students.filter(
+        student => student.marks !== null && student.marks !== undefined
+    ).length
+
+    const pendingCount = students.length - completedCount
+
     return (
-        <div className="student-list-page">
+        <div className="scholarship-results-page">
 
-            <header className="student-list-header">
-                <div className="student-list-brand">
-                    <div className="student-list-brand-icon">MA</div>
+            <div className="scholarship-results-summary">
+                <div>
+                    <span>Total Students</span>
+                    <strong>{students.length}</strong>
+                </div>
 
+                <div>
+                    <span>Completed</span>
+                    <strong>{completedCount}</strong>
+                </div>
+
+                <div>
+                    <span>Pending</span>
+                    <strong>{pendingCount}</strong>
+                </div>
+            </div>
+
+            <section className="scholarship-student-section">
+
+                <div className="scholarship-section-heading">
                     <div>
-                        <h2>Marks <span>Analysis</span></h2>
-                        <p>Teacher Portal</p>
-                    </div>
-                </div>
-
-                <button
-                    className="student-list-back-btn"
-                    onClick={() => navigate('/employee')}
-                >
-                    ← Back to Dashboard
-                </button>
-            </header>
-
-            <main className="student-list-main">
-
-                <div className="student-list-title">
-                    <span>GRADE 5 SCHOLARSHIP EXAMINATION</span>
-
-                    <h1>
-                        {selectedClass?.class_name || 'Student List'}
-                    </h1>
-
-                    <p>
-                        View Grade 5 students and manage their
-                        Scholarship Examination results.
-                    </p>
-                </div>
-
-                <div className="student-list-card">
-                    <section className="student-list-section">
-
-                        <h2>Student Records</h2>
-
+                        <h2>Scholarship Student Records</h2>
                         <p>
-                            {selectedClass
-                                ? `Class: ${selectedClass.class_name}`
-                                : 'Student information'}
+                            Enter or update Grade 5 Scholarship Examination marks.
                         </p>
+                    </div>
 
-                        {loading ? (
-                            <div className="student-list-message">
-                                Loading student records...
-                            </div>
-                        ) : error ? (
-                            <div className="student-list-error">
-                                {error}
-                            </div>
-                        ) : (
-                            <>
-                                <div className="student-list-info">
-                                    <strong>
-                                        Total Students: {students.length}
-                                    </strong>
-
-                                    <span>
-                                        Showing {filteredStudents.length} students
-                                    </span>
-                                </div>
-
-                                <div className="student-list-search">
-                                    <input
-                                        type="text"
-                                        placeholder="Search by index number or student name..."
-                                        value={search}
-                                        onChange={e => setSearch(e.target.value)}
-                                    />
-                                </div>
-
-                                {filteredStudents.length === 0 ? (
-                                    <div className="student-list-message">
-                                        {students.length === 0
-                                            ? 'No active students found in this class.'
-                                            : 'No students match your search.'}
-                                    </div>
-                                ) : (
-                                    <div className="student-table-wrapper">
-                                        <table className="student-list-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>No.</th>
-                                                    <th>Index Number</th>
-                                                    <th>Student Name</th>
-                                                    <th>Scholarship Marks ( / 200)</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                {filteredStudents.map((student, index) => (
-                                                    <tr key={student.id}>
-                                                        <td>{index + 1}</td>
-
-                                                        <td>{student.index_number}</td>
-
-                                                        <td>{student.student_name}</td>
-
-                                                        <td>
-                                                            <input
-                                                                type="number"
-                                                                min="0"
-                                                                max="200"
-                                                                step="0.01"
-                                                                placeholder="Enter marks"
-                                                                value={marks[student.id] ?? ''}
-                                                                onChange={e =>
-                                                                    handleMarksChange(
-                                                                        student.id,
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                            />
-                                                        </td>
-
-                                                        <td>
-                                                            <button
-                                                                type="button"
-                                                                disabled={saving[student.id]}
-                                                                onClick={() =>
-                                                                    handleSaveMarks(student.id)
-                                                                }
-                                                            >
-                                                                {saving[student.id]
-                                                                    ? 'Saving...'
-                                                                    : 'Save'}
-                                                            </button>
-
-                                                            {saveMessages[student.id] && (
-                                                                <div
-                                                                    className={
-                                                                        saveMessages[student.id] ===
-                                                                        'Marks saved successfully.'
-                                                                            ? 'scholarship-save-success'
-                                                                            : 'scholarship-save-error'
-                                                                    }
-                                                                >
-                                                                    {saveMessages[student.id]}
-                                                                </div>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </>
-                        )}
-
-                    </section>
+                    <button
+                        type="button"
+                        className="scholarship-refresh-button"
+                        onClick={fetchStudents}
+                        disabled={loading}
+                    >
+                        ↻ Refresh
+                    </button>
                 </div>
-            </main>
+
+                <div className="scholarship-filters">
+
+                    <input
+                        type="text"
+                        placeholder="Search by student name or index number..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+
+                    <div className="scholarship-filter-dropdown">
+                        <CustomDropdown
+                            value={selectedDivision}
+                            options={divisions.map(division => ({
+                                value: division,
+                                label: division === 'All'
+                                    ? 'All Divisions'
+                                    : `Division ${division}`
+                            }))}
+                            onChange={setSelectedDivision}
+                            placeholder="Select Division"
+                        />
+                    </div>
+
+                </div>
+
+                {error && (
+                    <div className="scholarship-error-message">
+                        {error}
+                    </div>
+                )}
+
+                {loading ? (
+                    <div className="scholarship-empty-state">
+                        Loading student records...
+                    </div>
+                ) : error ? null : filteredStudents.length === 0 ? (
+                    <div className="scholarship-empty-state">
+                        <h3>
+                            {students.length === 0
+                                ? 'No Grade 5 students found'
+                                : 'No students found'}
+                        </h3>
+                        <p>
+                            {students.length === 0
+                                ? 'There are currently no active Grade 5 student records.'
+                                : 'Try changing your search or division filter.'}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="scholarship-table-wrapper">
+                        <table className="scholarship-student-table">
+
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>School Index No.</th>
+                                    <th>Student Name</th>
+                                    <th>Division</th>
+                                    <th>Scholarship Marks (/200)</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {filteredStudents.map((student, index) => (
+                                    <tr key={student.id}>
+                                        <td>{index + 1}</td>
+
+                                        <td>{student.index_number}</td>
+
+                                        <td>{student.student_name}</td>
+
+                                        <td>{student.division}</td>
+
+                                        <td>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="200"
+                                                step="0.01"
+                                                placeholder="Enter marks"
+                                                value={marks[student.id] ?? ''}
+                                                onChange={e =>
+                                                    handleMarksChange(
+                                                        student.id,
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                        </td>
+
+                                        <td>
+                                            <span className={`scholarship-status ${
+                                                student.marks !== null &&
+                                                student.marks !== undefined
+                                                    ? 'completed'
+                                                    : 'pending'
+                                            }`}>
+                                                {student.marks !== null &&
+                                                student.marks !== undefined
+                                                    ? 'Completed'
+                                                    : 'Pending'}
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="scholarship-save-button"
+                                                disabled={saving[student.id]}
+                                                onClick={() =>
+                                                    handleSaveMarks(student.id)
+                                                }
+                                            >
+                                                {saving[student.id]
+                                                    ? 'Saving...'
+                                                    : 'Save'}
+                                            </button>
+
+                                            {saveMessages[student.id] && (
+                                                <div className={
+                                                    saveMessages[student.id] ===
+                                                    'Marks saved successfully.'
+                                                        ? 'scholarship-save-success'
+                                                        : 'scholarship-save-error'
+                                                }>
+                                                    {saveMessages[student.id]}
+                                                </div>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+
+                        </table>
+                    </div>
+                )}
+
+            </section>
         </div>
     )
 }

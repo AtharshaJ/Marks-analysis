@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './EmployeeDashboard.css'
 import CustomDropdown from '../components/CustomDropdown'
+import OLResults from './OLResults'
+import ScholarshipStudentList from './ScholarshipStudentList'
 
 function EmployeeDashboard({ user }) {
     const navigate = useNavigate()
 
-    const [activeSection, setActiveSection] = useState('Grade 5 Scholarship')
+    const [activeSection, setActiveSection] = useState('Dashboard')
     const [loggingOut, setLoggingOut] = useState(false)
 
     // Class information
@@ -15,13 +17,16 @@ function EmployeeDashboard({ user }) {
     const [classesLoading, setClassesLoading] = useState(false)
     const [classesError, setClassesError] = useState('')
     const [selectedClassId, setSelectedClassId] = useState('')
+    const [showScholarshipStudents, setShowScholarshipStudents] = useState(false)
 
     const navigationItems = [
-        { name: 'Grade 5 Scholarship', icon: '🎓' },
-        { name: 'Grade 11 O/L', icon: '📘' },
-        { name: 'Grade 13 A/L', icon: '📚' },
-        { name: 'Term Tests', icon: '📝' }
-    ]
+    { name: 'Dashboard', icon: '⌂' },
+     { name: 'Term Tests', icon: '▧' },
+    { name: 'Grade 5 Scholarship', icon: '♙' },
+    { name: 'Grade 11 O/L', icon: '▤' },
+    { name: 'Grade 13 A/L', icon: '▦' }
+   
+]
 
     // Fetch class divisions
     const fetchClasses = async () => {
@@ -63,18 +68,17 @@ function EmployeeDashboard({ user }) {
 
     // Handle navigation between examination sections
     const handleSectionChange = (section) => {
-        setActiveSection(section)
+    setActiveSection(section)
+    setSelectedClassId('')
+    setShowScholarshipStudents(section === 'Grade 5 Scholarship')
 
-        setSelectedClassId('')
-
-        if (
-            section === 'Term Tests' ||
-            section === 'Grade 5 Scholarship'
-        ) {
-            fetchClasses()
-        }
+    if (
+        section === 'Term Tests' ||
+        section === 'Grade 5 Scholarship'
+    ) {
+        fetchClasses()
     }
-
+}
     // Search for students in Term Tests
     const handleClassSearch = () => {
         if (!selectedClassId) {
@@ -87,13 +91,13 @@ function EmployeeDashboard({ user }) {
 
     // Search for Grade 5 Scholarship students
     const handleScholarshipClassSearch = () => {
-        if (!selectedClassId) {
-            alert('Please select a Grade 5 class first.')
-            return
-        }
-
-        navigate(`/employee/scholarship/${selectedClassId}/students`)
+    if (!selectedClassId) {
+        alert('Please select a Grade 5 class first.')
+        return
     }
+
+    setShowScholarshipStudents(true)
+}
 
     // Handle logout
     const handleLogout = async () => {
@@ -223,89 +227,88 @@ function EmployeeDashboard({ user }) {
                 {/* Main Content */}
                 <div className="teacher-content">
 
-                    {/* Welcome Section */}
-                    <section className="teacher-welcome">
-                        <div>
-                            <p className="teacher-welcome-label">
-                                TEACHER DASHBOARD
-                            </p>
+                    {activeSection === 'Dashboard' && (
+    <>
+        {/* Welcome Section */}
+        <section className="teacher-welcome">
+            <div>
+                <p className="teacher-welcome-label">
+                    TEACHER DASHBOARD
+                </p>
 
-                            <h2>Welcome, {user.full_name}!</h2>
+                <h2>Welcome, {user.full_name}!</h2>
 
-                            <p>
-                                Manage student information and academic
-                                records through your dashboard.
-                            </p>
-                        </div>
+                <p>
+                    Manage student information and academic
+                    records through your dashboard.
+                </p>
+            </div>
 
-                        <div className="teacher-welcome-icon">
-                            📖
-                        </div>
-                    </section>
+            <div className="teacher-welcome-icon">
+                📖
+            </div>
+        </section>
 
-                    {/* Teacher Information */}
-                    <section className="teacher-profile-card">
+        {/* Teacher Information */}
+        <section className="teacher-profile-card">
+            <h3>Teacher Information</h3>
 
-                        <h3>Teacher Information</h3>
+            <div className="teacher-profile-grid">
+                <div className="teacher-profile-item">
+                    <span>TR ID</span>
+                    <strong>{user.teacher_id}</strong>
+                </div>
 
-                        <div className="teacher-profile-grid">
+                <div className="teacher-profile-item">
+                    <span>Full Name</span>
+                    <strong>{user.full_name}</strong>
+                </div>
 
-                            <div className="teacher-profile-item">
-                                <span>TR ID</span>
-                                <strong>{user.teacher_id}</strong>
-                            </div>
+                <div className="teacher-profile-item">
+                    <span>Designation</span>
+                    <strong>{user.designation}</strong>
+                </div>
 
-                            <div className="teacher-profile-item">
-                                <span>Full Name</span>
-                                <strong>{user.full_name}</strong>
-                            </div>
+                {user.class_assignment && (
+                    <div className="teacher-profile-item">
+                        <span>Assigned Class</span>
+                        <strong>
+                            {user.class_assignment.class_name}
+                        </strong>
+                    </div>
+                )}
+            </div>
+        </section>
 
-                            <div className="teacher-profile-item">
-                                <span>Designation</span>
-                                <strong>{user.designation}</strong>
-                            </div>
+        {/* Student Management */}
+        {user.class_assignment && (
+            <section className="teacher-profile-card student-management-card">
+                <div className="student-management-heading">
+                    <div>
+                        <h3>Student Management</h3>
+                        <p>
+                            Manage students in your assigned class:{' '}
+                            <strong>
+                                {user.class_assignment.class_name}
+                            </strong>
+                        </p>
+                    </div>
 
-                            {user.class_assignment && (
-                                <div className="teacher-profile-item">
-                                    <span>Assigned Class</span>
-                                    <strong>
-                                        {user.class_assignment.class_name}
-                                    </strong>
-                                </div>
-                            )}
-
-                        </div>
-                    </section>
-
-                    {/* Class Teacher Student Management */}
-                    {user.class_assignment && (
-                        <section className="teacher-profile-card student-management-card">
-
-                            <div className="student-management-heading">
-                                <div>
-                                    <h3>Student Management</h3>
-                                    <p>
-                                        Manage students in your assigned class:
-                                        {' '}
-                                        <strong>
-                                            {user.class_assignment.class_name}
-                                        </strong>
-                                    </p>
-                                </div>
-
-                                <button
-                                    className="teacher-refresh-btn"
-                                    onClick={() => navigate('/employee/add-student')}
-                                >
-                                    + Add Student
-                                </button>
-                            </div>
-
-                        </section>
-                    )}
+                    <button
+                        className="teacher-refresh-btn"
+                        onClick={() => navigate('/employee/add-student')}
+                    >
+                        + Add Student
+                    </button>
+                </div>
+            </section>
+        )}
+    </>
+)}
 
                     {/* Selected Examination */}
-                    <section className="teacher-section-content">
+                    {activeSection !== 'Dashboard' && (
+    <section className="teacher-section-content">
 
                         <div className="teacher-section-heading">
                             <div>
@@ -410,6 +413,11 @@ function EmployeeDashboard({ user }) {
                             </div>
 
                         ) : activeSection === 'Grade 5 Scholarship' ? (
+    showScholarshipStudents ? (
+        <ScholarshipStudentList
+            classId={selectedClassId}
+        />
+    ) : (
 
                             /* Grade 5 Scholarship */
                             <div className="term-test-content">
@@ -490,22 +498,21 @@ function EmployeeDashboard({ user }) {
                                 )}
 
                             </div>
+    )
 
-                        ) : (
-
-                            /* Other Examination Sections */
-                            <div className="teacher-empty-state">
-                                <div className="teacher-empty-icon">📋</div>
-                                <h3>{activeSection}</h3>
-                                <p>
-                                    The student records and marks management section will appear here.
-                                </p>
-                            </div>
-
-                        )}
+                        ) : activeSection === 'Grade 11 O/L' ? (
+    <OLResults user={user} />
+) : (
+    <div className="teacher-empty-state">
+        <h3>{activeSection}</h3>
+        <p>
+            The student records and marks management section will appear here.
+        </p>
+    </div>
+)}
 
                     </section>
-
+                    )}
                 </div>
             </main>
         </div>

@@ -67,10 +67,12 @@ if (
 }
 
         const { data, error } = await supabase.rpc(
-            'execute_student_promotion',
-            { p_group: group }
-        )
-
+    'execute_student_promotion',
+    {
+        p_group: group,
+        p_exam_year: examYear
+    }
+)
         if (error) throw error
 
         return res.json({

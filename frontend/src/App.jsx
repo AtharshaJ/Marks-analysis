@@ -18,6 +18,7 @@ import StudentMarks from './pages/StudentMarks'
 import SubjectMarks from './pages/SubjectMarks'
 import SystemManagement from './pages/SystemManagement'
 import ScholarshipStudentList from './pages/ScholarshipStudentList'
+import OLResults from './pages/OLResults'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -155,6 +156,15 @@ function App() {
     element={
         <ProtectedRoute allowedRole="employee">
             {user => <ScholarshipStudentList user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/employee/ol-results"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <OLResults user={user} />}
         </ProtectedRoute>
     }
 />

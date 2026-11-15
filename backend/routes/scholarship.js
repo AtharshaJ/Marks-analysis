@@ -6,7 +6,9 @@ import { verifySession } from '../middleware/authMiddleware.js'
 const router = express.Router()
 
 // Get Grade 5 students and their Scholarship results
-router.get('/:classId/students', verifySession, async (req, res) => {
+
+// Get all Grade 5 students and their Scholarship results
+router.get('/students', verifySession, async (req, res) => {
     try {
         if (req.user?.type !== 'employee') {
             return res.status(403).json({
@@ -15,37 +17,23 @@ router.get('/:classId/students', verifySession, async (req, res) => {
             })
         }
 
-        const classId = Number(req.params.classId)
-
-        if (!Number.isInteger(classId) || classId <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid class ID.'
-            })
-        }
-
-        // Verify that this is a Grade 5 class
-        const { data: classInfo, error: classError } = await supabase
-            .from('class_divisions')
-            .select('id, grade, division, class_name')
-            .eq('id', classId)
-            .maybeSingle()
-
-        if (classError) throw classError
-
-        if (!classInfo || Number(classInfo.grade) !== 5) {
-            return res.status(404).json({
-                success: false,
-                message: 'Grade 5 class not found.'
-            })
-        }
-
-        // Retrieve active students
+        // Retrieve all active Grade 5 students with their class details
         const { data: students, error: studentsError } = await supabase
             .from('students')
-            .select('id, index_number, student_name')
-            .eq('class_id', classId)
+            .select(`
+                id,
+                index_number,
+                student_name,
+                class_id,
+                class_divisions!inner (
+                    id,
+                    grade,
+                    division,
+                    class_name
+                )
+            `)
             .eq('is_active', true)
+            .eq('class_divisions.grade', 5)
             .order('index_number', { ascending: true })
 
         if (studentsError) throw studentsError
@@ -74,7 +62,12 @@ router.get('/:classId/students', verifySession, async (req, res) => {
         )
 
         const studentsWithMarks = students.map(student => ({
-            ...student,
+            id: student.id,
+            index_number: student.index_number,
+            student_name: student.student_name,
+            class_id: student.class_id,
+            class_name: student.class_divisions.class_name,
+            division: student.class_divisions.division,
             marks: resultMap.has(Number(student.id))
                 ? resultMap.get(Number(student.id))
                 : null
@@ -82,7 +75,6 @@ router.get('/:classId/students', verifySession, async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            class: classInfo,
             count: studentsWithMarks.length,
             students: studentsWithMarks
         })
@@ -96,6 +88,7 @@ router.get('/:classId/students', verifySession, async (req, res) => {
         })
     }
 })
+
 
 
 // Save or update a student's Scholarship marks
