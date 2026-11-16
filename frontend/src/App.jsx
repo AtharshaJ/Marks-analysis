@@ -16,6 +16,9 @@ import SubjectManagement from './pages/SubjectManagement'
 import StudentList from './pages/StudentList'
 import StudentMarks from './pages/StudentMarks'
 import SubjectMarks from './pages/SubjectMarks'
+import TermTestsDashboard from './pages/TermTestsDashboard'
+import StudentProgressReport from './pages/StudentProgressReport'
+import PrintAllStudentReports from './pages/PrintAllStudentReports'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -129,6 +132,16 @@ function App() {
     }
 />
 
+{/* Term Tests Workspace */}
+<Route
+  path="/employee/term-tests/:classId"
+  element={
+    <ProtectedRoute allowedRole="employee">
+      {user => <TermTestsDashboard user={user} />}
+    </ProtectedRoute>
+  }
+/>
+
 <Route
   path="/employee/term-tests/:classId/students"
   element={
@@ -156,6 +169,32 @@ function App() {
     }
 />
 
+<Route
+    path="/employee/term-tests/:classId/analysis"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <ClassAnalysis user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/employee/term-tests/:classId/reports/print-all"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <PrintAllStudentReports user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+  path="/employee/term-tests/:classId/students/:studentId/report"
+  element={
+    <ProtectedRoute allowedRole="employee">
+      {user => <StudentProgressReport user={user} />}
+    </ProtectedRoute>
+  }
+/>
 
 {/* Add Student - Class Teacher only */}
 <Route

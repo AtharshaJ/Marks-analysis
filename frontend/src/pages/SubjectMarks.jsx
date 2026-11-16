@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './SubjectMarks.css'
 import CustomDropdown from '../components/CustomDropdown'
 
 function SubjectMarks({ user }) {
     const { classId } = useParams()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
 
     const API_BASE_URL =
         import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
     const [students, setStudents] = useState([])
     const [selectedClass, setSelectedClass] = useState(null)
-    const [academicYears, setAcademicYears] = useState([])
-
-    const [selectedYearId, setSelectedYearId] = useState('')
-    const [selectedTermId, setSelectedTermId] = useState('')
+   const selectedYearId = searchParams.get('yearId') || ''
+const selectedTermId = searchParams.get('termId') || ''
     const [selectedSubject, setSelectedSubject] = useState('')
 
     const [classSubjects, setClassSubjects] = useState([])
@@ -43,23 +42,16 @@ const [saveMessage, setSaveMessage] = useState('')
                 setLoading(true)
                 setError('')
 
-                const [studentsResponse, yearsResponse] =
-                    await Promise.all([
-                        fetch(
-                            `${API_BASE_URL}/api/term-tests/${classId}/students`,
-                            { credentials: 'include' }
-                        ),
-                        fetch(
-                            `${API_BASE_URL}/api/term-tests/academic-years`,
-                            { credentials: 'include' }
-                        )
-                    ])
+               const studentsResponse = await fetch(
+    `${API_BASE_URL}/api/term-tests/${classId}/students`,
+    { credentials: 'include' }
+)
 
-                const [studentsResult, yearsResult] =
-                    await Promise.all([
-                        studentsResponse.json(),
-                        yearsResponse.json()
-                    ])
+               const [studentsResult, yearsResult] =
+    await Promise.all([
+        studentsResponse.json(),
+        
+    ])
 
                 if (!studentsResponse.ok) {
                     throw new Error(
@@ -68,16 +60,11 @@ const [saveMessage, setSaveMessage] = useState('')
                     )
                 }
 
-                if (!yearsResponse.ok) {
-                    throw new Error(
-                        yearsResult.message ||
-                        'Unable to load academic years.'
-                    )
-                }
+             
 
                 setStudents(studentsResult.students || [])
                 setSelectedClass(studentsResult.class)
-                setAcademicYears(yearsResult.academicYears || [])
+              
 
                 // Load all subjects registered by students in this class
 const subjectsResponse = await fetch(
@@ -132,11 +119,9 @@ setSettingsLoading(false)
         fetchPageData()
     }, [classId])
 
-    const selectedYear = academicYears.find(
-        year => String(year.id) === selectedYearId
-    )
+    
 
-    const availableTerms = selectedYear?.academic_terms || []
+    
 
     // Get the selected subject
 const selectedSubjectData = classSubjects.find(subject =>
@@ -411,43 +396,8 @@ const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
                            
 <div className="subject-marks-selectors">
 
-    {/* Academic Year */}
-    <div>
-        <label>Academic Year</label>
-
-        <CustomDropdown
-            value={selectedYearId}
-            placeholder="Select Academic Year"
-            options={academicYears.map(year => ({
-                value: String(year.id),
-                label: String(year.year)
-            }))}
-            onChange={value => {
-                setSelectedYearId(value)
-                setSelectedTermId('')
-                setSelectedSubject('')
-            }}
-        />
-    </div>
-
-    {/* Term */}
-    <div>
-        <label>Term</label>
-
-        <CustomDropdown
-            value={selectedTermId}
-            placeholder="Select Term"
-            disabled={!selectedYearId}
-            options={availableTerms.map(term => ({
-                value: String(term.id),
-                label: term.term_name
-            }))}
-            onChange={value => {
-                setSelectedTermId(value)
-                setSelectedSubject('')
-            }}
-        />
-    </div>
+   
+   
 
     {/* Subject */}
     <div>
@@ -456,7 +406,7 @@ const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
         <CustomDropdown
             value={selectedSubject}
             placeholder="Select Subject"
-            disabled={!selectedTermId}
+            disabled={!selectedTermId || !selectedYearId}
             options={classSubjects.map(subject => ({
                 value: subject.subject_type === 'al'
                     ? `al-${subject.al_subject_no}`
@@ -477,10 +427,10 @@ const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
     <h3>Student Marks</h3>
 
     {!selectedYearId || !selectedTermId || !selectedSubject ? (
-        <p className="subject-marks-placeholder">
-            Select an academic year, term and subject
-            to view the students' marks.
-        </p>
+    <p className="subject-marks-placeholder">
+        Select a subject to view the students' marks.
+    </p>
+    
     ) : marksLoading ? (
         <p className="subject-marks-message">
             Loading student marks...

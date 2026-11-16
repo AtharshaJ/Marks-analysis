@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './StudentList.css'
+import CustomDropdown from '../components/CustomDropdown'
 
 function StudentList() {
     const { classId } = useParams()
@@ -21,6 +22,11 @@ const [requiresManualSelection, setRequiresManualSelection] = useState(false)
 const [settingsLoading, setSettingsLoading] = useState(true)
 const [settingsError, setSettingsError] = useState('')
 const [updatingSubjectId, setUpdatingSubjectId] = useState(null)
+const [academicYears, setAcademicYears] = useState([])
+const [selectedYearId, setSelectedYearId] = useState('')
+const [terms, setTerms] = useState([])
+const [selectedTermId, setSelectedTermId] = useState('')
+const [reportLoading, setReportLoading] = useState(false)
 
     const API_BASE_URL =
         import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -46,6 +52,40 @@ const [updatingSubjectId, setUpdatingSubjectId] = useState(null)
 
                 setStudents(result.students || [])
                 setSelectedClass(result.class)
+
+                // Fetch academic years for progress reports
+const yearsResponse = await fetch(
+    `${API_BASE_URL}/api/term-tests/academic-years`,
+    { credentials: 'include' }
+)
+
+const yearsResult = await yearsResponse.json()
+
+if (!yearsResponse.ok) {
+    throw new Error(
+        yearsResult.message || 'Unable to load academic years.'
+    )
+}
+
+const years = yearsResult.academicYears || []
+
+setAcademicYears(years)
+
+// Select active academic year
+const activeYear = years.find(year => year.is_active)
+
+if (activeYear) {
+    setSelectedYearId(String(activeYear.id))
+
+    const sortedTerms = [...(activeYear.academic_terms || [])]
+        .sort((a, b) => a.term_number - b.term_number)
+
+    setTerms(sortedTerms)
+
+    if (sortedTerms.length > 0) {
+        setSelectedTermId(String(sortedTerms[0].id))
+    }
+}
 
                 // Fetch subject inclusion settings
 const settingsResponse = await fetch(
@@ -108,6 +148,25 @@ setClassSubjects(subjectsResult.subjects || [])
                 .includes(searchText)
         )
     })
+
+    const handleYearChange = (yearId) => {
+    setSelectedYearId(yearId)
+
+    const selectedYear = academicYears.find(
+        year => String(year.id) === String(yearId)
+    )
+
+    const sortedTerms = [...(selectedYear?.academic_terms || [])]
+        .sort((a, b) => a.term_number - b.term_number)
+
+    setTerms(sortedTerms)
+
+    setSelectedTermId(
+        sortedTerms.length > 0
+            ? String(sortedTerms[0].id)
+            : ''
+    )
+}
 
     const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
     if (!isClassTeacher) return
@@ -212,15 +271,91 @@ setClassSubjects(subjectsResult.subjects || [])
                                 : 'Student information'}
                         </p>
 
-                        <div className="student-list-actions">
+                       <div className="student-list-actions">
+
     <button
         className="student-list-subjects-btn"
         onClick={() =>
-            navigate(`/employee/term-tests/${classId}/subjects`)
+            navigate(
+    `/employee/term-tests/${classId}/subjects?yearId=${selectedYearId}&termId=${selectedTermId}`
+)
         }
     >
         View Subjects →
     </button>
+
+</div>
+
+{/* Progress Report Selection */}
+<div className="progress-report-selection">
+
+    <h3>Student Progress Reports</h3>
+
+    <p>
+        Select an academic year and term to view or print student reports.
+    </p>
+
+    
+<div className="student-report-controls">
+
+    <div className="student-report-controls-header">
+        <h3>Student Progress Reports</h3>
+        <p>
+            Select an academic year and term to view or print student progress reports.
+        </p>
+    </div>
+
+    <div className="student-report-selectors">
+
+        <div>
+            <label>Academic Year</label>
+
+            <CustomDropdown
+                value={selectedYearId}
+                onChange={handleYearChange}
+                placeholder="Select Academic Year"
+                options={academicYears.map(year => ({
+                    value: String(year.id),
+                    label: String(year.year)
+                }))}
+            />
+        </div>
+
+        <div>
+            <label>Academic Term</label>
+
+            <CustomDropdown
+                value={selectedTermId}
+                onChange={setSelectedTermId}
+                placeholder="Select Academic Term"
+                disabled={!terms.length}
+                options={terms.map(term => ({
+                    value: String(term.id),
+                    label: term.term_name
+                }))}
+            />
+        </div>
+
+    </div>
+
+    <div className="student-report-actions">
+        <button
+            type="button"
+            className="student-report-print-all-btn"
+            disabled={!selectedTermId || students.length === 0 || reportLoading}
+            onClick={() =>
+    navigate(
+        `/employee/term-tests/${classId}/reports/print-all?yearId=${selectedYearId}&termId=${selectedTermId}`
+    )
+}
+        >
+            {reportLoading ? 'Preparing Reports...' : 'Print All Reports'}
+        </button>
+    </div>
+
+</div>
+
+
 </div>
 
 {/* Subject Inclusion Settings Dropdown */}
@@ -344,23 +479,28 @@ setClassSubjects(subjectsResult.subjects || [])
                                         <table className="student-list-table">
 
                                             <thead>
-                                                <tr>
-                                                    <th>No.</th>
-                                                    <th>Index Number</th>
-                                                    <th>Student Name</th>
-                                                </tr>
-                                            </thead>
+    <tr>
+        <th>No.</th>
+        <th>Index Number</th>
+        <th>Student Name</th>
+    </tr>
+</thead>
 
-                                            <tbody>
+                                         <tbody>
     {filteredStudents.map((student, index) => (
         <tr
             key={student.id}
             className="student-clickable-row"
-            onClick={() =>
+            onClick={() => {
+                if (!selectedTermId || !selectedYearId) {
+                    alert('Please select an academic year and term first.')
+                    return
+                }
+
                 navigate(
-                    `/employee/term-tests/${classId}/students/${student.id}`
+                    `/employee/term-tests/${classId}/students/${student.id}?yearId=${selectedYearId}&termId=${selectedTermId}`
                 )
-            }
+            }}
         >
             <td>{index + 1}</td>
             <td>{student.index_number}</td>

@@ -507,3 +507,63 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Student Navigation */
+
+.student-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.student-navigation button {
+    padding: 10px 18px;
+    border: 1px solid #173e70;
+    border-radius: 7px;
+    background: #173e70;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.student-navigation button:hover:not(:disabled) {
+    background: #168b91;
+    border-color: #168b91;
+}
+
+.student-navigation button:disabled {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.student-navigation span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .student-navigation {
+        flex-wrap: wrap;
+    }
+
+    .student-navigation button {
+        flex: 1;
+        padding: 10px;
+    }
+
+    .student-navigation span {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+}

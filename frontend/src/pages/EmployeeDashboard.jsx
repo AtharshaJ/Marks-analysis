@@ -2,11 +2,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './EmployeeDashboard.css'
+import CustomDropdown from '../components/CustomDropdown'
 
 function EmployeeDashboard({ user }) {
     const navigate = useNavigate()
 
-    const [activeSection, setActiveSection] = useState('Grade 5 Scholarship')
+   const [activeSection, setActiveSection] = useState('Dashboard')
     const [loggingOut, setLoggingOut] = useState(false)
 
     // Term Test classes
@@ -17,11 +18,10 @@ function EmployeeDashboard({ user }) {
     const [classSearch, setClassSearch] = useState('')
 
     const navigationItems = [
-        { name: 'Grade 5 Scholarship', icon: '🎓' },
-        { name: 'Grade 11 O/L', icon: '📘' },
-        { name: 'Grade 13 A/L', icon: '📚' },
-        { name: 'Term Tests', icon: '📝' }
-    ]
+    { name: 'Dashboard', icon: '⌂' },
+    { name: 'Term Tests', icon: '▤' },
+    { name: 'Public Tests', icon: '▦' }
+]
 
     // Fetch class divisions for Term Tests
     const fetchClasses = async () => {
@@ -58,24 +58,24 @@ function EmployeeDashboard({ user }) {
 
     // Handle navigation between examination sections
     const handleSectionChange = (section) => {
-        setActiveSection(section)
+    setActiveSection(section)
 
-        if (section === 'Term Tests') {
-            setSelectedClassId('')
-            setClassSearch('')
-            fetchClasses()
-        }
+    if (section === 'Term Tests') {
+        setSelectedClassId('')
+        setClassSearch('')
+        fetchClasses()
     }
+}
 
     // Search for students in the selected class
-    const handleClassSearch = () => {
-        if (!selectedClassId) {
-            alert('Please select a class first.')
-            return
-        }
-
-        navigate(`/employee/term-tests/${selectedClassId}/students`)
+const handleClassSearch = () => {
+    if (!selectedClassId) {
+        alert('Please select a class first.')
+        return
     }
+
+    navigate(`/employee/term-tests/${selectedClassId}`)
+}
 
     // Handle logout
     const handleLogout = async () => {
@@ -206,6 +206,8 @@ function EmployeeDashboard({ user }) {
 
                 {/* Main Content */}
                 <div className="teacher-content">
+                    {activeSection === 'Dashboard' && (
+    <>
 
                     {/* Welcome Section */}
                     <section className="teacher-welcome">
@@ -285,142 +287,124 @@ function EmployeeDashboard({ user }) {
 
                         </section>
                     )}
+                        </>
+)}
 
                     {/* Selected Examination */}
-                    <section className="teacher-section-content">
+                    {/* Selected Examination */}
+{activeSection !== 'Dashboard' && (
+    <section className="teacher-section-content">
 
-                        <div className="teacher-section-heading">
-                            <div>
-                                <span>ACADEMIC MANAGEMENT</span>
-                                <h2>{activeSection}</h2>
-                            </div>
+        <div className="teacher-section-heading">
+            <div>
+                <span>ACADEMIC MANAGEMENT</span>
+                <h2>{activeSection}</h2>
+            </div>
 
-                            {activeSection === 'Term Tests' && (
-                                <button
-                                    className="teacher-refresh-btn"
-                                    onClick={fetchClasses}
-                                    disabled={classesLoading}
-                                >
-                                    {classesLoading ? 'Refreshing...' : '↻ Refresh'}
-                                </button>
-                            )}
-                        </div>
+            {activeSection === 'Term Tests' && (
+                <button
+                    className="teacher-refresh-btn"
+                    onClick={fetchClasses}
+                    disabled={classesLoading}
+                >
+                    {classesLoading ? 'Refreshing...' : '↻ Refresh'}
+                </button>
+            )}
+        </div>
 
-                        {activeSection === 'Term Tests' ? (
-                            <div className="term-test-content">
+        {activeSection === 'Term Tests' ? (
+            <div className="term-test-content">
 
-                                {classesLoading ? (
-                                    <div className="teacher-empty-state">
-                                        <div className="teacher-empty-icon">⏳</div>
-                                        <h3>Loading Classes...</h3>
-                                        <p>
-                                            Please wait while we retrieve the class divisions.
-                                        </p>
-                                    </div>
+                {classesLoading ? (
+    <div className="teacher-empty-state">
+        <h3>Loading Classes...</h3>
+        <p>Please wait while we retrieve the class divisions.</p>
+    </div>
+) : classesError ? (
+    <div className="teacher-empty-state">
+        <h3>Unable to Load Classes</h3>
+        <p>{classesError}</p>
 
-                                ) : classesError ? (
-                                    <div className="teacher-empty-state">
-                                        <div className="teacher-empty-icon">⚠️</div>
-                                        <h3>Unable to Load Classes</h3>
-                                        <p>{classesError}</p>
+        <button
+            className="teacher-refresh-btn"
+            onClick={fetchClasses}
+        >
+            Try Again
+        </button>
+    </div>
+) : classes.length === 0 ? (
+    <div className="teacher-empty-state">
+        <h3>No Classes Available</h3>
+        <p>
+            No class divisions have been created by the Administrator yet.
+        </p>
+    </div>
+) : (
+    <div className="term-test-intro">
+        <h3>Select a Class</h3>
 
-                                        <button
-                                            className="teacher-refresh-btn"
-                                            onClick={fetchClasses}
-                                        >
-                                            Try Again
-                                        </button>
-                                    </div>
+        <p>
+            Search for and select a class division
+            to view its students and term test records.
+        </p>
 
-                                ) : classes.length === 0 ? (
-                                    <div className="teacher-empty-state">
-                                        <div className="teacher-empty-icon">🏫</div>
-                                        <h3>No Classes Available</h3>
-                                        <p>
-                                            No class divisions have been created by the Administrator yet.
-                                        </p>
-                                    </div>
+        <div style={{
+            display: 'flex',
+            gap: '12px',
+            flexWrap: 'wrap',
+            marginTop: '20px',
+            alignItems: 'center'
+        }}>
+<CustomDropdown
+    value={selectedClassId}
+    placeholder="Search or select a class..."
+    options={filteredClasses.map(classItem => ({
+        value: String(classItem.id),
+        label: classItem.class_name
+    }))}
+    onChange={(value) => {
+        setSelectedClassId(value)
 
-                                ) : (
-                                    <div className="term-test-intro">
-                                        <h3>Select a Class</h3>
+        const selectedClass = classes.find(
+            classItem => String(classItem.id) === value
+        )
 
-                                        <p>
-                                            Search for and select a class division
-                                            to view its students and term test records.
-                                        </p>
+        setClassSearch(selectedClass?.class_name || '')
+    }}
+/>
 
-                                        <div style={{
-    display: 'flex',
-    gap: '12px',
-    flexWrap: 'wrap',
-    marginTop: '20px',
-    alignItems: 'center'
-}}>
-    <input
-        type="text"
-        list="term-test-classes"
-        placeholder="Type or select a class..."
-        value={classSearch}
-        onChange={(e) => {
-            const value = e.target.value
-            setClassSearch(value)
+            <button
+                className="teacher-refresh-btn"
+                onClick={handleClassSearch}
+                disabled={!selectedClassId}
+            >
+                Search
+            </button>
+        </div>
 
-            const matchedClass = classes.find(
-                classItem =>
-                    classItem.class_name.toLowerCase() === value.toLowerCase()
-            )
-
-            setSelectedClassId(matchedClass ? String(matchedClass.id) : '')
-        }}
-        style={{
-            padding: '12px',
-            minWidth: '220px',
-            flex: '1',
-            border: '1px solid #ccc',
-            borderRadius: '8px'
-        }}
-    />
-
-    <datalist id="term-test-classes">
-        {filteredClasses.map(classItem => (
-            <option
-                key={classItem.id}
-                value={classItem.class_name}
-            />
-        ))}
-    </datalist>
-
-    <button
-        className="teacher-refresh-btn"
-        onClick={handleClassSearch}
-        disabled={!selectedClassId}
-    >
-        Search
-    </button>
-</div>
-
-{filteredClasses.length === 0 && classSearch && (
-    <p style={{ marginTop: '12px' }}>
-        No matching classes found.
-    </p>
+        {filteredClasses.length === 0 && classSearch && (
+            <p style={{ marginTop: '12px' }}>
+                No matching classes found.
+            </p>
+        )}
+    </div>
 )}
-                                    </div>
-                                )}
 
-                            </div>
+            </div>
 
-                        ) : (
-                            <div className="teacher-empty-state">
-                                <div className="teacher-empty-icon">📋</div>
-                                <h3>{activeSection}</h3>
-                                <p>
-                                    The student records and marks management section will appear here.
-                                </p>
-                            </div>
-                        )}
+        ) : activeSection === 'Public Tests' ? (
+            <div className="teacher-empty-state">
+                <div className="teacher-empty-icon">▦</div>
+                <h3>Public Tests</h3>
+                <p>
+                    Public examination results and marks management
+                    will appear here.
+                </p>
+            </div>
+        ) : null}
 
-                    </section>
+    </section>
+)}
 
                 </div>
             </main>

@@ -1,24 +1,26 @@
 
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './StudentMarks.css'
-import CustomDropdown from '../components/CustomDropdown'
+
 
 
 function StudentMarks({ user }) {
     const { classId, studentId } = useParams()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
 
     const API_BASE_URL =
         import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
+    
+
     const [student, setStudent] = useState(null)
     const [selectedClass, setSelectedClass] = useState(null)
+    const [classStudents, setClassStudents] = useState([])
     const [subjects, setSubjects] = useState([])
-    const [academicYears, setAcademicYears] = useState([])
-
-    const [selectedYearId, setSelectedYearId] = useState('')
-    const [selectedTermId, setSelectedTermId] = useState('')
+    const [selectedYearId] = useState(searchParams.get('yearId') || '')
+const [selectedTermId] = useState(searchParams.get('termId') || '')
 
     const [marks, setMarks] = useState({})
     const [marksLoading, setMarksLoading] = useState(false)
@@ -34,7 +36,27 @@ function StudentMarks({ user }) {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
-    
+    const currentStudentIndex = classStudents.findIndex(
+    item => String(item.id) === String(studentId)
+)
+
+const previousStudent =
+    currentStudentIndex > 0
+        ? classStudents[currentStudentIndex - 1]
+        : null
+
+const nextStudent =
+    currentStudentIndex >= 0 && currentStudentIndex < classStudents.length - 1
+        ? classStudents[currentStudentIndex + 1]
+        : null
+
+    const navigateToStudent = (targetStudent) => {
+    if (!targetStudent) return
+
+    navigate(
+        `/employee/term-tests/${classId}/students/${targetStudent.id}?yearId=${selectedYearId}&termId=${selectedTermId}`
+    )
+}
 
     // Load student, subjects and academic years
     useEffect(() => {
@@ -44,33 +66,26 @@ function StudentMarks({ user }) {
                 setError('')
 
                 const [
-                    studentsResponse,
-                    subjectsResponse,
-                    yearsResponse
-                ] = await Promise.all([
-                    fetch(
-                        `${API_BASE_URL}/api/term-tests/${classId}/students`,
-                        { credentials: 'include' }
-                    ),
-                    fetch(
-                        `${API_BASE_URL}/api/term-tests/${classId}/students/${studentId}/subjects`,
-                        { credentials: 'include' }
-                    ),
-                    fetch(
-                        `${API_BASE_URL}/api/term-tests/academic-years`,
-                        { credentials: 'include' }
-                    )
-                ])
+    studentsResponse,
+    subjectsResponse
+] = await Promise.all([
+    fetch(
+        `${API_BASE_URL}/api/term-tests/${classId}/students`,
+        { credentials: 'include' }
+    ),
+    fetch(
+        `${API_BASE_URL}/api/term-tests/${classId}/students/${studentId}/subjects`,
+        { credentials: 'include' }
+    )
+])
 
-                const [
-                    studentsResult,
-                    subjectsResult,
-                    yearsResult
-                ] = await Promise.all([
-                    studentsResponse.json(),
-                    subjectsResponse.json(),
-                    yearsResponse.json()
-                ])
+               const [
+    studentsResult,
+    subjectsResult
+] = await Promise.all([
+    studentsResponse.json(),
+    subjectsResponse.json()
+])
 
                 if (!studentsResponse.ok) {
                     throw new Error(
@@ -84,11 +99,7 @@ function StudentMarks({ user }) {
                     )
                 }
 
-                if (!yearsResponse.ok) {
-                    throw new Error(
-                        yearsResult.message || 'Unable to load academic years.'
-                    )
-                }
+                
 
                 const currentStudent = studentsResult.students.find(
                     item => String(item.id) === String(studentId)
@@ -99,24 +110,9 @@ function StudentMarks({ user }) {
                 }
 
                 setStudent(currentStudent)
-                setSelectedClass(studentsResult.class)
-                setSubjects(subjectsResult.subjects || [])
-                setAcademicYears(yearsResult.academicYears || [])
-
-                // Select active academic year if available
-                const activeYear = (yearsResult.academicYears || [])
-                    .find(year => year.is_active)
-
-                if (activeYear) {
-                    setSelectedYearId(String(activeYear.id))
-
-                    const firstTerm = [...activeYear.academic_terms]
-                        .sort((a, b) => a.term_number - b.term_number)[0]
-
-                    if (firstTerm) {
-                        setSelectedTermId(String(firstTerm.id))
-                    }
-                }
+setSelectedClass(studentsResult.class)
+setClassStudents(studentsResult.students || [])
+setSubjects(subjectsResult.subjects || [])
 
             } catch (error) {
                 console.error('Student marks page error:', error)
@@ -218,11 +214,7 @@ useEffect(() => {
     fetchPerformanceSummary()
 }, [classId, studentId, selectedTermId])
 
-    const selectedYear = academicYears.find(
-        year => String(year.id) === selectedYearId
-    )
-
-    const availableTerms = selectedYear?.academic_terms || []
+    
 
     const handleSaveMarks = async () => {
     if (!selectedYearId || !selectedTermId) {
@@ -392,6 +384,28 @@ if (summaryResponse.ok) {
 
                             </div>
 
+                            <div className="student-navigation">
+    <button
+        type="button"
+        onClick={() => navigateToStudent(previousStudent)}
+        disabled={!previousStudent}
+    >
+        ← Previous Student
+    </button>
+
+    <span>
+        Student {currentStudentIndex + 1} of {classStudents.length}
+    </span>
+
+    <button
+        type="button"
+        onClick={() => navigateToStudent(nextStudent)}
+        disabled={!nextStudent}
+    >
+        Next Student →
+    </button>
+</div>
+
                         </section>
 
                         <section className="student-performance-summary">
@@ -444,40 +458,7 @@ if (summaryResponse.ok) {
 
                             <h2>Term Test Marks</h2>
 
-                            <div className="student-marks-selectors">
-
-                                <div>
-                                    <label>Academic Year</label>
-
-                                   <CustomDropdown
-    value={selectedYearId}
-    placeholder="Select Academic Year"
-    options={academicYears.map(year => ({
-        value: String(year.id),
-        label: String(year.year)
-    }))}
-    onChange={value => {
-        setSelectedYearId(value)
-        setSelectedTermId('')
-    }}
-/>
-                                </div>
-
-                                <div>
-                                    <label>Term</label>
-<CustomDropdown
-    value={selectedTermId}
-    placeholder="Select Term"
-    disabled={!selectedYearId}
-    options={availableTerms.map(term => ({
-        value: String(term.id),
-        label: term.term_name
-    }))}
-    onChange={value => setSelectedTermId(value)}
-/>
-                                </div>
-
-                            </div>
+                            
 
                             <div className="student-marks-subjects">
     <h3>Subjects</h3>
@@ -536,6 +517,19 @@ if (summaryResponse.ok) {
 </div>
 
 <div className="student-marks-save-section">
+
+    <button
+    type="button"
+    className="student-report-btn"
+    onClick={() =>
+        navigate(
+            `/employee/term-tests/${classId}/students/${student.id}/report?yearId=${selectedYearId}&termId=${selectedTermId}`
+        )
+    }
+    disabled={!selectedTermId || !selectedYearId}
+>
+    View Report
+</button>
 
     <button
         type="button"

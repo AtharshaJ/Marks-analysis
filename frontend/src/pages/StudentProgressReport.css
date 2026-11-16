@@ -1,0 +1,220 @@
+
+.progress-report-page {
+    min-height: 100vh;
+    padding: 25px;
+    background: #eef3f9;
+    font-family: 'Segoe UI', sans-serif;
+    color: #1e293b;
+}
+
+.progress-report-actions {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.progress-report-actions button,
+.progress-report-message button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #173e70;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.progress-report-paper {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 18mm 17mm;
+    background: white;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
+}
+
+.progress-report-heading {
+    text-align: center;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #173e70;
+}
+
+.progress-report-heading h1 {
+    margin: 0 0 12px;
+    color: #173e70;
+    font-size: 21px;
+}
+
+.progress-report-heading h2 {
+    margin: 0;
+    font-size: 17px;
+    letter-spacing: 1.5px;
+}
+
+.progress-report-student-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px 25px;
+    margin: 25px 0;
+    font-size: 14px;
+}
+
+.progress-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.progress-report-table th,
+.progress-report-table td {
+    padding: 11px 10px;
+    border: 1px solid #64748b;
+    text-align: left;
+}
+
+.progress-report-table th {
+    background: #e8eef6;
+    color: #173e70;
+    font-weight: 700;
+}
+
+.progress-report-table th:first-child,
+.progress-report-table td:first-child {
+    width: 45px;
+    text-align: center;
+}
+
+.progress-report-table th:nth-child(3),
+.progress-report-table th:nth-child(4),
+.progress-report-table td:nth-child(3),
+.progress-report-table td:nth-child(4) {
+    text-align: center;
+    width: 125px;
+}
+
+.progress-report-summary {
+    margin-top: 30px;
+}
+
+.progress-report-summary h3 {
+    color: #173e70;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 8px;
+}
+
+.progress-report-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.progress-report-summary-grid div {
+    border: 1px solid #cbd5e1;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.progress-report-summary-grid span,
+.progress-report-summary-grid strong {
+    display: block;
+}
+
+.progress-report-summary-grid span {
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 7px;
+}
+
+.progress-report-summary-grid strong {
+    color: #173e70;
+    font-size: 19px;
+}
+
+.progress-report-remarks {
+    margin-top: 35px;
+    font-size: 14px;
+}
+
+.progress-report-remarks div {
+    height: 65px;
+    border-bottom: 1px solid #94a3b8;
+}
+
+.progress-report-signatures {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 65px;
+}
+
+.progress-report-signatures div {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 12px;
+}
+
+.progress-report-signatures span {
+    font-weight: 700;
+    border-top: 1px solid #334155;
+    padding-top: 8px;
+    text-align: center;
+}
+
+.progress-report-signatures small {
+    font-size: 11px;
+}
+
+.progress-report-message {
+    padding: 40px;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.progress-report-error {
+    color: #b91c1c;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    body {
+        margin: 0;
+        background: white;
+    }
+
+    .progress-report-page {
+        min-height: auto;
+        padding: 0;
+        background: white;
+    }
+
+    .progress-report-actions {
+        display: none !important;
+    }
+
+    .progress-report-paper {
+    width: 210mm;
+    height: 297mm;
+    min-height: 297mm;
+    margin: 0;
+    padding: 18mm 17mm;
+    box-shadow: none;
+    box-sizing: border-box;
+    page-break-after: always;
+    break-after: page;
+}
+
+.progress-report-paper:last-child {
+    page-break-after: auto;
+    break-after: auto;
+}
+}
