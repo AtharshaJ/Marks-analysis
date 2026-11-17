@@ -231,14 +231,14 @@ setClassSubjects(subjectsResult.subjects || [])
                         <p>Teacher Portal</p>
                     </div>
                 </div>
-
-                <button
-                    className="student-list-back-btn"
-                    onClick={() => navigate('/employee')}
-                >
-                    ← Back to Dashboard
-                </button>
-
+ <button
+                className="subject-analysis-back-btn"
+                onClick={() =>
+                    navigate(`/employee/term-tests/${classId}`)
+                }
+            >
+                ← Back to Term Tests
+            </button>
             </header>
 
             {/* Main Content */}

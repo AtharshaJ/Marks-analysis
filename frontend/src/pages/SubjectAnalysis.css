@@ -1,0 +1,476 @@
+
+/* ================================
+   SUBJECT ANALYSIS PAGE
+================================ */
+
+.subject-analysis-page {
+    min-height: 100vh;
+    width: 100%;
+    padding-bottom: 40px;
+    background-image:
+        linear-gradient(
+            rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)
+        ),
+        url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #263c56;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.subject-analysis-page * {
+    box-sizing: border-box;
+}
+
+/* ================================
+   HEADER
+================================ */
+
+.subject-analysis-header {
+    min-height: 85px;
+    padding: 15px 6%;
+    background: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.subject-analysis-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.subject-analysis-brand-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #168b91;
+    color: white;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.subject-analysis-brand h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 21px;
+}
+
+.subject-analysis-brand h2 span {
+    color: #8de0dc;
+}
+
+.subject-analysis-brand p {
+    margin: 4px 0 0;
+    color: #d6e3f2;
+    font-size: 13px;
+}
+
+.subject-analysis-back-btn {
+    padding: 11px 20px;
+    background: #ffffff;
+    color: #173e70;
+    border: 1px solid #dce7f2;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+.subject-analysis-back-btn:hover {
+    background: #168b91;
+    color: #ffffff;
+    border-color: #168b91;
+}
+
+/* ================================
+   MAIN CONTENT
+================================ */
+
+.subject-analysis-main {
+    width: 94%;
+    max-width: none;
+    margin: 30px auto;
+}
+
+.subject-analysis-title {
+    margin-bottom: 25px;
+}
+
+.subject-analysis-title > span {
+    color: #168b91;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.subject-analysis-title h1 {
+    margin: 8px 0;
+    color: #173e70;
+    font-size: 27px;
+}
+
+.subject-analysis-title p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* ================================
+   CLASS INFORMATION
+================================ */
+
+.subject-analysis-class-card {
+    width: 100%;
+    margin-bottom: 25px;
+    padding: 23px 25px;
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(25, 55, 90, 0.06);
+}
+
+.subject-analysis-class-card h2 {
+    margin: 0 0 15px;
+    color: #173e70;
+    font-size: 19px;
+}
+
+.subject-analysis-class-card > div {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 5px 45px 0 0;
+}
+
+.subject-analysis-class-card span {
+    color: #718096;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-analysis-class-card strong {
+    color: #173e70;
+    font-size: 15px;
+}
+
+/* ================================
+   FILTER PANEL
+================================ */
+
+.subject-analysis-content {
+    width: 100%;
+}
+
+.subject-analysis-content > h2 {
+    color: #173e70;
+    font-size: 19px;
+    margin: 0 0 15px;
+}
+
+.subject-analysis-selectors {
+    width: 100%;
+    margin-bottom: 25px;
+    padding: 25px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    background: #ffffff;
+    border: 1px solid #dce7f2;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(23, 62, 112, 0.06);
+}
+
+.subject-analysis-selectors > div {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+}
+
+.subject-analysis-selectors label {
+    color: #34445a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ================================
+   OVERVIEW CARDS
+================================ */
+
+.subject-analysis-overview {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.subject-analysis-stat-card {
+    padding: 23px;
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(25, 55, 90, 0.06);
+    border-top: 4px solid #168b91;
+}
+
+.subject-analysis-stat-card span {
+    color: #718096;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-analysis-stat-card h3 {
+    margin: 12px 0 0;
+    color: #173e70;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+/* ================================
+   ANALYSIS SECTIONS
+================================ */
+
+.subject-analysis-section {
+    width: 100%;
+    margin: 25px 0;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(25, 55, 90, 0.06);
+}
+
+.subject-analysis-section > h2 {
+    margin: 0 0 22px;
+    color: #173e70;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.subject-analysis-section > p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* ================================
+   GRADE DISTRIBUTION
+================================ */
+
+.subject-analysis-grade-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.subject-analysis-grade-card {
+    padding: 18px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f8fc;
+    border: 1px solid #e1eaf2;
+    border-radius: 9px;
+}
+
+.subject-analysis-grade-card span {
+    color: #718096;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.subject-analysis-grade-card strong {
+    color: #173e70;
+    font-size: 23px;
+}
+
+/* ================================
+   STUDENT RANKINGS TABLE
+================================ */
+
+.subject-analysis-table-wrapper {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e3eaf2;
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.subject-analysis-table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.subject-analysis-table th {
+    padding: 17px 22px;
+    background: #173e70;
+    color: #ffffff;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.subject-analysis-table td {
+    padding: 16px 22px;
+    color: #34445a;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.subject-analysis-table tbody tr:nth-child(even) {
+    background: #f5f8fc;
+}
+
+.subject-analysis-table tbody tr:hover {
+    background: #edf5fc;
+}
+
+.subject-analysis-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ================================
+   SUBJECT COMPARISON
+================================ */
+
+.subject-comparison-section > p {
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.subject-comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.subject-comparison-card {
+    padding: 22px;
+    background: #f5f8fc;
+    border: 1px solid #e1eaf2;
+    border-radius: 10px;
+}
+
+.subject-comparison-card h3 {
+    margin: 0 0 7px;
+    color: #173e70;
+    font-size: 17px;
+}
+
+.subject-comparison-card > p {
+    margin: 0 0 15px;
+    color: #718096;
+    font-size: 13px;
+}
+
+.subject-comparison-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #e1eaf2;
+    color: #34445a;
+    font-size: 14px;
+}
+
+.subject-comparison-item:last-child {
+    border-bottom: none;
+}
+
+.subject-comparison-item strong {
+    color: #168b91;
+    font-size: 16px;
+}
+
+/* ================================
+   ERROR / EMPTY STATES
+================================ */
+
+.subject-analysis-error {
+    padding: 20px;
+    margin-top: 20px;
+    background: #fff0f0;
+    border: 1px solid #ffd2d2;
+    border-radius: 9px;
+    color: #c03939 !important;
+    font-size: 13px;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 1000px) {
+    .subject-analysis-overview {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .subject-analysis-grade-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .subject-analysis-header {
+        padding: 18px 5%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .subject-analysis-main {
+        width: 92%;
+    }
+
+    .subject-analysis-selectors {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .subject-analysis-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .subject-analysis-stat-card {
+        padding: 17px;
+    }
+
+    .subject-analysis-stat-card h3 {
+        font-size: 23px;
+    }
+
+    .subject-analysis-section {
+        padding: 20px 16px;
+    }
+
+    .subject-analysis-grade-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .subject-comparison-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .subject-analysis-overview {
+        grid-template-columns: 1fr;
+    }
+}

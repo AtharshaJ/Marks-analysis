@@ -19,6 +19,8 @@ import SubjectMarks from './pages/SubjectMarks'
 import TermTestsDashboard from './pages/TermTestsDashboard'
 import StudentProgressReport from './pages/StudentProgressReport'
 import PrintAllStudentReports from './pages/PrintAllStudentReports'
+import ClassAnalysis from './pages/ClassAnalysis'
+import SubjectAnalysis from './pages/SubjectAnalysis'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -165,6 +167,15 @@ function App() {
     element={
         <ProtectedRoute allowedRole="employee">
             {user => <SubjectMarks user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/employee/term-tests/:classId/subject-analysis"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <SubjectAnalysis user={user} />}
         </ProtectedRoute>
     }
 />

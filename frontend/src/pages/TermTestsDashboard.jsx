@@ -6,32 +6,33 @@ function TermTestsDashboard() {
     const navigate = useNavigate()
     const { classId } = useParams()
 
-    const menuItems = [
-        {
-            title: 'Student View',
-            description: 'View individual student marks, totals, averages and performance.',
-            icon: '♙',
-            path: `/employee/term-tests/${classId}/students`
-        },
-        {
-            title: 'Subject View',
-            description: 'View and manage student marks subject by subject.',
-            icon: '▤',
-            path: `/employee/term-tests/${classId}/subjects`
-        },
-        {
-            title: 'Class Analysis',
-            description: 'Explore class performance, rankings and statistical reports.',
-            icon: '▥',
-            path: `/employee/term-tests/${classId}/analysis`
-        },
-        {
-            title: 'Subject Settings',
-            description: 'Configure which subjects are included in class calculations.',
-            icon: '⚙',
-            path: `/employee/term-tests/${classId}/settings`
-        }
-    ]
+const menuItems = [
+    {
+        title: 'Editing View',
+        description: 'View individual student marks, totals, averages and performance.',
+        icon: '♙',
+        path: `/employee/term-tests/${classId}/students`
+    },
+    
+    {
+        title: 'Subject Analysis',
+        description: 'Analyse subject performance, grade distribution and student rankings.',
+        icon: '▥',
+        path: `/employee/term-tests/${classId}/subject-analysis`
+    },
+    {
+        title: 'Class Analysis',
+        description: 'Explore class performance, rankings and statistical reports.',
+        icon: '▦',
+        path: `/employee/term-tests/${classId}/analysis`
+    },
+    {
+        title: 'Subject Settings',
+        description: 'Configure which subjects are included in class calculations.',
+        icon: '⚙',
+        path: `/employee/term-tests/${classId}/settings`
+    }
+]
 
     return (
         <div className="term-tests-dashboard">

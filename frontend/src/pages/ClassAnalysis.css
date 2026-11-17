@@ -1,0 +1,372 @@
+
+/* ================================
+   CLASS ANALYSIS PAGE
+================================ */
+
+.class-analysis-page {
+    min-height: 100vh;
+    width: 100%;
+    background-image:
+        linear-gradient(
+            rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)
+        ),
+        url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #263c56;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+.class-analysis-page * {
+    box-sizing: border-box;
+}
+
+/* ================================
+   HEADER
+================================ */
+
+.class-analysis-header {
+    min-height: 85px;
+    padding: 15px 6%;
+    background: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
+
+.class-analysis-header h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.class-analysis-header p {
+    margin: 5px 0 0;
+    color: #d6e3f2;
+    font-size: 13px;
+}
+
+/* ================================
+   MAIN CONTENT
+================================ */
+
+.class-analysis-page {
+    padding-bottom: 40px;
+}
+
+.class-analysis-filters,
+.class-analysis-overview,
+.class-analysis-section,
+.class-analysis-empty,
+.class-analysis-error {
+    width: 94%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+.class-analysis-filters {
+    margin-top: 30px;
+    margin-bottom: 25px;
+    padding: 25px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    background: #ffffff;
+    border: 1px solid #dce7f2;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(23, 62, 112, 0.06);
+}
+
+.class-analysis-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.class-analysis-filter label {
+    color: #34445a;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ================================
+   OVERVIEW CARDS
+================================ */
+
+.class-analysis-overview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.class-analysis-stat-card {
+    padding: 23px;
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(25, 55, 90, 0.06);
+    border-top: 4px solid #168b91;
+}
+
+.class-analysis-stat-card span {
+    color: #718096;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.class-analysis-stat-card h2 {
+    margin: 12px 0 0;
+    color: #173e70;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+/* ================================
+   ANALYSIS SECTIONS
+================================ */
+
+.class-analysis-section {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(25, 55, 90, 0.06);
+}
+
+.class-analysis-section > h2 {
+    margin: 0 0 22px;
+    color: #173e70;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+/* ================================
+   GRADE DISTRIBUTION
+================================ */
+
+.class-analysis-grade-distribution {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.class-analysis-grade-card {
+    padding: 18px 12px;
+    text-align: center;
+    background: #f5f8fc;
+    border: 1px solid #e1eaf2;
+    border-radius: 9px;
+    transition: 0.2s ease;
+}
+
+.class-analysis-grade-card:hover {
+    border-color: #168b91;
+    background: #edf5fc;
+}
+
+.class-analysis-grade-card span {
+    color: #718096;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.class-analysis-grade-card h2 {
+    margin: 10px 0 5px;
+    color: #173e70;
+    font-size: 25px;
+}
+
+.class-analysis-grade-card p {
+    margin: 0;
+    color: #168b91;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ================================
+   TABLE
+================================ */
+
+/* ================================
+   TABLE
+================================ */
+
+.class-analysis-table-wrapper {
+    width: 100%;
+    max-width: none;
+    overflow-x: auto;
+    border: 1px solid #e3eaf2;
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.class-analysis-table {
+    width: 100%;
+    min-width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.class-analysis-table th {
+    padding: 17px 22px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.class-analysis-table td {
+    padding: 16px 22px;
+    color: #34445a;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.class-analysis-table tbody tr:nth-child(even) {
+    background: #f5f8fc;
+}
+
+.class-analysis-table tbody tr:hover {
+    background: #edf5fc;
+}
+
+.class-analysis-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ================================
+   LOADING / ERROR / EMPTY
+================================ */
+
+.class-analysis-empty,
+.class-analysis-error {
+    padding: 20px;
+    margin-top: 20px;
+    background: #ffffff;
+    border: 1px solid #e5ebf3;
+    border-radius: 9px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.class-analysis-error {
+    background: #fff0f0;
+    border-color: #ffd2d2;
+    color: #c03939;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 700px) {
+    .class-analysis-header {
+        padding: 18px 5%;
+    }
+
+    .class-analysis-header h1 {
+        font-size: 21px;
+    }
+
+    .class-analysis-filters,
+    .class-analysis-overview,
+    .class-analysis-section,
+    .class-analysis-empty,
+    .class-analysis-error {
+        width: 92%;
+    }
+
+    .class-analysis-filters {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .class-analysis-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .class-analysis-stat-card {
+        padding: 17px;
+    }
+
+    .class-analysis-stat-card h2 {
+        font-size: 23px;
+    }
+
+    .class-analysis-section {
+        padding: 20px 16px;
+    }
+
+    .class-analysis-grade-distribution {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+    .class-analysis-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .class-analysis-grade-distribution {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Student Rankings - Full Width Fix */
+
+.class-analysis-section:has(.class-analysis-table-wrapper) {
+    width: 94%;
+    max-width: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.class-analysis-section .class-analysis-table-wrapper {
+    display: block;
+    width: 100%;
+    max-width: none;
+}
+
+.class-analysis-section .class-analysis-table {
+    display: table;
+    width: 100%;
+    min-width: 100%;
+    table-layout: fixed;
+}
+
+.class-analysis-back-btn {
+    padding: 11px 20px;
+    background: #ffffff;
+    color: #173e70;
+    border: 1px solid #dce7f2;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+.class-analysis-back-btn:hover {
+    background: #168b91;
+    color: #ffffff;
+    border-color: #168b91;
+}
+
+@media (max-width: 600px) {
+    .class-analysis-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
