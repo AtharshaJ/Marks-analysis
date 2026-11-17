@@ -1,0 +1,321 @@
+
+/* ================================
+   SCHOLARSHIP EXAMINATION PAGE
+================================ */
+
+.scholarship-exam-page {
+    min-height: 100vh;
+    width: 100%;
+    background-image:
+        linear-gradient(
+            rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)
+        ),
+        url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Segoe UI', sans-serif;
+    color: #173e70;
+}
+
+/* ================================
+   HEADER
+================================ */
+
+.scholarship-exam-header {
+    width: 100%;
+    min-height: 75px;
+    padding: 15px 35px;
+    background: #173e70;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scholarship-exam-header h2 {
+    color: white;
+    font-size: 21px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.scholarship-exam-header button {
+    padding: 10px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 7px;
+    background: transparent;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.scholarship-exam-header button:hover {
+    background: #168b91;
+    border-color: #168b91;
+}
+
+/* ================================
+   MAIN CONTENT
+================================ */
+
+.scholarship-exam-main {
+    width: 94%;
+    max-width: 1450px;
+    margin: 30px auto;
+    padding-bottom: 40px;
+}
+
+/* ================================
+   PAGE TITLE
+================================ */
+
+.scholarship-exam-title {
+    margin-bottom: 25px;
+}
+
+.scholarship-exam-title h2 {
+    color: #173e70;
+    font-size: 25px;
+    font-weight: 700;
+    margin: 0 0 7px;
+}
+
+.scholarship-exam-title p {
+    color: #52677f;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ================================
+   EXAM YEAR
+================================ */
+
+.scholarship-exam-year {
+    background: rgba(255, 255, 255, 0.94);
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid #d7e3f0;
+    box-shadow: 0 4px 14px rgba(23, 62, 112, 0.07);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.scholarship-exam-year label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #173e70;
+}
+
+.scholarship-exam-year input {
+    width: 150px;
+    padding: 10px 12px;
+    border: 1px solid #cbdced;
+    border-radius: 7px;
+    font-size: 14px;
+    color: #173e70;
+    outline: none;
+}
+
+.scholarship-exam-year input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.12);
+}
+
+/* ================================
+   RESULTS TABLE CONTAINER
+================================ */
+
+.scholarship-exam-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #d7e3f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(23, 62, 112, 0.08);
+}
+
+.scholarship-exam-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+.scholarship-exam-table thead {
+    background: #173e70;
+}
+
+.scholarship-exam-table th {
+    padding: 16px 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.scholarship-exam-table td {
+    padding: 14px 20px;
+    color: #334e68;
+    font-size: 13px;
+    border-bottom: 1px solid #e5edf5;
+}
+
+.scholarship-exam-table tbody tr:nth-child(even):not(.scholarship-add-row):not(.scholarship-add-trigger) {
+    background: #f5f9fd;
+}
+
+.scholarship-exam-table tbody tr:hover:not(.scholarship-add-row):not(.scholarship-add-trigger) {
+    background: #edf5fb;
+}
+
+.scholarship-exam-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ================================
+   ADD NEW RESULT TRIGGER ROW
+================================ */
+
+.scholarship-add-trigger {
+    cursor: pointer;
+    background: #f0f7fc;
+    transition: background 0.2s ease;
+}
+
+.scholarship-add-trigger td {
+    text-align: center;
+    padding: 17px;
+    color: #168b91;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px dashed #9bb6d3;
+}
+
+.scholarship-add-trigger:hover {
+    background: #e2f2f2;
+}
+
+.scholarship-add-trigger span {
+    display: inline-block;
+    width: 100%;
+}
+
+/* ================================
+   EXPANDED ENTRY ROW
+================================ */
+
+.scholarship-add-row td {
+    padding: 12px;
+    background: #f7faff;
+}
+
+.scholarship-add-row input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cbdced;
+    border-radius: 7px;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 13px;
+    color: #173e70;
+}
+
+.scholarship-add-row input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 2px rgba(22, 139, 145, 0.12);
+}
+
+.scholarship-add-btn {
+    width: 100%;
+    padding: 11px;
+    background: #168b91;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.scholarship-add-btn:hover {
+    background: #117078;
+}
+
+.scholarship-add-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ================================
+   ERROR MESSAGE
+================================ */
+
+.scholarship-error {
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    background: #fff0f0;
+    border: 1px solid #f0caca;
+    border-radius: 8px;
+    color: #b42318;
+    font-size: 13px;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 768px) {
+    .scholarship-exam-header {
+        padding: 14px 18px;
+        gap: 12px;
+    }
+
+    .scholarship-exam-header h2 {
+        font-size: 17px;
+    }
+
+    .scholarship-exam-header button {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .scholarship-exam-main {
+        width: 95%;
+        margin-top: 22px;
+    }
+
+    .scholarship-exam-title h2 {
+        font-size: 21px;
+    }
+
+    .scholarship-exam-year {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .scholarship-exam-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .scholarship-exam-year {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .scholarship-exam-year input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

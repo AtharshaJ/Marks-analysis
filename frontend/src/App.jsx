@@ -21,6 +21,8 @@ import StudentProgressReport from './pages/StudentProgressReport'
 import PrintAllStudentReports from './pages/PrintAllStudentReports'
 import ClassAnalysis from './pages/ClassAnalysis'
 import SubjectAnalysis from './pages/SubjectAnalysis'
+import ScholarshipExam from './pages/ScholarshipExam'
+import ScholarshipAnalysis from './pages/ScholarshipAnalysis'
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -130,6 +132,26 @@ function App() {
     element={
         <ProtectedRoute allowedRole="employee">
             {user => <EmployeeDashboard user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+{/* Grade 5 Scholarship Examination */}
+<Route
+    path="/employee/public-exams/scholarship"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <ScholarshipExam user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+{/* Scholarship Marks Analysis */}
+<Route
+    path="/employee/public-exams/scholarship/analysis"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <ScholarshipAnalysis user={user} />}
         </ProtectedRoute>
     }
 />

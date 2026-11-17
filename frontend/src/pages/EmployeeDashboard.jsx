@@ -1,13 +1,17 @@
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import './EmployeeDashboard.css'
 import CustomDropdown from '../components/CustomDropdown'
 
 function EmployeeDashboard({ user }) {
     const navigate = useNavigate()
 
-   const [activeSection, setActiveSection] = useState('Dashboard')
+   const location = useLocation()
+
+const [activeSection, setActiveSection] = useState(
+    location.state?.activeSection || 'Dashboard'
+)
     const [loggingOut, setLoggingOut] = useState(false)
 
     // Term Test classes
@@ -16,6 +20,7 @@ function EmployeeDashboard({ user }) {
     const [classesError, setClassesError] = useState('')
     const [selectedClassId, setSelectedClassId] = useState('')
     const [classSearch, setClassSearch] = useState('')
+    const [expandedPublicExam, setExpandedPublicExam] = useState('')
 
     const navigationItems = [
     { name: 'Dashboard', icon: '⌂' },
@@ -392,16 +397,134 @@ const handleClassSearch = () => {
 
             </div>
 
-        ) : activeSection === 'Public Tests' ? (
-            <div className="teacher-empty-state">
-                <div className="teacher-empty-icon">▦</div>
-                <h3>Public Tests</h3>
-                <p>
-                    Public examination results and marks management
-                    will appear here.
-                </p>
+        
+) : activeSection === 'Public Tests' ? (
+    <div className="public-tests-page">
+
+        <div className="public-tests-header">
+            <h2>Public Examinations</h2>
+            <p>
+                Manage public examination results and analyse
+                student performance.
+            </p>
+        </div>
+
+       
+<div className="public-exams-grid">
+
+    {/* Grade 5 Scholarship */}
+    <div className="public-exam-card">
+        <div className="public-exam-icon">▦</div>
+        <h3>Grade 5 Scholarship</h3>
+        <p>Scholarship examination results and analysis.</p>
+
+        <button
+            onClick={() =>
+                setExpandedPublicExam(
+                    expandedPublicExam === 'scholarship' ? '' : 'scholarship'
+                )
+            }
+        >
+            {expandedPublicExam === 'scholarship' ? 'Close' : 'Open'}
+        </button>
+
+        {expandedPublicExam === 'scholarship' && (
+            <div className="public-exam-actions">
+                <button
+    className="public-exam-edit-btn"
+    onClick={() => navigate('/employee/public-exams/scholarship')}
+>
+    Manage Results
+</button>
+
+                <button
+    className="public-exam-analysis-btn"
+    onClick={() => navigate('/employee/public-exams/scholarship/analysis')}
+>
+    View Analysis
+</button>
             </div>
-        ) : null}
+        )}
+    </div>
+
+
+    {/* G.C.E. O/L */}
+    <div className="public-exam-card">
+        <div className="public-exam-icon">▤</div>
+        <h3>G.C.E. O/L</h3>
+        <p>Ordinary Level examination results and analysis.</p>
+
+        <button
+            onClick={() =>
+                setExpandedPublicExam(
+                    expandedPublicExam === 'ol' ? '' : 'ol'
+                )
+            }
+        >
+            {expandedPublicExam === 'ol' ? 'Close' : 'Open'}
+        </button>
+
+        {expandedPublicExam === 'ol' && (
+            <div className="public-exam-actions">
+                <button
+                    className="public-exam-edit-btn"
+                    onClick={() => {}}
+                >
+                    Editing
+                </button>
+
+                <button
+                    className="public-exam-analysis-btn"
+                    onClick={() => {}}
+                >
+                    View Analysis
+                </button>
+            </div>
+        )}
+    </div>
+
+
+    {/* G.C.E. A/L */}
+    <div className="public-exam-card">
+        <div className="public-exam-icon">▥</div>
+        <h3>G.C.E. A/L</h3>
+        <p>Advanced Level examination results and analysis.</p>
+
+        <button
+            onClick={() =>
+                setExpandedPublicExam(
+                    expandedPublicExam === 'al' ? '' : 'al'
+                )
+            }
+        >
+            {expandedPublicExam === 'al' ? 'Close' : 'Open'}
+        </button>
+
+        {expandedPublicExam === 'al' && (
+            <div className="public-exam-actions">
+                <button
+                    className="public-exam-edit-btn"
+                    onClick={() => {}}
+                >
+                    Editing
+                </button>
+
+                <button
+                    className="public-exam-analysis-btn"
+                    onClick={() => {}}
+                >
+                    View Analysis
+                </button>
+            </div>
+        )}
+    </div>
+
+</div>
+
+
+    </div>
+) : null}
+
 
     </section>
 )}

@@ -929,3 +929,136 @@
         align-items: flex-start;
     }
 }
+
+
+/* ================================
+   PUBLIC EXAMINATIONS
+================================ */
+
+.public-tests-page {
+    width: 100%;
+    padding: 25px;
+}
+
+.public-tests-header {
+    margin-bottom: 28px;
+}
+
+.public-tests-header h2 {
+    color: #173e70;
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.public-tests-header p {
+    color: #52677f;
+    font-size: 14px;
+}
+
+.public-exams-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.public-exam-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #d7e3f0;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 4px 14px rgba(23, 62, 112, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.public-exam-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(23, 62, 112, 0.13);
+}
+
+.public-exam-icon {
+    width: 48px;
+    height: 48px;
+    background: #e8f1fb;
+    color: #173e70;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    margin-bottom: 18px;
+}
+
+.public-exam-card h3 {
+    color: #173e70;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.public-exam-card p {
+    color: #66788d;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 42px;
+    margin-bottom: 20px;
+}
+
+.public-exam-card button {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    background: #173e70;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.public-exam-card button:hover {
+    background: #168b91;
+}
+
+@media (max-width: 900px) {
+    .public-exams-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .public-tests-page {
+        padding: 15px;
+    }
+
+    .public-exams-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.public-exam-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e8f1;
+}
+
+.public-exam-card .public-exam-edit-btn {
+    background: #168b91;
+}
+
+.public-exam-card .public-exam-edit-btn:hover {
+    background: #117078;
+}
+
+.public-exam-card .public-exam-analysis-btn {
+    background: #e8f1fb;
+    color: #173e70;
+    border: 1px solid #cbdced;
+}
+
+.public-exam-card .public-exam-analysis-btn:hover {
+    background: #d5e5f5;
+    color: #173e70;
+}
