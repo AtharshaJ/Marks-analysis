@@ -60,6 +60,26 @@ const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
 
     const [loggingOut, setLoggingOut] = useState(false)
 
+    // Student Promotion
+const [promotionGroup, setPromotionGroup] = useState('1-11')
+const [promotionExamYear, setPromotionExamYear] = useState(
+    new Date().getFullYear()
+)
+
+const [promotionPreview, setPromotionPreview] = useState(null)
+const [promotionLoading, setPromotionLoading] = useState(false)
+const [promotionExecuting, setPromotionExecuting] = useState(false)
+const [promotionError, setPromotionError] = useState('')
+const [promotionMessage, setPromotionMessage] = useState('')
+const [showPromotionConfirm, setShowPromotionConfirm] = useState(false)
+
+// Examination data deletion
+const [examDeleteType, setExamDeleteType] = useState('')
+const [examDeleteLoading, setExamDeleteLoading] = useState(false)
+const [examDeleteError, setExamDeleteError] = useState('')
+const [examDeleteMessage, setExamDeleteMessage] = useState('')
+const [examDeleteSummary, setExamDeleteSummary] = useState(null)
+
 // Handle admin logout
 const handleLogout = async () => {
     try {
@@ -93,6 +113,7 @@ const handleLogout = async () => {
         { id: 'teachers', label: 'Teacher Management', icon: '♙' },
     { id: 'classes', label: 'Class Divisions', icon: '⌂' },
     { id: 'subject-management', label: 'Subject Management', icon: '▦' },
+    { id: 'promotion', label: 'Student Promotion', icon: '⇧' },
     { id: 'settings', label: 'Account Settings', icon: '⚙' }
     ]
 
@@ -645,6 +666,133 @@ useEffect(() => {
             setActionLoading(false)
         }
     }
+
+// Generate student promotion preview
+const handlePromotionPreview = async () => {
+    try {
+        setPromotionLoading(true)
+        setPromotionError('')
+        setPromotionMessage('')
+        setPromotionPreview(null)
+
+        const response = await fetch(
+            `http://localhost:5000/api/promotion/preview/${promotionGroup}`,
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+
+        const data = await response.json()
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || 'Unable to generate promotion preview.'
+            )
+        }
+
+        setPromotionPreview(data)
+    } catch (error) {
+        console.error('Promotion preview error:', error)
+        setPromotionError(error.message)
+    } finally {
+        setPromotionLoading(false)
+    }
+}
+
+// Execute student promotion
+const handleExecutePromotion = async () => {
+    try {
+        setPromotionExecuting(true)
+        setPromotionError('')
+        setPromotionMessage('')
+        setShowPromotionConfirm(false)
+
+        const response = await fetch(
+            'http://localhost:5000/api/promotion/execute',
+            {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    group: promotionGroup,
+                    examYear: Number(promotionExamYear)
+                })
+            }
+        )
+
+        const data = await response.json()
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || 'Student promotion failed.'
+            )
+        }
+
+        setPromotionMessage(
+            data.message || 'Student promotion completed successfully.'
+        )
+
+        setPromotionPreview(null)
+
+    } catch (error) {
+        console.error('Promotion execution error:', error)
+        setPromotionError(error.message)
+    } finally {
+        setPromotionExecuting(false)
+    }
+}
+
+
+const handleExamDataDeletion = async () => {
+    const endpoints = {
+        scholarship: '/clear-scholarship',
+        ol: '/clear-ol',
+        al: '/clear-al'
+    }
+
+    const selectedType = examDeleteType
+
+    if (!endpoints[selectedType]) return
+
+    try {
+        setExamDeleteLoading(true)
+        setExamDeleteError('')
+        setExamDeleteMessage('')
+        setExamDeleteSummary(null)
+
+        const response = await fetch(
+            `http://localhost:5000/api/promotion${endpoints[selectedType]}`,
+            {
+                method: 'DELETE',
+                credentials: 'include'
+            }
+        )
+
+        const data = await response.json()
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || 'Unable to delete examination data.'
+            )
+        }
+
+        setExamDeleteSummary(data)
+        setExamDeleteMessage(
+            `${data.exam_type} examination data cleared successfully.`
+        )
+
+    } catch (error) {
+        console.error('Examination data deletion error:', error)
+        setExamDeleteError(error.message)
+    } finally {
+        setExamDeleteLoading(false)
+        setExamDeleteType('')
+    }
+}
+
 
     return (
         <div className="admin-dashboard">
@@ -1232,6 +1380,316 @@ useEffect(() => {
 {/* Subject Management */}
 {activeSection === 'subject-management' && (
     <SubjectManagement embedded />
+)}
+
+{activeSection === 'promotion' && (
+    <div className="promotion-section">
+
+        <div className="promotion-header">
+            <h2>Student Promotion</h2>
+            <p>
+                Review student promotions and prepare the annual
+                academic-year transition.
+            </p>
+        </div>
+
+        <div className="promotion-controls">
+
+            <div className="promotion-field">
+                <label>Promotion Group</label>
+
+                <CustomDropdown
+                    options={[
+                        { value: '1-11', label: 'Grades 1 – 11' },
+                        { value: '12-13', label: 'Grades 12 – 13' }
+                    ]}
+                    value={promotionGroup}
+                    onChange={(value) => {
+                        setPromotionGroup(value)
+                        setPromotionPreview(null)
+                        setPromotionError('')
+                        setPromotionMessage('')
+                    }}
+                    placeholder="Select promotion group"
+                />
+            </div>
+
+            <div className="promotion-field">
+                <label>Examination Year</label>
+
+                <CustomDropdown
+                    options={Array.from(
+                        { length: 3 },
+                        (_, index) => {
+                            const year = new Date().getFullYear() - index
+
+                            return {
+                                value: String(year),
+                                label: String(year)
+                            }
+                        }
+                    )}
+                    value={String(promotionExamYear)}
+                    onChange={(value) => {
+                        setPromotionExamYear(Number(value))
+                        setPromotionPreview(null)
+                    }}
+                    placeholder="Select examination year"
+                />
+            </div>
+
+            <button
+                className="promotion-preview-button"
+                onClick={handlePromotionPreview}
+                disabled={promotionLoading || promotionExecuting}
+            >
+                {promotionLoading
+                    ? 'Generating Preview...'
+                    : 'Generate Promotion Preview'}
+            </button>
+
+        </div>
+
+
+{/* PUBLIC EXAMINATION DATA MANAGEMENT */}
+<div className="exam-data-management">
+
+    <h3>Public Examination Data Management</h3>
+
+    <p>
+        Clear examination records independently when preparing
+        for a new examination cycle.
+    </p>
+
+    <div className="exam-delete-buttons">
+
+        <button
+            className="exam-delete-button"
+            onClick={() => {
+                setExamDeleteType('scholarship')
+                setExamDeleteError('')
+                setExamDeleteMessage('')
+            }}
+            disabled={examDeleteLoading}
+        >
+            Delete Scholarship Results
+        </button>
+
+        <button
+            className="exam-delete-button"
+            onClick={() => {
+                setExamDeleteType('ol')
+                setExamDeleteError('')
+                setExamDeleteMessage('')
+            }}
+            disabled={examDeleteLoading}
+        >
+            Delete O/L Results
+        </button>
+
+        <button
+            className="exam-delete-button"
+            onClick={() => {
+                setExamDeleteType('al')
+                setExamDeleteError('')
+                setExamDeleteMessage('')
+            }}
+            disabled={examDeleteLoading}
+        >
+            Delete A/L Results
+        </button>
+
+    </div>
+
+    {examDeleteError && (
+        <div className="promotion-error">
+            {examDeleteError}
+        </div>
+    )}
+
+    {examDeleteMessage && (
+        <div className="promotion-success">
+            {examDeleteMessage}
+        </div>
+    )}
+
+    {examDeleteSummary && (
+        <div className="exam-delete-summary">
+            <h4>Deletion Summary</h4>
+
+            {Object.entries(examDeleteSummary)
+                .filter(([key]) => key.endsWith('_deleted'))
+                .map(([key, value]) => (
+                    <p key={key}>
+                        {key.replaceAll('_', ' ')}: <strong>{value}</strong>
+                    </p>
+                ))}
+        </div>
+    )}
+
+</div>
+
+
+{/* EXAMINATION DATA DELETION CONFIRMATION */}
+{examDeleteType && (
+    <div className="exam-delete-confirm-overlay">
+        <div className="exam-delete-confirm">
+
+            <h3>Confirm Permanent Deletion</h3>
+
+            <p>
+                Are you sure you want to permanently delete all
+                {examDeleteType === 'scholarship'
+                    ? ' Scholarship'
+                    : examDeleteType === 'ol'
+                        ? ' O/L'
+                        : ' A/L'} examination records?
+            </p>
+
+            <p className="exam-delete-warning">
+                This action cannot be undone. The main student
+                records, subjects, and class information will
+                remain unchanged.
+            </p>
+
+            <div className="exam-delete-confirm-actions">
+
+                <button
+                    type="button"
+                    onClick={() => setExamDeleteType('')}
+                    disabled={examDeleteLoading}
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    className="exam-delete-confirm-button"
+                    onClick={handleExamDataDeletion}
+                    disabled={examDeleteLoading}
+                >
+                    {examDeleteLoading
+                        ? 'Deleting...'
+                        : 'Yes, Delete All Records'}
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+)}
+
+
+
+        {promotionError && (
+            <div className="promotion-error">
+                {promotionError}
+            </div>
+        )}
+
+        {promotionMessage && (
+            <div className="promotion-success">
+                {promotionMessage}
+            </div>
+        )}
+
+        {promotionPreview && (
+            <div className="promotion-preview">
+                <h3>Promotion Preview</h3>
+                <p>Review the details before proceeding.</p>
+
+                
+
+                <div className="promotion-summary">
+                    <div>
+                        <strong>
+                            {promotionPreview.summary?.students_to_promote ?? 0}
+                        </strong>
+                        <span>Students to Promote</span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {promotionPreview.summary?.students_to_delete ?? 0}
+                        </strong>
+                        <span>Students to Delete</span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {promotionPreview.summary?.marks_to_delete ?? 0}
+                        </strong>
+                        <span>Term-Test Marks to Delete</span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {promotionPreview.summary?.classes_to_create ?? 0}
+                        </strong>
+                        <span>Classes to Create</span>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {promotionPreview.summary?.teachers_to_reassign ?? 0}
+                        </strong>
+                        <span>Teachers to Reassign</span>
+                    </div>
+                </div>
+
+                <div className="promotion-preservation-note">
+                    Scholarship, O/L and A/L examination records
+                    are intended to remain untouched.
+                </div>
+
+                <button
+                    className="promotion-execute-button"
+                    onClick={() => setShowPromotionConfirm(true)}
+                    disabled={promotionExecuting}
+                >
+                    Review and Confirm Promotion
+                </button>
+            </div>
+        )}
+
+        {showPromotionConfirm && (
+            <div className="promotion-confirm">
+                <h3>Confirm Student Promotion</h3>
+
+                <p>
+                    Are you sure you want to execute the promotion
+                    for {promotionGroup === '1-11'
+                        ? 'Grades 1 – 11'
+                        : 'Grades 12 – 13'}?
+                </p>
+
+                <p>
+                    This operation deletes selected student records
+                    and their term-test marks. It cannot be easily
+                    undone.
+                </p>
+
+                <div className="promotion-confirm-actions">
+                    <button
+                        onClick={() => setShowPromotionConfirm(false)}
+                        disabled={promotionExecuting}
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        onClick={handleExecutePromotion}
+                        disabled={promotionExecuting}
+                    >
+                        {promotionExecuting
+                            ? 'Processing...'
+                            : 'Confirm Promotion'}
+                    </button>
+                </div>
+            </div>
+        )}
+
+    </div>
 )}
 
 
