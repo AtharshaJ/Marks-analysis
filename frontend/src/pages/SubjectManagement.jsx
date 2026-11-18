@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './SubjectManagement.css'
+import CustomDropdown from '../components/CustomDropdown'
 
 const API_URL = 'http://localhost:5000/api/subjects'
 
@@ -689,16 +690,15 @@ function SubjectManagement({ embedded = false }) {
                                             Subject Type
                                         </label>
 
-                                        <select
-                                            id="al-subject-type"
-                                            value={alSubjectType}
-                                            onChange={(e) =>
-                                                setAlSubjectType(e.target.value)
-                                            }
-                                        >
-                                            <option value="Common">Common</option>
-                                            <option value="Choice">Choice</option>
-                                        </select>
+                                       <CustomDropdown
+    value={alSubjectType}
+    onChange={setAlSubjectType}
+    placeholder="Select subject type"
+    options={[
+        { value: 'Common', label: 'Common' },
+        { value: 'Choice', label: 'Choice' }
+    ]}
+/>
                                     </div>
 
                                     <button
@@ -755,19 +755,15 @@ function SubjectManagement({ embedded = false }) {
                                                                 }
                                                             />
 
-                                                            <select
-                                                                aria-label="Subject type"
-                                                                value={editAlSubjectType}
-                                                                onChange={(e) =>
-                                                                    setEditAlSubjectType(
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                            >
-                                                                <option value="Common">Common</option>
-                                                                <option value="Choice">Choice</option>
-                                                            </select>
-
+                                                           <CustomDropdown
+    value={editAlSubjectType}
+    onChange={setEditAlSubjectType}
+    placeholder="Select subject type"
+    options={[
+        { value: 'Common', label: 'Common' },
+        { value: 'Choice', label: 'Choice' }
+    ]}
+/>
                                                             <button
                                                                 type="button"
                                                                 onClick={handleEditALSubject}
@@ -859,32 +855,25 @@ function SubjectManagement({ embedded = false }) {
                                         />
                                     </div>
 
-                                    <div className="subject-form-field">
-                                        <label htmlFor="subject-basket">
-                                            Subject Category
-                                        </label>
+                                   <div className="subject-form-field">
+    <label>Subject Category</label>
 
-                                        <select
-                                            id="subject-basket"
-                                            value={selectedBasketId}
-                                            onChange={(e) =>
-                                                setSelectedBasketId(e.target.value)
-                                            }
-                                        >
-                                            <option value="">
-                                                Compulsory Subject
-                                            </option>
-
-                                            {availableBaskets.map(basket => (
-                                                <option
-                                                    key={basket.id}
-                                                    value={basket.id}
-                                                >
-                                                    {basket.basket_name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+    <CustomDropdown
+        value={selectedBasketId}
+        onChange={setSelectedBasketId}
+        placeholder="Compulsory Subject"
+        options={[
+            {
+                value: '',
+                label: 'Compulsory Subject'
+            },
+            ...availableBaskets.map(basket => ({
+                value: String(basket.id),
+                label: basket.basket_name
+            }))
+        ]}
+    />
+</div>
 
                                     <button
                                         type="submit"

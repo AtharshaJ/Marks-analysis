@@ -45,6 +45,37 @@ const [classActionMessage, setClassActionMessage] = useState('')
 const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
     const navigate = useNavigate()
 
+    const [loggingOut, setLoggingOut] = useState(false)
+
+// Handle admin logout
+const handleLogout = async () => {
+    try {
+        setLoggingOut(true)
+
+        const API_BASE_URL =
+            import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/auth/logout`,
+            {
+                method: 'POST',
+                credentials: 'include'
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error('Logout failed.')
+        }
+
+        navigate('/login', { replace: true })
+
+    } catch (error) {
+        console.error('Logout error:', error)
+        alert('Unable to log out. Please try again.')
+        setLoggingOut(false)
+    }
+}
+
     const menuItems = [
         { id: 'teachers', label: 'Teacher Management', icon: '♙' },
     { id: 'classes', label: 'Class Divisions', icon: '⌂' },
@@ -445,10 +476,20 @@ const handleDeleteClass = async () => {
                     ))}
                 </nav>
 
-                <div className="admin-sidebar-footer">
-                    <p>Marks Analysis System</p>
-                    <span>Administrator Panel</span>
-                </div>
+ 
+
+            <div className="admin-sidebar-footer">
+    <button
+        className="admin-logout-btn"
+        onClick={handleLogout}
+        disabled={loggingOut}
+    >
+        <span>↪</span>
+        {loggingOut ? 'Logging out...' : 'Log Out'}
+    </button>
+
+    <p>Marks Analysis System</p>
+</div>
 
             </aside>
 
