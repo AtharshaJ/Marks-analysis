@@ -23,21 +23,7 @@ const [rangeError, setRangeError] = useState('')
 const [analysisView, setAnalysisView] = useState('all')
 
 
-const [printTarget, setPrintTarget] = useState('')
 
-useEffect(() => {
-    if (!printTarget) return
-
-    document.body.setAttribute(
-        'data-scholarship-print',
-        printTarget
-    )
-
-    window.print()
-
-    document.body.removeAttribute('data-scholarship-print')
-    setPrintTarget('')
-}, [printTarget])
 
     // Sort students from highest marks to lowest marks
 const rankedStudents = [...results]
@@ -187,30 +173,28 @@ const handleAddRange = () => {
 
             <main className="scholarship-analysis-main">
 
-                <div className="scholarship-analysis-title">
+           <div className="scholarship-print-report-header">
+    <h1>Thondaimanaru Veeragaththippillai Maha Vidyalayam</h1>
+    <h2>Grade 5 Scholarship Examination {examYear}</h2>
+    <h3>RESULTS SUMMARY</h3>
 
+    <p>
+        {analysisView === 'all'
+            ? 'STUDENT RESULTS RANKING'
+            : analysisView === 'passed'
+                ? 'PASSED STUDENTS'
+                : 'MARKS RANGE ANALYSIS'}
+    </p>
+</div>
+
+<div className="scholarship-analysis-title">
     <div>
-        <h2>Scholarship Marks Analysis</h2>
+        <h2>Scholarship Results Analysis</h2>
         <p>
             Analyse student performance, cut-off marks
             and marks distribution.
         </p>
     </div>
-
-    <div className="scholarship-analysis-print-buttons">
-    <button
-        onClick={() => setPrintTarget(analysisView)}
-        disabled={
-            loading ||
-            results.length === 0 ||
-            (analysisView === 'passed' && passedCount === 0) ||
-            (analysisView === 'ranges' && marksRanges.length === 0)
-        }
-    >
-        Print Current View
-    </button>
-</div>
-
 </div>
 
                 {/* ================================
@@ -243,22 +227,33 @@ const handleAddRange = () => {
         />
     </div>
 
+   
+
+    <div className="scholarship-analysis-filter">
+        <label>Analysis Category</label>
+
+        <CustomDropdown
+            value={analysisView}
+            onChange={setAnalysisView}
+            options={[
+                { value: 'all', label: 'All Students Ranking' },
+                { value: 'passed', label: 'Passed Students' },
+                { value: 'ranges', label: 'Marks Range Analysis' }
+            ]}
+            placeholder="Select Analysis"
+        />
+    </div>
+
+     <button
+        className="scholarship-analysis-print-btn"
+        onClick={() => window.print()}
+        disabled={loading || results.length === 0}
+    >
+        Print Analysis
+    </button>
+
 </div>
 
-<div className="scholarship-analysis-filter">
-    <label>Analysis View</label>
-
-   <CustomDropdown
-    value={analysisView}
-    onChange={setAnalysisView}
-    options={[
-        { value: 'all', label: 'All Students Ranking' },
-        { value: 'passed', label: 'Passed Students' },
-        { value: 'ranges', label: 'Marks Range Analysis' }
-    ]}
-    placeholder="Select Analysis View"
-/>
-</div>
 
 {/* ================================
     SUMMARY CARDS
@@ -269,7 +264,8 @@ const handleAddRange = () => {
 ) : error ? (
     <p className="scholarship-analysis-error">{error}</p>
 ) : (
-    <div className="scholarship-analysis-summary">
+    <>
+        <div className="scholarship-analysis-summary">
 
         <div className="scholarship-analysis-card">
             <span>Total Students</span>
@@ -286,8 +282,7 @@ const handleAddRange = () => {
             <h3>{failedCount}</h3>
         </div>
 
-    </div>
-)}
+           </div>
 
 {/* ================================
     COMPLETE STUDENT RANKING
@@ -518,8 +513,12 @@ const handleAddRange = () => {
 
         </div>
 
-    </section>
+      </section>
 )}
+
+    </>
+)}
+
             </main>
         </div>
 
