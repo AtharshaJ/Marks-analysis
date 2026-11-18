@@ -1419,3 +1419,147 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+
+/* ================================
+   ADMIN ACCOUNT SETTINGS
+================================ */
+
+.admin-settings-page {
+    width: 100%;
+    max-width: 1000px;
+    padding: 10px 5px 35px;
+    color: #173e70;
+}
+
+.admin-settings-heading {
+    margin-bottom: 25px;
+}
+
+.admin-settings-heading h2 {
+    margin: 0 0 8px;
+    font-size: 25px;
+    color: #173e70;
+}
+
+.admin-settings-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.settings-card {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #dbe5f0;
+    border-radius: 12px;
+    padding: 25px 28px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 14px rgba(23, 62, 112, 0.07);
+}
+
+.settings-card-heading {
+    margin-bottom: 22px;
+}
+
+.settings-card-heading h3 {
+    margin: 0 0 6px;
+    color: #173e70;
+    font-size: 19px;
+}
+
+.settings-card-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.settings-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+    max-width: 550px;
+}
+
+.settings-form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.settings-form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.settings-form-group input:focus {
+    border-color: #2563a6;
+    box-shadow: 0 0 0 3px rgba(37, 99, 166, 0.12);
+}
+
+.settings-form-group input:read-only {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+.settings-save-button {
+    border: none;
+    border-radius: 7px;
+    padding: 11px 20px;
+    background: #173e70;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.settings-save-button:hover:not(:disabled) {
+    background: #24558e;
+    transform: translateY(-1px);
+}
+
+.settings-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.settings-alert {
+    padding: 12px 15px;
+    border-radius: 7px;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+.settings-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.settings-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+@media (max-width: 600px) {
+    .settings-card {
+        padding: 20px 16px;
+    }
+
+    .settings-save-button {
+        width: 100%;
+    }
+}

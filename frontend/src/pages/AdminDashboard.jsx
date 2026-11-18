@@ -31,6 +31,19 @@ const [allActiveTeachers, setAllActiveTeachers] = useState([])
 // Selected class for editing
 const [selectedClass, setSelectedClass] = useState(null)
 
+// Admin Account Settings
+const [adminUsername, setAdminUsername] = useState('')
+const [newAdminUsername, setNewAdminUsername] = useState('')
+const [usernameCurrentPassword, setUsernameCurrentPassword] = useState('')
+
+const [passwordCurrentPassword, setPasswordCurrentPassword] = useState('')
+const [newAdminPassword, setNewAdminPassword] = useState('')
+const [confirmAdminPassword, setConfirmAdminPassword] = useState('')
+
+const [accountLoading, setAccountLoading] = useState(false)
+const [accountError, setAccountError] = useState('')
+const [accountMessage, setAccountMessage] = useState('')
+
 // Class editing form
 const [editClassGrade, setEditClassGrade] = useState('')
 const [editClassDivision, setEditClassDivision] = useState('')
@@ -288,6 +301,172 @@ const handleUpdateClass = async (e) => {
     }
 }
 
+const handleUpdateUsername = async (e) => {
+    e.preventDefault()
+
+    setAccountError('')
+    setAccountMessage('')
+    setAccountLoading(true)
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/auth/admin/update-username',
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    newUsername: newAdminUsername,
+                    currentPassword: usernameCurrentPassword
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to update username.')
+        }
+
+        setAdminUsername(result.username)
+        setNewAdminUsername(result.username)
+        setUsernameCurrentPassword('')
+        setAccountMessage(result.message)
+
+    } catch (error) {
+        setAccountError(error.message)
+    } finally {
+        setAccountLoading(false)
+    }
+}
+
+const handleUpdatePassword = async (e) => {
+    e.preventDefault()
+
+    setAccountError('')
+    setAccountMessage('')
+    setAccountLoading(true)
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/auth/admin/update-password',
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    currentPassword: passwordCurrentPassword,
+                    newPassword: newAdminPassword,
+                    confirmPassword: confirmAdminPassword
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to update password.')
+        }
+
+        setPasswordCurrentPassword('')
+        setNewAdminPassword('')
+        setConfirmAdminPassword('')
+        setAccountMessage(result.message)
+
+    } catch (error) {
+        setAccountError(error.message)
+    } finally {
+        setAccountLoading(false)
+    }
+}
+
+const handleUpdateAdminUsername = async (e) => {
+    e.preventDefault()
+
+    setAccountError('')
+    setAccountMessage('')
+    setAccountLoading(true)
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/auth/admin/update-username',
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    newUsername: newAdminUsername,
+                    currentPassword: usernameCurrentPassword
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to update username.')
+        }
+
+        setAdminUsername(result.username)
+        setNewAdminUsername(result.username)
+        setUsernameCurrentPassword('')
+        setAccountMessage(result.message)
+
+    } catch (error) {
+        setAccountError(error.message)
+    } finally {
+        setAccountLoading(false)
+    }
+}
+
+const handleUpdateAdminPassword = async (e) => {
+    e.preventDefault()
+
+    setAccountError('')
+    setAccountMessage('')
+    setAccountLoading(true)
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/auth/admin/update-password',
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    currentPassword: passwordCurrentPassword,
+                    newPassword: newAdminPassword,
+                    confirmPassword: confirmAdminPassword
+                })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Unable to update password.')
+        }
+
+        setPasswordCurrentPassword('')
+        setNewAdminPassword('')
+        setConfirmAdminPassword('')
+        setAccountMessage(result.message)
+
+    } catch (error) {
+        setAccountError(error.message)
+    } finally {
+        setAccountLoading(false)
+    }
+}
+
 // Delete the selected class
 const handleDeleteClass = async () => {
     if (!selectedClass) return
@@ -333,6 +512,36 @@ const handleDeleteClass = async () => {
         fetchClasses()
     }
 }, [activeSection])
+
+useEffect(() => {
+    const fetchAdminAccount = async () => {
+        try {
+            const response = await fetch(
+                'http://localhost:5000/api/auth/me',
+                {
+                    credentials: 'include'
+                }
+            )
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Unable to load account.')
+            }
+
+            if (result.user?.role === 'admin') {
+                setAdminUsername(result.user.username)
+                setNewAdminUsername(result.user.username)
+            }
+
+        } catch (error) {
+            console.error('Admin account error:', error)
+        }
+    }
+
+    fetchAdminAccount()
+}, [])
+
 
     // Update an employee in the table and modal
     const updateEmployeeInDashboard = (updatedEmployee) => {
@@ -1034,13 +1243,147 @@ const handleDeleteClass = async () => {
                         </div>
                     )}
 
-                    {/* Account Settings */}
-                    {activeSection === 'settings' && (
-                        <div>
-                            <h2>Account Settings</h2>
-                            <p>Manage your Administrator account.</p>
-                        </div>
-                    )}
+                   {/* Account Settings */}
+{activeSection === 'settings' && (
+    <div className="admin-settings-page">
+
+        <div className="admin-settings-heading">
+            <h2>Account Settings</h2>
+            <p>Manage your administrator login credentials.</p>
+        </div>
+
+        {accountError && (
+            <div className="settings-alert settings-error">
+                {accountError}
+            </div>
+        )}
+
+        {accountMessage && (
+            <div className="settings-alert settings-success">
+                {accountMessage}
+            </div>
+        )}
+
+        {/* Username Settings */}
+        <div className="settings-card">
+            <div className="settings-card-heading">
+                <h3>Change Username</h3>
+                <p>Update the username you use to log in.</p>
+            </div>
+
+            <form onSubmit={handleUpdateAdminUsername}>
+
+                <div className="settings-form-group">
+                    <label>Current Username</label>
+                    <input
+                        type="text"
+                        value={adminUsername}
+                        readOnly
+                    />
+                </div>
+
+                <div className="settings-form-group">
+                    <label>New Username</label>
+                    <input
+                        type="text"
+                        value={newAdminUsername}
+                        onChange={(e) =>
+                            setNewAdminUsername(e.target.value)
+                        }
+                        placeholder="Enter new username"
+                        required
+                        minLength={3}
+                        maxLength={30}
+                    />
+                </div>
+
+                <div className="settings-form-group">
+                    <label>Current Password</label>
+                    <input
+                        type="password"
+                        value={usernameCurrentPassword}
+                        onChange={(e) =>
+                            setUsernameCurrentPassword(e.target.value)
+                        }
+                        placeholder="Enter current password"
+                        required
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={accountLoading}
+                    className="settings-save-button"
+                >
+                    {accountLoading ? 'Updating...' : 'Update Username'}
+                </button>
+
+            </form>
+        </div>
+
+        {/* Password Settings */}
+        <div className="settings-card">
+            <div className="settings-card-heading">
+                <h3>Change Password</h3>
+                <p>Choose a new password for your administrator account.</p>
+            </div>
+
+            <form onSubmit={handleUpdateAdminPassword}>
+
+                <div className="settings-form-group">
+                    <label>Current Password</label>
+                    <input
+                        type="password"
+                        value={passwordCurrentPassword}
+                        onChange={(e) =>
+                            setPasswordCurrentPassword(e.target.value)
+                        }
+                        placeholder="Enter current password"
+                        required
+                    />
+                </div>
+
+                <div className="settings-form-group">
+                    <label>New Password</label>
+                    <input
+                        type="password"
+                        value={newAdminPassword}
+                        onChange={(e) =>
+                            setNewAdminPassword(e.target.value)
+                        }
+                        placeholder="Enter new password"
+                        required
+                        minLength={8}
+                    />
+                </div>
+
+                <div className="settings-form-group">
+                    <label>Confirm New Password</label>
+                    <input
+                        type="password"
+                        value={confirmAdminPassword}
+                        onChange={(e) =>
+                            setConfirmAdminPassword(e.target.value)
+                        }
+                        placeholder="Confirm new password"
+                        required
+                        minLength={8}
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={accountLoading}
+                    className="settings-save-button"
+                >
+                    {accountLoading ? 'Updating...' : 'Update Password'}
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+)}
 
                 </section>
 

@@ -3,7 +3,10 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import supabase from '../supabase.js';
-import { verifySession } from '../middleware/authMiddleware.js';
+import {
+    verifySession,
+    requireAdmin
+} from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -393,5 +396,198 @@ router.post('/reset-password', async (req, res) => {
         });
     }
 });
+
+
+// Update Administrator Username
+router.put(
+    '/admin/update-username',
+    verifySession,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const { newUsername, currentPassword } = req.body;
+
+            if (
+                typeof newUsername !== 'string' ||
+                typeof currentPassword !== 'string' ||
+                !newUsername.trim() ||
+                !currentPassword
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please complete all fields.'
+                });
+            }
+
+            const cleanUsername = newUsername.trim();
+
+            if (cleanUsername.length < 3 || cleanUsername.length > 30) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username must contain 3–30 characters.'
+                });
+            }
+
+            const { data: admin, error: adminError } = await supabase
+                .from('admins')
+                .select('id, username, password')
+                .eq('id', req.user.id)
+                .maybeSingle();
+
+            if (adminError) throw adminError;
+
+            if (!admin) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Administrator account not found.'
+                });
+            }
+
+            const passwordMatches = await bcrypt.compare(
+                currentPassword,
+                admin.password
+            );
+
+            if (!passwordMatches) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Current password is incorrect.'
+                });
+            }
+
+            const { data: existingAdmin, error: existingError } = await supabase
+                .from('admins')
+                .select('id')
+                .eq('username', cleanUsername)
+                .neq('id', admin.id)
+                .maybeSingle();
+
+            if (existingError) throw existingError;
+
+            if (existingAdmin) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'This username is already in use.'
+                });
+            }
+
+            const { error: updateError } = await supabase
+                .from('admins')
+                .update({ username: cleanUsername })
+                .eq('id', admin.id);
+
+            if (updateError) throw updateError;
+
+            return res.json({
+                success: true,
+                message: 'Username updated successfully.',
+                username: cleanUsername
+            });
+
+        } catch (error) {
+            console.error('Admin username update error:', error.message);
+
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to update username.'
+            });
+        }
+    }
+);
+
+
+// Update Administrator Password
+router.put(
+    '/admin/update-password',
+    verifySession,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const {
+                currentPassword,
+                newPassword,
+                confirmPassword
+            } = req.body;
+
+            if (
+                typeof currentPassword !== 'string' ||
+                typeof newPassword !== 'string' ||
+                typeof confirmPassword !== 'string' ||
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please complete all fields.'
+                });
+            }
+
+            if (newPassword.length < 8) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'New password must contain at least 8 characters.'
+                });
+            }
+
+            if (newPassword !== confirmPassword) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'New passwords do not match.'
+                });
+            }
+
+            const { data: admin, error: adminError } = await supabase
+                .from('admins')
+                .select('id, password')
+                .eq('id', req.user.id)
+                .maybeSingle();
+
+            if (adminError) throw adminError;
+
+            if (!admin) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Administrator account not found.'
+                });
+            }
+
+            const passwordMatches = await bcrypt.compare(
+                currentPassword,
+                admin.password
+            );
+
+            if (!passwordMatches) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Current password is incorrect.'
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+            const { error: updateError } = await supabase
+                .from('admins')
+                .update({ password: hashedPassword })
+                .eq('id', admin.id);
+
+            if (updateError) throw updateError;
+
+            return res.json({
+                success: true,
+                message: 'Password updated successfully.'
+            });
+
+        } catch (error) {
+            console.error('Admin password update error:', error.message);
+
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to update password.'
+            });
+        }
+    }
+);
+
 
 export default router;
