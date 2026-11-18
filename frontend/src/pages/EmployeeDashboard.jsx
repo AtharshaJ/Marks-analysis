@@ -363,18 +363,12 @@ const handleClassSearch = () => {
 <CustomDropdown
     value={selectedClassId}
     placeholder="Search or select a class..."
-    options={filteredClasses.map(classItem => ({
+    options={classes.map(classItem => ({
         value: String(classItem.id),
         label: classItem.class_name
     }))}
     onChange={(value) => {
         setSelectedClassId(value)
-
-        const selectedClass = classes.find(
-            classItem => String(classItem.id) === value
-        )
-
-        setClassSearch(selectedClass?.class_name || '')
     }}
 />
 

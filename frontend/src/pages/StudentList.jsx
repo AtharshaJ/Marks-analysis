@@ -1,12 +1,17 @@
 
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import {
+    useNavigate,
+    useParams,
+    useSearchParams
+} from 'react-router-dom'
 import './StudentList.css'
 import CustomDropdown from '../components/CustomDropdown'
 
 function StudentList() {
     const { classId } = useParams()
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
 
     const [students, setStudents] = useState([])
     const [selectedClass, setSelectedClass] = useState(null)
@@ -71,20 +76,42 @@ const years = yearsResult.academicYears || []
 
 setAcademicYears(years)
 
-// Select active academic year
+// Restore previously selected year, otherwise use active year
+const urlYearId = searchParams.get('yearId')
+const urlTermId = searchParams.get('termId')
+
+const savedYear = years.find(
+    year => String(year.id) === urlYearId
+)
+
 const activeYear = years.find(year => year.is_active)
 
-if (activeYear) {
-    setSelectedYearId(String(activeYear.id))
+const initialYear = savedYear || activeYear || years[0]
 
-    const sortedTerms = [...(activeYear.academic_terms || [])]
+if (initialYear) {
+    const yearId = String(initialYear.id)
+
+    setSelectedYearId(yearId)
+
+    const sortedTerms = [...(initialYear.academic_terms || [])]
         .sort((a, b) => a.term_number - b.term_number)
 
     setTerms(sortedTerms)
 
-    if (sortedTerms.length > 0) {
-        setSelectedTermId(String(sortedTerms[0].id))
+    const savedTerm = sortedTerms.find(
+        term => String(term.id) === urlTermId
+    )
+
+    const initialTerm = savedTerm || sortedTerms[0]
+
+    if (initialTerm) {
+        setSelectedTermId(String(initialTerm.id))
     }
+
+    setSearchParams({
+        yearId,
+        termId: initialTerm ? String(initialTerm.id) : ''
+    }, { replace: true })
 }
 
                 // Fetch subject inclusion settings
@@ -161,11 +188,16 @@ setClassSubjects(subjectsResult.subjects || [])
 
     setTerms(sortedTerms)
 
-    setSelectedTermId(
-        sortedTerms.length > 0
-            ? String(sortedTerms[0].id)
-            : ''
-    )
+    const firstTermId = sortedTerms.length > 0
+        ? String(sortedTerms[0].id)
+        : ''
+
+    setSelectedTermId(firstTermId)
+
+    setSearchParams({
+        yearId,
+        termId: firstTermId
+    })
 }
 
     const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
@@ -326,7 +358,14 @@ setClassSubjects(subjectsResult.subjects || [])
 
             <CustomDropdown
                 value={selectedTermId}
-                onChange={setSelectedTermId}
+                onChange={(termId) => {
+    setSelectedTermId(termId)
+
+    setSearchParams({
+        yearId: selectedYearId,
+        termId
+    })
+}}
                 placeholder="Select Academic Term"
                 disabled={!terms.length}
                 options={terms.map(term => ({

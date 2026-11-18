@@ -327,15 +327,16 @@ if (summaryResponse.ok) {
                         <p>Teacher Portal</p>
                     </div>
                 </div>
-
-                <button
-                    className="student-marks-back-btn"
-                    onClick={() =>
-                        navigate(`/employee/term-tests/${classId}/students`)
-                    }
-                >
-                    ← Back to Student List
-                </button>
+<button
+    className="student-marks-back-btn"
+    onClick={() =>
+        navigate(
+            `/employee/term-tests/${classId}/students?yearId=${selectedYearId}&termId=${selectedTermId}`
+        )
+    }
+>
+    ← Back to Student List
+</button>
             </header>
 
             <main className="student-marks-main">
