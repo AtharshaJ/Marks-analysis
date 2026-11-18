@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AdminDashboard.css'
+import StudentPromotion from '../components/StudentPromotion'
 
 function AdminDashboard() {
     const [activeSection, setActiveSection] = useState('teachers')
@@ -47,6 +48,7 @@ const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
         { id: 'teachers', label: 'Teacher Management', icon: '👩‍🏫' },
         { id: 'classes', label: 'Class Divisions', icon: '🏫' },
         { id: 'subject-management', label: 'Subject Management', icon: '📚' },
+        { id: 'system-management', label: 'System Management', icon: '⚙️' },
         { id: 'settings', label: 'Account Settings', icon: '⚙️' }
     ]
 
@@ -985,6 +987,62 @@ const handleDeleteClass = async () => {
                             <p>Assign teachers to their respective class divisions.</p>
                         </div>
                     )}
+
+                    {/* System Management */}
+{activeSection === 'system-management' && (
+    <div className="system-management">
+
+        <div className="teacher-section-heading">
+            <div>
+                <h2>System Management</h2>
+                <p>
+                    Manage annual student promotions and public examination records.
+                </p>
+            </div>
+        </div>
+
+        {/* Student Promotion */}
+      
+<StudentPromotion />
+
+        {/* Public Examination Data */}
+        <div className="system-management-section">
+            <h3>Public Examination Records</h3>
+            <p>
+                Permanently delete examination records independently.
+            </p>
+
+            <div className="system-management-cards">
+
+                <div className="system-management-card">
+                    <h4>Grade 5 Scholarship</h4>
+                    <p>Delete all Scholarship examination records.</p>
+                    <button className="system-delete-button" disabled>
+                        Delete Scholarship Records
+                    </button>
+                </div>
+
+                <div className="system-management-card">
+                    <h4>G.C.E. O/L</h4>
+                    <p>Delete all O/L examination records.</p>
+                    <button className="system-delete-button" disabled>
+                        Delete O/L Records
+                    </button>
+                </div>
+
+                <div className="system-management-card">
+                    <h4>G.C.E. A/L</h4>
+                    <p>Delete all A/L examination records.</p>
+                    <button className="system-delete-button" disabled>
+                        Delete A/L Records
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+)}
 
                     {/* Account Settings */}
                     {activeSection === 'settings' && (

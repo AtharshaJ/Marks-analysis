@@ -1372,3 +1372,92 @@
     background-color: #dce9f8;
 }
 
+
+/* ================================
+   SYSTEM MANAGEMENT
+================================ */
+
+.system-management {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.system-management-section {
+    background: rgba(255, 255, 255, 0.88);
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid #d7e3f0;
+    box-shadow: 0 3px 12px rgba(23, 62, 112, 0.06);
+}
+
+.system-management-section h3 {
+    color: #173e70;
+    font-size: 19px;
+    margin: 0 0 8px;
+}
+
+.system-management-section > p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 22px;
+}
+
+.system-management-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+}
+
+.system-management-card {
+    background: #f7faff;
+    border: 1px solid #dce7f3;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.system-management-card h4 {
+    color: #173e70;
+    font-size: 16px;
+    margin: 0 0 10px;
+}
+
+.system-management-card p {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 20px;
+    flex: 1;
+}
+
+.system-management-card button {
+    width: 100%;
+    padding: 11px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #173e70;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    opacity: 1;
+    transition: 0.2s ease;
+}
+
+.system-management-card button:hover {
+    background: #102d50;
+    transform: translateY(-2px);
+}
+
+.system-management-card button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: none;
+}
+.system-management-card .system-delete-button {
+    background: #b42318;
+}
+

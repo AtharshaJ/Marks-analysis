@@ -1,0 +1,80 @@
+
+.student-promotion {
+    width: 100%;
+}
+
+.promotion-loading {
+    color: #173e70;
+    font-weight: 600;
+    margin: 15px 0;
+}
+
+.promotion-error {
+    background: #fdecec;
+    color: #b42318;
+    border: 1px solid #f5c2c0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.promotion-preview {
+    background: #ffffff;
+    border: 1px solid #d8e2ef;
+    border-radius: 12px;
+    padding: 22px;
+    margin-top: 25px;
+}
+
+.promotion-preview h3 {
+    color: #173e70;
+    margin: 0 0 8px;
+}
+
+.promotion-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.promotion-preview-item {
+    background: #f3f7fc;
+    border: 1px solid #e0e9f3;
+    border-radius: 9px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.promotion-preview-item span {
+    color: #52657c;
+    font-size: 13px;
+}
+
+.promotion-preview-item strong {
+    color: #173e70;
+    font-size: 25px;
+}
+
+.promotion-warning {
+    color: #8a5700;
+    background: #fff7e6;
+    border: 1px solid #f5dfad;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .promotion-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .promotion-preview-grid {
+        grid-template-columns: 1fr;
+    }
+}
