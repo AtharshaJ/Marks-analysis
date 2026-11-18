@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AdminDashboard.css'
+import CustomDropdown from '../components/CustomDropdown'
+import SubjectManagement from './SubjectManagement'
 
 function AdminDashboard() {
     const [activeSection, setActiveSection] = useState('teachers')
@@ -44,10 +46,10 @@ const [showDeleteClassConfirm, setShowDeleteClassConfirm] = useState(false)
     const navigate = useNavigate()
 
     const menuItems = [
-        { id: 'teachers', label: 'Teacher Management', icon: '👩‍🏫' },
-        { id: 'classes', label: 'Class Divisions', icon: '🏫' },
-        { id: 'subject-management', label: 'Subject Management', icon: '📚' },
-        { id: 'settings', label: 'Account Settings', icon: '⚙️' }
+        { id: 'teachers', label: 'Teacher Management', icon: '♙' },
+    { id: 'classes', label: 'Class Divisions', icon: '⌂' },
+    { id: 'subject-management', label: 'Subject Management', icon: '▦' },
+    { id: 'settings', label: 'Account Settings', icon: '⚙' }
     ]
 
     const filteredEmployees = employees.filter(employee => {
@@ -213,6 +215,11 @@ const handleUpdateClass = async (e) => {
     setClassActionLoading(true)
     setClassActionError('')
     setClassActionMessage('')
+
+    if (!editClassGrade) {
+    setClassActionError('Please select a grade.')
+    return
+}
 
     try {
         const response = await fetch(
@@ -430,13 +437,7 @@ const handleDeleteClass = async () => {
                             className={`admin-nav-item ${
                                 activeSection === item.id ? 'active' : ''
                             }`}
-                            onClick={() => {
-    if (item.id === 'subject-management') {
-        navigate('/admin/subject-management')
-    } else {
-        setActiveSection(item.id)
-    }
-}}
+                           onClick={() => setActiveSection(item.id)}
                         >
                             <span>{item.icon}</span>
                             {item.label}
@@ -794,20 +795,19 @@ const handleDeleteClass = async () => {
 
                 <label htmlFor="class-grade">Grade</label>
 
-                <select
-                    id="class-grade"
-                    value={newClassGrade}
-                    onChange={(e) => setNewClassGrade(e.target.value)}
-                    required
-                >
-                    <option value="">Select Grade</option>
+                <CustomDropdown
+    value={newClassGrade}
+    onChange={setNewClassGrade}
+    placeholder="Select Grade"
+    options={Array.from({ length: 13 }, (_, index) => {
+        const grade = index + 1
 
-                    {Array.from({ length: 13 }, (_, index) => index + 1).map(grade => (
-                        <option key={grade} value={grade}>
-                            Grade {grade}
-                        </option>
-                    ))}
-                </select>
+        return {
+            value: String(grade),
+            label: `Grade ${grade}`
+        }
+    })}
+/>
 
                 <label htmlFor="class-division">
                     Division <span>(Optional)</span>
@@ -826,19 +826,21 @@ const handleDeleteClass = async () => {
     Class Teacher <span>(Optional)</span>
 </label>
 
-<select
-    id="class-teacher"
+<CustomDropdown
     value={newClassTeacher}
-    onChange={(e) => setNewClassTeacher(e.target.value)}
->
-    <option value="">No class teacher assigned</option>
-
-    {eligibleTeachers.map((teacher) => (
-        <option key={teacher.id} value={teacher.id}>
-            {teacher.full_name} ({teacher.teacher_id})
-        </option>
-    ))}
-</select>
+    onChange={setNewClassTeacher}
+    placeholder="No class teacher assigned"
+    options={[
+        {
+            value: '',
+            label: 'No class teacher assigned'
+        },
+        ...eligibleTeachers.map(teacher => ({
+            value: String(teacher.id),
+            label: `${teacher.full_name} (${teacher.teacher_id})`
+        }))
+    ]}
+/>
 
                 <div className="class-name-preview">
                     <span>Class Name Preview</span>
@@ -977,6 +979,11 @@ const handleDeleteClass = async () => {
     </div>
 )}
 
+{/* Subject Management */}
+{activeSection === 'subject-management' && (
+    <SubjectManagement embedded />
+)}
+
 
                     {/* Class Teacher Assignments */}
                     {activeSection === 'assignments' && (
@@ -1029,19 +1036,19 @@ const handleDeleteClass = async () => {
                                 Grade
                             </label>
 
-                            <select
-                                id="edit-class-grade"
-                                value={editClassGrade}
-                                onChange={(e) => setEditClassGrade(e.target.value)}
-                                required
-                            >
-                                <option value="">Select Grade</option>
-                                {Array.from({ length: 13 }, (_, i) => i + 1).map(grade => (
-                                    <option key={grade} value={grade}>
-                                        Grade {grade}
-                                    </option>
-                                ))}
-                            </select>
+                          <CustomDropdown
+    value={editClassGrade}
+    onChange={setEditClassGrade}
+    placeholder="Select Grade"
+    options={Array.from({ length: 13 }, (_, index) => {
+        const grade = index + 1
+
+        return {
+            value: String(grade),
+            label: `Grade ${grade}`
+        }
+    })}
+/>
 
                             <label htmlFor="edit-class-division">
                                 Division
@@ -1059,24 +1066,21 @@ const handleDeleteClass = async () => {
                                 Class Teacher
                             </label>
 
-                            <select
-                                id="edit-class-teacher"
-                                value={editClassTeacher}
-                                onChange={(e) => setEditClassTeacher(e.target.value)}
-                            >
-                                <option value="">
-                                    No class teacher assigned
-                                </option>
-
-                                {allActiveTeachers.map(teacher => (
-                                    <option
-                                        key={teacher.id}
-                                        value={teacher.id}
-                                    >
-                                        {teacher.full_name} ({teacher.teacher_id})
-                                    </option>
-                                ))}
-                            </select>
+                           <CustomDropdown
+    value={editClassTeacher}
+    onChange={setEditClassTeacher}
+    placeholder="No class teacher assigned"
+    options={[
+        {
+            value: '',
+            label: 'No class teacher assigned'
+        },
+        ...allActiveTeachers.map(teacher => ({
+            value: String(teacher.id),
+            label: `${teacher.full_name} (${teacher.teacher_id})`
+        }))
+    ]}
+/>
 
                             {editClassTeacher && (() => {
     const assignedClass = classes.find(

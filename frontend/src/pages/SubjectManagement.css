@@ -414,3 +414,120 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ================================
+   EMBEDDED ADMIN DASHBOARD VIEW
+================================ */
+
+.subject-management-page.embedded {
+    min-height: auto;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.subject-management-page.embedded .subject-panel {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* =================================
+   SUBJECT MANAGEMENT BUTTON THEME
+================================= */
+
+.subject-management-page button:not(.modal-close-button) {
+    font-family: inherit;
+}
+
+.subject-management-page .subject-primary-button,
+.subject-management-page .subject-save-button,
+.subject-management-page .subject-add-button {
+    background: #173e70;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.subject-management-page .subject-primary-button:hover,
+.subject-management-page .subject-save-button:hover,
+.subject-management-page .subject-add-button:hover {
+    background: #102d50;
+    box-shadow: 0 4px 10px rgba(23, 62, 112, 0.18);
+    transform: translateY(-1px);
+}
+
+/* =================================
+   ADMIN DASHBOARD BUTTON THEME
+================================= */
+
+/* Add Subject and Add A/L Subject */
+.subject-management-page .add-subject-button,
+.subject-management-page .create-stream-form button {
+    background: #173e70;
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.subject-management-page .add-subject-button:hover:not(:disabled),
+.subject-management-page .create-stream-form button:hover:not(:disabled) {
+    background: #102d50;
+    box-shadow: 0 4px 10px rgba(23, 62, 112, 0.18);
+    transform: translateY(-2px);
+}
+
+/* Edit, Rename and Save buttons */
+.subject-management-page .subject-item > button,
+.subject-management-page .subject-edit-row button:not(.subject-cancel-button) {
+    background: #173e70;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.subject-management-page .subject-item > button:hover,
+.subject-management-page .subject-edit-row button:not(.subject-cancel-button):hover:not(:disabled) {
+    background: #102d50;
+}
+
+/* Disabled buttons */
+.subject-management-page button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Cancel buttons */
+.subject-management-page .subject-cancel-button {
+    background: #edf1f5;
+    color: #52677f;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.subject-management-page .subject-cancel-button:hover:not(:disabled) {
+    background: #dfe6ee;
+}
+
+/* Selected Subject Group */
+.subject-management-page .subject-group-button.selected {
+    background: #173e70;
+    color: #ffffff;
+    border-color: #173e70;
+}
+
+.subject-management-page .subject-group-button:not(.selected):hover {
+    border-color: #6d9dcc;
+    color: #173e70;
+}

@@ -5,7 +5,7 @@ import './SubjectManagement.css'
 
 const API_URL = 'http://localhost:5000/api/subjects'
 
-function SubjectManagement() {
+function SubjectManagement({ embedded = false }) {
     const navigate = useNavigate()
 
     const [groups, setGroups] = useState([])
@@ -448,8 +448,8 @@ function SubjectManagement() {
     }
 
     return (
-        <div className="subject-management-page">
-
+        <div className={`subject-management-page ${embedded ? 'embedded' : ''}`}>
+{!embedded && (
             <header className="subject-page-header">
                 <div>
                     <button
@@ -466,6 +466,8 @@ function SubjectManagement() {
                     </p>
                 </div>
             </header>
+
+)}        
 
             {errorMessage && (
                 <div className="subject-message subject-error">
