@@ -291,15 +291,19 @@ const subjectAnalysis = choiceSubjects.map(subject => {
 return (
     <div className="ol-analysis-page">
 
-        {/* PAGE HEADER */}
-        <div className="ol-analysis-header">
-    <button
-        className="ol-back-button"
-        onClick={() => navigate('/employee')}
-    >
-        ← Back to Public Tests
-    </button>
-</div>
+            <header className="ol-analysis-header">
+                <h2>G.C.E. Advanced Level Examination</h2>
+
+                <button
+                    onClick={() =>
+                        navigate('/employee', {
+                            state: { activeSection: 'Public Examinations' }
+                        })
+                    }
+                >
+                    ← Back to Public Examinations
+                </button>
+            </header>
 
         <main className="ol-analysis-main">
 

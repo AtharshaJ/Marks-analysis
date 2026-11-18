@@ -25,7 +25,7 @@ const [activeSection, setActiveSection] = useState(
     const navigationItems = [
     { name: 'Dashboard', icon: '⌂' },
     { name: 'Term Tests', icon: '▤' },
-    { name: 'Public Tests', icon: '▦' }
+    { name: 'Public Examinations', icon: '▦' }
 ]
 
     // Fetch class divisions for Term Tests
@@ -392,7 +392,7 @@ const handleClassSearch = () => {
             </div>
 
         
-) : activeSection === 'Public Tests' ? (
+) : activeSection === 'Public Examinations' ? (
     <div className="public-tests-page">
 
         <div className="public-tests-header">

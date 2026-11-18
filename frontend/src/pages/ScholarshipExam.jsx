@@ -120,8 +120,8 @@ const handleAddResult = async () => {
             <header className="scholarship-exam-header">
                 <h2>Grade 5 Scholarship Examination</h2>
 
-                <button onClick={() => navigate('/employee', { state: { activeSection: 'Public Tests' } })}>
-    Back to Public Tests
+                <button onClick={() => navigate('/employee', { state: { activeSection: 'Public Examinations' } })}>
+    Back to Public Examinations
 </button>
             </header>
 

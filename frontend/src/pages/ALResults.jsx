@@ -409,11 +409,11 @@ function ALResults({ user }) {
                 <button
                     onClick={() =>
                         navigate('/employee', {
-                            state: { activeSection: 'Public Tests' }
+                            state: { activeSection: 'Public Examinations' }
                         })
                     }
                 >
-                    Back to Public Tests
+                    Back to Public Examinations
                 </button>
             </header>
 
