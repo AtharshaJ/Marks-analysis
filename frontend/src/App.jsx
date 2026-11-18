@@ -25,6 +25,8 @@ import ScholarshipExam from './pages/ScholarshipExam'
 import ScholarshipAnalysis from './pages/ScholarshipAnalysis'
 import OLResults from './pages/OLResults'
 import OLAnalysis from './pages/OLAnalysis'
+import ALResults from './pages/ALResults'
+import ALAnalysis from './pages/ALAnalysis'
 
 
 // Check whether a user is authenticated
@@ -175,6 +177,25 @@ function App() {
     element={
         <ProtectedRoute allowedRole="employee">
             {user => <OLAnalysis user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/employee/public-exams/al"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <ALResults user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+{/* A/L Marks Analysis */}
+<Route
+    path="/employee/public-exams/al/analysis"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <ALAnalysis user={user} />}
         </ProtectedRoute>
     }
 />

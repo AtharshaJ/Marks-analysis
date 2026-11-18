@@ -20,6 +20,7 @@ import studentProgressReportRoutes from './routes/studentProgressReportRoutes.js
 import classAnalysisRoutes from './routes/classAnalysisRoutes.js'
 import scholarshipExamRoutes from './routes/scholarshipExamRoutes.js'
 import olExamRoutes from './routes/olExamRoutes.js'
+import alExamRoutes from './routes/alExamRoutes.js'
 
 
 app.use(cors({
@@ -42,6 +43,7 @@ app.use('/api/student-progress-reports', studentProgressReportRoutes)
 app.use('/api/class-analysis', classAnalysisRoutes)
 app.use('/api/scholarship-exams', scholarshipExamRoutes)
 app.use('/api/ol-results', olExamRoutes)
+app.use('/api/al-results', alExamRoutes)
 
 const PORT = process.env.PORT || 5000;
 
