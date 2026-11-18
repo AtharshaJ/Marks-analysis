@@ -467,15 +467,17 @@ const handleClassSearch = () => {
         {expandedPublicExam === 'ol' && (
             <div className="public-exam-actions">
                 <button
-                    className="public-exam-edit-btn"
-                    onClick={() => {}}
-                >
-                    Editing
-                </button>
+    className="public-exam-edit-btn"
+    onClick={() => navigate('/employee/public-exams/ol')}
+>
+    Manage Results
+</button>
 
                 <button
                     className="public-exam-analysis-btn"
-                    onClick={() => {}}
+                   onClick={() =>
+    navigate('/employee/public-exams/ol/analysis')
+}
                 >
                     View Analysis
                 </button>

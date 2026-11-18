@@ -23,6 +23,9 @@ import ClassAnalysis from './pages/ClassAnalysis'
 import SubjectAnalysis from './pages/SubjectAnalysis'
 import ScholarshipExam from './pages/ScholarshipExam'
 import ScholarshipAnalysis from './pages/ScholarshipAnalysis'
+import OLResults from './pages/OLResults'
+import OLAnalysis from './pages/OLAnalysis'
+
 
 // Check whether a user is authenticated
 function ProtectedRoute({ allowedRole, children }) {
@@ -136,6 +139,8 @@ function App() {
     }
 />
 
+
+
 {/* Grade 5 Scholarship Examination */}
 <Route
     path="/employee/public-exams/scholarship"
@@ -146,12 +151,30 @@ function App() {
     }
 />
 
+<Route
+    path="/employee/public-exams/ol"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <OLResults user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
 {/* Scholarship Marks Analysis */}
 <Route
     path="/employee/public-exams/scholarship/analysis"
     element={
         <ProtectedRoute allowedRole="employee">
             {user => <ScholarshipAnalysis user={user} />}
+        </ProtectedRoute>
+    }
+/>
+
+<Route
+    path="/employee/public-exams/ol/analysis"
+    element={
+        <ProtectedRoute allowedRole="employee">
+            {user => <OLAnalysis user={user} />}
         </ProtectedRoute>
     }
 />
