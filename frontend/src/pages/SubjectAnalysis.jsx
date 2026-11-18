@@ -407,7 +407,7 @@ const rankedStudents = [...completedStudents]
             student.marks >= 75 ? 'A' :
             student.marks >= 65 ? 'B' :
             student.marks >= 50 ? 'C' :
-            student.marks >= 35 ? 'S' : 'F'
+            student.marks >= 35 ? 'S' : 'W'
     }))
 
 
@@ -595,7 +595,7 @@ return (
                                                     className="subject-analysis-grade-card"
                                                     key={grade}
                                                 >
-                                                    <span>Grade {grade}</span>
+                                                   <span>Grade {grade === 'F' ? 'W' : grade}</span>
                                                     <strong>{count}</strong>
                                                 </div>
                                             )

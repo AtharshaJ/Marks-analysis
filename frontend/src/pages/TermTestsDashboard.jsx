@@ -25,13 +25,8 @@ const menuItems = [
         description: 'Explore class performance, rankings and statistical reports.',
         icon: '▦',
         path: `/employee/term-tests/${classId}/analysis`
-    },
-    {
-        title: 'Subject Settings',
-        description: 'Configure which subjects are included in class calculations.',
-        icon: '⚙',
-        path: `/employee/term-tests/${classId}/settings`
     }
+    
 ]
 
     return (
