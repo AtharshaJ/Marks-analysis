@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AddStudent.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 // Searchable A/L subject selector
 function SearchableSubjectSelect({
@@ -147,8 +148,7 @@ function AddStudent({ user }) {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+   const API_BASE_URL = API_URL;
 
     const grade = Number(user.class_assignment.grade)
     const isAL = grade === 12 || grade === 13

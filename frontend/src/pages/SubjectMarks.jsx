@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './SubjectMarks.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 function SubjectMarks({ user }) {
     const { classId } = useParams()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const API_BASE_URL = API_URL;
 
     const [students, setStudents] = useState([])
     const [selectedClass, setSelectedClass] = useState(null)

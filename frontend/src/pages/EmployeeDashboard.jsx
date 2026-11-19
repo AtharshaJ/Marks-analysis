@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import './EmployeeDashboard.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 function EmployeeDashboard({ user }) {
     const navigate = useNavigate()
@@ -33,9 +34,7 @@ const [activeSection, setActiveSection] = useState(
         try {
             setClassesLoading(true)
             setClassesError('')
-
-            const API_BASE_URL =
-                import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_BASE_URL = API_URL;
 
             const response = await fetch(
                 `${API_BASE_URL}/api/classes/teacher-classes`,
@@ -87,8 +86,7 @@ const handleClassSearch = () => {
         try {
             setLoggingOut(true)
 
-            const API_BASE_URL =
-                import.meta.env.VITE_API_URL || 'http://localhost:5000'
+           
 
             const response = await fetch(
                 `${API_BASE_URL}/api/auth/logout`,

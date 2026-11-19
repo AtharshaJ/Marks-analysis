@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './OLResults.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 function ALResults({ user }) {
     const navigate = useNavigate()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+   const API_BASE_URL = API_URL;
 
     const [examYear, setExamYear] = useState(new Date().getFullYear())
 

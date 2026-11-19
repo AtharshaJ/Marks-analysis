@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import CustomDropdown from '../components/CustomDropdown'
 import './ClassAnalysis.css'
+import API_URL from '../config';
 
 function ClassAnalysis({ user }) {
     const { classId } = useParams()
     const navigate = useNavigate()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const API_BASE_URL = API_URL;
 
     const [years, setYears] = useState([])
     const [terms, setTerms] = useState([])

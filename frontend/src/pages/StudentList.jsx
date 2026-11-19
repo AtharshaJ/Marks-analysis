@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom'
 import './StudentList.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 function StudentList() {
     const { classId } = useParams()
@@ -33,8 +34,7 @@ const [terms, setTerms] = useState([])
 const [selectedTermId, setSelectedTermId] = useState('')
 const [reportLoading, setReportLoading] = useState(false)
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const API_BASE_URL = API_URL;
 
     useEffect(() => {
         const fetchStudents = async () => {

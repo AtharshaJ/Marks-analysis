@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './OLAnalysis.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 function OLAnalysis({ user }) {
     const navigate = useNavigate()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+   const API_BASE_URL = API_URL;
 
     const [examYear, setExamYear] = useState(new Date().getFullYear())
     const [students, setStudents] = useState([])

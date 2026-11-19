@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './AddEmployee.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
 function AddEmployee() {
     const navigate = useNavigate()
@@ -17,9 +18,7 @@ function AddEmployee() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [feedback, setFeedback] = useState(null)
     const [employeeCreated, setEmployeeCreated] = useState(false)
-
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_BASE_URL = API_URL;
 
     const copyPassword = async () => {
         try {

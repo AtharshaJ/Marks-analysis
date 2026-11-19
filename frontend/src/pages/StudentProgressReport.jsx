@@ -2,14 +2,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './StudentProgressReport.css'
+import API_URL from '../config';
 
 function StudentProgressReport({ user }) {
     const { classId, studentId } = useParams()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL || 'http://localhost:5000'
+    const API_BASE_URL = API_URL;
 
     const yearId = searchParams.get('yearId')
     const termId = searchParams.get('termId')
