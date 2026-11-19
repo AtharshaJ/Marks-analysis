@@ -31,16 +31,12 @@ if (process.env.NODE_ENV !== 'production') {
     }));
 }
 
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}));
+if (process.env.NODE_ENV !== 'production') {
+    app.use(cors({
+        origin: 'http://localhost:5173',
+        credentials: true
+    }));
+}
 
 
 app.use(express.json());
