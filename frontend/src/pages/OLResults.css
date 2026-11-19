@@ -515,3 +515,61 @@
         padding: 15px;
     }
 }
+
+
+/* A/L Stream Dropdown */
+
+.al-stream-dropdown .custom-dropdown-trigger {
+    background: #ffffff;
+    border: 1px solid #cbd8e5;
+    color: #173e70;
+}
+
+.al-stream-dropdown .custom-dropdown-menu {
+    top: calc(100% + 9px);
+    background: #ffffff;
+    border: 1px solid #dce6ef;
+    border-radius: 9px;
+    padding: 5px;
+    box-shadow: 0 8px 24px rgba(23, 62, 112, 0.12);
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.al-stream-dropdown .custom-dropdown-option {
+    background: #ffffff;
+    color: #34495e;
+    border-radius: 6px;
+    text-align: left;
+}
+
+.al-stream-dropdown .custom-dropdown-option:hover {
+    background: #f4f8f8;
+    color: #34495e;
+}
+
+.al-stream-dropdown .custom-dropdown-option.selected {
+    background: #e2f3f2;
+    color: #116f74;
+    font-weight: 600;
+}
+
+.al-stream-dropdown .custom-dropdown-menu::-webkit-scrollbar {
+    width: 7px;
+}
+
+.al-stream-dropdown .custom-dropdown-menu::-webkit-scrollbar-thumb {
+    background: #b7d9d8;
+    border-radius: 10px;
+}
+
+.al-stream-dropdown .custom-dropdown-menu::-webkit-scrollbar-track {
+    background: #f4f8fa;
+}
+
+/* Align A/L Add Student button with the input fields */
+.ol-results-actions > button {
+    align-self: flex-end;
+    margin-bottom: 0;
+    min-height: 46px;
+}

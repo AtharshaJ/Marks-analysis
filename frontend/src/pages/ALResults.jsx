@@ -396,12 +396,8 @@ function ALResults({ user }) {
     }
 
     
-
-    return (
-        <div className="ol-results-page">
-            
-    return (
-        <div className="ol-results-page">
+return (
+    <div className="ol-results-page">
 
             <header className="ol-results-header">
                 <h2>G.C.E. Advanced Level Examination</h2>
@@ -785,6 +781,63 @@ function ALResults({ user }) {
                     <p style={{ color: 'red' }}>{error}</p>
                 )}
 
+                {/* A/L RESULTS FILTERS AND ACTIONS */}
+<div className="ol-results-actions">
+
+    <div className="ol-form-group">
+        <label>Examination Year</label>
+
+        <input
+            type="number"
+            value={examYear}
+            onChange={e => setExamYear(Number(e.target.value))}
+        />
+    </div>
+
+  <div className="ol-form-group">
+    <label>Examination Stream</label>
+
+    <div className="al-stream-dropdown">
+        <CustomDropdown
+            value={selectedStreamId}
+            options={streams.map(stream => ({
+                value: String(stream.id),
+                label: stream.stream_name
+            }))}
+            onChange={value => {
+                setSelectedStreamId(value)
+
+                setStudentForm({
+                    exam_index_number: '',
+                    full_name: '',
+                    subject_1_no: '',
+                    subject_2_no: '',
+                    subject_3_no: ''
+                })
+
+                setError('')
+            }}
+            placeholder="Select A/L Stream"
+            searchable={true}
+            searchPlaceholder="Search streams..."
+        />
+    </div>
+</div>
+
+    <button
+        type="button"
+        disabled={!selectedStreamId}
+        onClick={() => {
+            setStudentPopupStep(1)
+            setError('')
+            setShowStudentPopup(true)
+        }}
+    >
+        + Add Student
+    </button>
+
+</div>
+
                 {/* REGISTERED STUDENTS TABLE */}
                 {selectedStreamId && (
                     <div className="ol-student-table-section">
@@ -915,66 +968,7 @@ function ALResults({ user }) {
                     </div>
                 )}
 
-<div className="ol-results-actions">
-    <button
-        type="button"
-        disabled={!selectedStreamId}
-        onClick={() => {
-            setStudentPopupStep(1)
-            setError('')
-            setShowStudentPopup(true)
-        }}
-    >
-        + Add Student
-    </button>
-</div>
 
-                
-<div className="ol-results-actions">
-
-    <div className="ol-form-group">
-        
-
-       <div className="ol-form-group">
-    <label>Examination Year</label>
-
-    <input
-        type="number"
-        value={examYear}
-        onChange={e => setExamYear(Number(e.target.value))}
-    />
-</div>
-    </div>
-
-    <div className="ol-form-group">
-        <label>Examination Stream</label>
-
-        <CustomDropdown
-            value={selectedStreamId}
-            options={streams.map(stream => ({
-                value: String(stream.id),
-                label: stream.stream_name
-            }))}
-            onChange={value => {
-                setSelectedStreamId(value)
-
-                setStudentForm({
-                    exam_index_number: '',
-                    full_name: '',
-                    subject_1_no: '',
-                    subject_2_no: '',
-                    subject_3_no: ''
-                })
-
-                setError('')
-            }}
-            placeholder="Select A/L Stream"
-            searchable={true}
-            searchPlaceholder="Search streams..."
-        />
-    </div>
-
-</div>
 
 
             </main>
@@ -982,8 +976,7 @@ function ALResults({ user }) {
         </div>
     )
 
-        </div>
-    )
+       
 }
 
 export default ALResults
