@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react'
+import API_URL from '../config';
 import { useNavigate } from 'react-router-dom'
 import './AdminDashboard.css'
 import CustomDropdown from '../components/CustomDropdown'
@@ -113,7 +114,7 @@ const handleAddAcademicYear = async () => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/term-tests/academic-years',
+           `${API_URL}/api/term-tests/academic-years`,
             {
                 method: 'POST',
                 credentials: 'include',
@@ -151,8 +152,7 @@ const handleLogout = async () => {
     try {
         setLoggingOut(true)
 
-        const API_BASE_URL =
-            import.meta.env.VITE_API_URL || 'http://localhost:5000'
+        const API_BASE_URL = API_URL
 
         const response = await fetch(
             `${API_BASE_URL}/api/auth/logout`,
@@ -221,7 +221,7 @@ const handleAddClass = async (e) => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/classes',
+            `${API_URL}/api/classes`,
             {
                 method: 'POST',
                 credentials: 'include',
@@ -267,7 +267,7 @@ const handleAddClass = async (e) => {
 
         try {
             const response = await fetch(
-                'http://localhost:5000/api/employees',
+                `${API_URL}/api/employees`,
                 {
                     credentials: 'include'
                 }
@@ -293,7 +293,7 @@ const handleAddClass = async (e) => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/term-tests/academic-years',
+            `${API_URL}/api/term-tests/academic-years`,
             {
                 credentials: 'include'
             }
@@ -331,7 +331,7 @@ const fetchClasses = async () => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/classes',
+            `${API_URL}/api/classes`,
             {
                 credentials: 'include'
             }
@@ -390,7 +390,7 @@ const handleUpdateClass = async (e) => {
 
     try {
         const response = await fetch(
-            `http://localhost:5000/api/classes/${selectedClass.id}`,
+            `${API_URL}/api/classes/${selectedClass.id}`,
             {
                 method: 'PATCH',
                 credentials: 'include',
@@ -433,7 +433,7 @@ const handleUpdateUsername = async (e) => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/auth/admin/update-username',
+            `${API_URL}/api/auth/admin/update-username`,
             {
                 method: 'PUT',
                 headers: {
@@ -474,7 +474,7 @@ const handleUpdatePassword = async (e) => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/auth/admin/update-password',
+            `${API_URL}/api/auth/admin/update-password`,
             {
                 method: 'PUT',
                 headers: {
@@ -516,7 +516,7 @@ const handleUpdateAdminUsername = async (e) => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/auth/admin/update-username',
+            `${API_URL}/api/auth/admin/update-username`,
             {
                 method: 'PUT',
                 headers: {
@@ -557,7 +557,7 @@ const handleUpdateAdminPassword = async (e) => {
 
     try {
         const response = await fetch(
-            'http://localhost:5000/api/auth/admin/update-password',
+            `${API_URL}/api/auth/admin/update-password`,
             {
                 method: 'PUT',
                 headers: {
@@ -600,7 +600,7 @@ const handleDeleteClass = async () => {
 
     try {
         const response = await fetch(
-            `http://localhost:5000/api/classes/${selectedClass.id}`,
+            `${API_URL}/api/classes/${selectedClass.id}`,
             {
                 method: 'DELETE',
                 credentials: 'include'
@@ -643,7 +643,7 @@ useEffect(() => {
     const fetchAdminAccount = async () => {
         try {
             const response = await fetch(
-                'http://localhost:5000/api/auth/me',
+                `${API_URL}/api/auth/me`,
                 {
                     credentials: 'include'
                 }
@@ -698,7 +698,7 @@ useEffect(() => {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/employees/${selectedEmployee.id}/password-reset`,
+                `${API_URL}/api/employees/${selectedEmployee.id}/password-reset`,
                 {
                     method: 'PATCH',
                     credentials: 'include',
@@ -745,7 +745,7 @@ useEffect(() => {
 
         try {
             const response = await fetch(
-                `http://localhost:5000/api/employees/${selectedEmployee.id}/status`,
+                `${API_URL}/api/employees/${selectedEmployee.id}/status`,
                 {
                     method: 'PATCH',
                     credentials: 'include',
@@ -781,7 +781,7 @@ const handlePromotionPreview = async () => {
         setPromotionPreview(null)
 
         const response = await fetch(
-            `http://localhost:5000/api/promotion/preview/${promotionGroup}`,
+            `${API_URL}/api/promotion/preview/${promotionGroup}`,
             {
                 method: 'GET',
                 credentials: 'include'
@@ -814,7 +814,7 @@ const handleExecutePromotion = async () => {
         setShowPromotionConfirm(false)
 
         const response = await fetch(
-            'http://localhost:5000/api/promotion/execute',
+            `${API_URL}/api/promotion/execute`,
             {
                 method: 'POST',
                 credentials: 'include',
@@ -869,7 +869,7 @@ const handleExamDataDeletion = async () => {
         setExamDeleteSummary(null)
 
         const response = await fetch(
-            `http://localhost:5000/api/promotion${endpoints[selectedType]}`,
+            `${API_URL}/api/promotion${endpoints[selectedType]}`,
             {
                 method: 'DELETE',
                 credentials: 'include'

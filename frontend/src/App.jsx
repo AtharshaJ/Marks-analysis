@@ -7,6 +7,8 @@ import {
   Navigate
 } from 'react-router-dom'
 
+import API_URL from './config';
+
 import Login from './pages/login'
 import AddEmployee from './pages/AddEmployee'
 import AdminDashboard from './pages/AdminDashboard'
@@ -38,7 +40,7 @@ function ProtectedRoute({ allowedRole, children }) {
     const checkSession = async () => {
       try {
         const response = await fetch(
-          'http://localhost:5000/api/auth/me',
+          `${API_URL}/api/auth/me`,
           {
             credentials: 'include'
           }

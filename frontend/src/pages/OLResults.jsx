@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './OLResults.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config'
 
 function OLResults({ user }) {
     const navigate = useNavigate()
@@ -49,7 +50,7 @@ const [savingGrades, setSavingGrades] = useState(false)
                 setError('')
 
                 const response = await fetch(
-                    'http://localhost:5000/api/ol-results/subjects',
+                    `${API_URL}/api/ol-results/subjects`,
                     {
                         credentials: 'include'
                     }
@@ -86,7 +87,7 @@ useEffect(() => {
     const fetchStudents = async () => {
         try {
             const response = await fetch(
-                `http://localhost:5000/api/ol-results/year/${examYear}`,
+               `${API_URL}/api/ol-results/year/${examYear}`,
                 {
                     credentials: 'include'
                 }
@@ -194,7 +195,7 @@ const handleSaveGrades = async (e) => {
 
         const responses = await Promise.all(
             subjectIds.map(subjectId =>
-                fetch('http://localhost:5000/api/ol-results/grades', {
+                fetch(`${API_URL}/api/ol-results/grades`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -224,7 +225,7 @@ const handleSaveGrades = async (e) => {
         }
 
         const refreshResponse = await fetch(
-            `http://localhost:5000/api/ol-results/year/${examYear}`,
+            `${API_URL}/api/ol-results/year/${examYear}`,
             { credentials: 'include' }
         )
 
@@ -265,7 +266,7 @@ const handleRegisterStudent = async (e) => {
         setError('')
 
         const response = await fetch(
-            'http://localhost:5000/api/ol-results/students',
+            `${API_URL}/api/ol-results/students`,
             {
                 method: 'POST',
                 headers: {

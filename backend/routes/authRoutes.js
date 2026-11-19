@@ -13,6 +13,14 @@ const router = express.Router();
 // Session duration: 7 days
 const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000;
 
+const SESSION_COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: SESSION_DURATION,
+    path: '/'
+};
+
 // Create a secure random session token
 function generateSessionToken() {
     return crypto.randomBytes(32).toString('hex');
@@ -147,14 +155,7 @@ if (!employee.is_active) {
         if (sessionError) throw sessionError;
 
         // Send session token in an HttpOnly cookie
-        res.cookie('sessionToken', sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: SESSION_DURATION,
-            path: '/'
-        });
-
+     res.cookie('sessionToken', sessionToken, SESSION_COOKIE_OPTIONS);
         return res.json({
             success: true,
             message: 'Login successful.',
@@ -263,12 +264,12 @@ router.post('/logout', async (req, res) => {
             if (error) throw error;
         }
 
-        res.clearCookie('sessionToken', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/'
-        });
+      res.clearCookie('sessionToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/'
+});
 
         return res.json({
             success: true,

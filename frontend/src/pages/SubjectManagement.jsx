@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './SubjectManagement.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config';
 
-const API_URL = 'http://localhost:5000/api/subjects'
+const SUBJECTS_API_URL = `${API_URL}/api/subjects`;
 
 function SubjectManagement({ embedded = false }) {
     const navigate = useNavigate()
@@ -47,7 +48,7 @@ function SubjectManagement({ embedded = false }) {
         setErrorMessage('')
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(SUBJECTS_API_URL, {
                 credentials: 'include'
             })
 
@@ -137,7 +138,7 @@ function SubjectManagement({ embedded = false }) {
         setSaving(true)
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(SUBJECTS_API_URL, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -189,7 +190,7 @@ function SubjectManagement({ embedded = false }) {
         setSaving(true)
 
         try {
-            const response = await fetch(`${API_URL}/al`, {
+            const response = await fetch(`${SUBJECTS_API_URL}/al`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -242,7 +243,7 @@ function SubjectManagement({ embedded = false }) {
         setSaving(true)
 
         try {
-            const response = await fetch(`${API_URL}/streams`, {
+            const response = await fetch(`${SUBJECTS_API_URL}/streams`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -296,7 +297,7 @@ function SubjectManagement({ embedded = false }) {
 
         try {
             const response = await fetch(
-                `${API_URL}/streams/${streamId}`,
+                `${SUBJECTS_API_URL}/streams/${streamId}`,
                 {
                     method: 'PATCH',
                     credentials: 'include',
@@ -352,7 +353,7 @@ function SubjectManagement({ embedded = false }) {
         setSuccessMessage('')
 
         try {
-            const response = await fetch(`${API_URL}/${subjectId}`, {
+            const response = await fetch(`${SUBJECTS_API_URL}/${subjectId}`, {
                 method: 'PATCH',
                 credentials: 'include',
                 headers: {
@@ -409,7 +410,7 @@ function SubjectManagement({ embedded = false }) {
 
         try {
             const response = await fetch(
-                `${API_URL}/al/${encodeURIComponent(editingAlSubjectNo)}`,
+                `${SUBJECTS_API_URL}/al/${encodeURIComponent(editingAlSubjectNo)}`,
                 {
                     method: 'PATCH',
                     credentials: 'include',

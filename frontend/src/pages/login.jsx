@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Login.css'
+import API_URL from '../config';
 
 function Login() {
   const [loginId, setLoginId] = useState('')
@@ -30,7 +31,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/auth/login',
+        `${API_URL}/api/auth/login`,
         {
           method: 'POST',
           headers: {
@@ -75,7 +76,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/auth/reset-password',
+        `${API_URL}/api/auth/reset-password`,
         {
           method: 'POST',
           headers: {

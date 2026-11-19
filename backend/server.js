@@ -2,7 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import supabase from './supabase.js';
+
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -24,8 +24,19 @@ import alExamRoutes from './routes/alExamRoutes.js'
 import promotionRoutes from './routes/promotionRoutes.js'
 
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
@@ -55,32 +66,7 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/api/test-db', async (req, res) => {
-    try {
-        const { data, error } = await supabase
-            .from('employees')
-            .select('teacher_id')
-            .limit(1);
 
-        if (error) {
-            throw error;
-        }
-
-        res.json({
-            success: true,
-            message: 'Supabase database connected successfully!',
-            data
-        });
-
-    } catch (error) {
-        console.error('Database connection error:', error.message);
-
-        res.status(500).json({
-            success: false,
-            message: 'Database connection failed.'
-        });
-    }
-});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
