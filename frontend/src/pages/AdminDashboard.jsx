@@ -28,6 +28,15 @@ const [addClassMessage, setAddClassMessage] = useState('')
 const [eligibleTeachers, setEligibleTeachers] = useState([])
 const [newClassTeacher, setNewClassTeacher] = useState('')
 const [allActiveTeachers, setAllActiveTeachers] = useState([])
+
+
+const [newAcademicYear, setNewAcademicYear] = useState('')
+const [academicYearLoading, setAcademicYearLoading] = useState(false)
+const [academicYearMessage, setAcademicYearMessage] = useState('')
+const [academicYearError, setAcademicYearError] = useState('')
+
+const [academicYears, setAcademicYears] = useState([])
+const [academicYearsLoading, setAcademicYearsLoading] = useState(false)
 // Selected class for editing
 const [selectedClass, setSelectedClass] = useState(null)
 
@@ -80,6 +89,63 @@ const [examDeleteError, setExamDeleteError] = useState('')
 const [examDeleteMessage, setExamDeleteMessage] = useState('')
 const [examDeleteSummary, setExamDeleteSummary] = useState(null)
 
+
+
+
+const handleAddAcademicYear = async () => {
+    const year = Number(newAcademicYear)
+
+    if (
+        !Number.isInteger(year) ||
+        year < 2000 ||
+        year > 2100
+    ) {
+        setAcademicYearError(
+            'Enter a valid academic year between 2000 and 2100.'
+        )
+        setAcademicYearMessage('')
+        return
+    }
+
+    setAcademicYearLoading(true)
+    setAcademicYearError('')
+    setAcademicYearMessage('')
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/term-tests/academic-years',
+            {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ year })
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || 'Unable to create academic year.'
+            )
+        }
+
+setAcademicYearMessage(result.message)
+setNewAcademicYear('')
+
+// Refresh the academic years dropdown
+await fetchAcademicYears()
+
+    } catch (error) {
+        setAcademicYearError(error.message)
+    } finally {
+        setAcademicYearLoading(false)
+    }
+}
+
+
 // Handle admin logout
 const handleLogout = async () => {
     try {
@@ -113,7 +179,7 @@ const handleLogout = async () => {
         { id: 'teachers', label: 'Teacher Management', icon: '♙' },
     { id: 'classes', label: 'Class Divisions', icon: '⌂' },
     { id: 'subject-management', label: 'Subject Management', icon: '▦' },
-    { id: 'promotion', label: 'Student Promotion', icon: '⇧' },
+    { id: 'promotion', label: 'System Management', icon: '⇧' },
     { id: 'settings', label: 'Account Settings', icon: '⚙' }
     ]
 
@@ -221,6 +287,42 @@ const handleAddClass = async (e) => {
             setLoading(false)
         }
     }
+
+    const fetchAcademicYears = async () => {
+    setAcademicYearsLoading(true)
+
+    try {
+        const response = await fetch(
+            'http://localhost:5000/api/term-tests/academic-years',
+            {
+                credentials: 'include'
+            }
+        )
+
+        const result = await response.json()
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || 'Unable to load academic years.'
+            )
+        }
+
+        setAcademicYears(result.academicYears || [])
+
+        // Select the newest available academic year by default
+        if (result.academicYears?.length > 0) {
+            setPromotionExamYear(
+                Number(result.academicYears[0].year)
+            )
+        }
+
+    } catch (error) {
+        console.error('Academic years loading error:', error)
+        setAcademicYearError(error.message)
+    } finally {
+        setAcademicYearsLoading(false)
+    }
+}
 
     // Fetch class divisions from backend
 const fetchClasses = async () => {
@@ -524,9 +626,12 @@ const handleDeleteClass = async () => {
     }
 }
 
-    useEffect(() => {
-        fetchEmployees()
-    }, [])
+
+
+   useEffect(() => {
+    fetchEmployees()
+    fetchAcademicYears()
+}, [])
 
     useEffect(() => {
     if (activeSection === 'classes') {
@@ -1385,6 +1490,55 @@ const handleExamDataDeletion = async () => {
 {activeSection === 'promotion' && (
     <div className="promotion-section">
 
+        {/* Academic Year Management */}
+<div className="academic-year-management">
+    <div className="academic-year-header">
+        <div>
+            <h2>Academic Year Management</h2>
+            <p>
+                Create and manage academic years and their three terms.
+            </p>
+        </div>
+    </div>
+
+    <div className="academic-year-add-form">
+        <input
+            type="number"
+            min="2000"
+            max="2100"
+            placeholder="Enter academic year (e.g. 2028)"
+            value={newAcademicYear}
+            onChange={e => {
+                setNewAcademicYear(e.target.value)
+                setAcademicYearError('')
+                setAcademicYearMessage('')
+            }}
+        />
+
+        <button
+            type="button"
+            onClick={handleAddAcademicYear}
+            disabled={academicYearLoading || !newAcademicYear}
+        >
+            {academicYearLoading ? 'Creating...' : 'Add Academic Year'}
+        </button>
+    </div>
+
+    {academicYearMessage && (
+        <div className="academic-year-success">
+            {academicYearMessage}
+        </div>
+    )}
+
+    {academicYearError && (
+        <div className="academic-year-error">
+            {academicYearError}
+        </div>
+    )}
+
+    
+</div>
+
         <div className="promotion-header">
             <h2>Student Promotion</h2>
             <p>
@@ -1418,17 +1572,10 @@ const handleExamDataDeletion = async () => {
                 <label>Examination Year</label>
 
                 <CustomDropdown
-                    options={Array.from(
-                        { length: 3 },
-                        (_, index) => {
-                            const year = new Date().getFullYear() - index
-
-                            return {
-                                value: String(year),
-                                label: String(year)
-                            }
-                        }
-                    )}
+                    options={academicYears.map(item => ({
+    value: String(item.year),
+    label: String(item.year)
+}))}
                     value={String(promotionExamYear)}
                     onChange={(value) => {
                         setPromotionExamYear(Number(value))

@@ -15,16 +15,34 @@
     gap: 12px;
 }
 
+
 .progress-report-actions button,
 .progress-report-message button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    background: #173e70;
-    color: white;
+    padding: 8px 14px;
+    border: 1px solid #cbd9e9;
+    border-radius: 7px;
+    background: #edf3fa;
+    color: #31577f;
+    font-family: inherit;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
+
+.progress-report-actions button:hover,
+.progress-report-message button:hover {
+    background: #dce8f5;
+    border-color: #a9bfd9;
+    color: #173e70;
+}
+
+.progress-report-actions button:disabled,
+.progress-report-message button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 
 .progress-report-paper {
     width: 210mm;
@@ -180,41 +198,63 @@
     color: #b91c1c;
 }
 
+
 @media print {
     @page {
         size: A4 portrait;
         margin: 0;
     }
 
-    body {
-        margin: 0;
-        background: white;
+    html,
+    body,
+    #root {
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        overflow: visible !important;
     }
 
     .progress-report-page {
-        min-height: auto;
-        padding: 0;
-        background: white;
+        display: block !important;
+        width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        overflow: visible !important;
     }
 
-    .progress-report-actions {
+    .progress-report-actions,
+    .progress-report-page > h1 {
         display: none !important;
     }
 
     .progress-report-paper {
-    width: 210mm;
-    height: 297mm;
-    min-height: 297mm;
-    margin: 0;
-    padding: 18mm 17mm;
-    box-shadow: none;
-    box-sizing: border-box;
-    page-break-after: always;
-    break-after: page;
+        display: block !important;
+        position: relative !important;
+        visibility: visible !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        margin: 0 !important;
+        padding: 18mm 17mm !important;
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        page-break-after: always;
+        break-after: page;
+    }
+
+    .progress-report-paper:last-child {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    .progress-report-paper * {
+        visibility: visible !important;
+    }
 }
 
-.progress-report-paper:last-child {
-    page-break-after: auto;
-    break-after: auto;
-}
-}

@@ -33,10 +33,13 @@ function PrintAllStudentReports({ user }) {
                 setError('')
 
                 // Fetch all active students in the selected class.
-                const studentsResponse = await fetch(
-                    `${API_BASE_URL}/api/term-tests/${classId}/students`,
-                    { credentials: 'include' }
-                )
+               const studentsResponse = await fetch(
+    `${API_BASE_URL}/api/term-tests/${classId}/students`,
+    {
+        credentials: 'include',
+        cache: 'no-store'
+    }
+)
 
                 const studentsResult = await studentsResponse.json()
 
@@ -117,10 +120,10 @@ function PrintAllStudentReports({ user }) {
     }, [classId, termId])
 
     useEffect(() => {
-        if (!loading && !error && reports.length > 0) {
-            window.print()
-        }
-    }, [loading, error, reports])
+    if (!loading && !error && reports.length > 0) {
+        window.print()
+    }
+}, [loading, error, reports])
 
     if (loading) {
         return (
@@ -149,6 +152,7 @@ function PrintAllStudentReports({ user }) {
 
     return (
         <div className="progress-report-page">
+         
             <div className="progress-report-actions">
                 <button onClick={() => navigate(-1)}>Back</button>
                 <button onClick={() => window.print()}>
@@ -202,7 +206,7 @@ function PrintAllStudentReports({ user }) {
                             </div>
                             <div>
                                 <strong>Academic Year:</strong>{' '}
-                                {academicTerm.academic_year?.year || yearId || '—'}
+                                {academicTerm.academic_years?.year || yearId || '—'}
                             </div>
                             <div>
                                 <strong>Term:</strong>{' '}

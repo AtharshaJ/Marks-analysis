@@ -1959,3 +1959,155 @@
         width: 100%;
     }
 }
+
+/* Academic Year Management */
+
+.academic-year-management {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #d7e3f0;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 28px;
+    box-shadow: 0 3px 12px rgba(23, 62, 112, 0.06);
+}
+
+.academic-year-header h2 {
+    color: #173e70;
+    font-size: 19px;
+    margin: 0 0 6px;
+}
+
+.academic-year-header p {
+    color: #71839a;
+    font-size: 13px;
+    margin: 0;
+}
+
+.academic-year-add-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    max-width: 570px;
+}
+
+.academic-year-add-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #cbd9e9;
+    border-radius: 7px;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+    color: #31577f;
+}
+
+.academic-year-add-form input:focus {
+    border-color: #477db5;
+    box-shadow: 0 0 0 3px rgba(71, 125, 181, 0.12);
+}
+
+.academic-year-add-form button {
+    padding: 10px 17px;
+    border: none;
+    border-radius: 7px;
+    background: #173e70;
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.academic-year-add-form button:hover:not(:disabled) {
+    background: #28578d;
+}
+
+.academic-year-add-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.academic-year-success,
+.academic-year-error {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+.academic-year-success {
+    background: #eaf6ee;
+    color: #267342;
+}
+
+.academic-year-error {
+    background: #fff0f0;
+    color: #b42318;
+}
+
+.academic-year-list {
+    margin-top: 24px;
+}
+
+.academic-year-list h3 {
+    color: #31577f;
+    font-size: 15px;
+    margin: 0 0 13px;
+}
+
+.academic-year-card {
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid #dce6f1;
+    border-radius: 9px;
+    background: #f8fbff;
+}
+
+.academic-year-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.academic-year-card-header strong {
+    color: #173e70;
+    font-size: 16px;
+}
+
+.academic-year-card-header span {
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #edf3fa;
+    color: #31577f;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.academic-year-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.academic-year-terms span {
+    padding: 6px 11px;
+    border: 1px solid #d7e3f0;
+    border-radius: 6px;
+    background: white;
+    color: #526b88;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .academic-year-add-form {
+        flex-direction: column;
+    }
+
+    .academic-year-add-form button {
+        width: 100%;
+    }
+}

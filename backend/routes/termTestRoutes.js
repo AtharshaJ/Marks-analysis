@@ -1,20 +1,77 @@
 
 import express from 'express'
 import supabase from '../supabase.js'
-import { verifySession } from '../middleware/authMiddleware.js'
+import {
+    verifySession,
+    requireAdmin
+} from '../middleware/authMiddleware.js'
 
 const router = express.Router()
+
+
+// Create a new academic year (Admin only)
+router.post(
+    '/academic-years',
+    verifySession,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const year = Number(req.body.year)
+
+            if (
+                !Number.isInteger(year) ||
+                year < 2000 ||
+                year > 2100
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Academic year must be a valid year between 2000 and 2100.'
+                })
+            }
+
+            const { data, error } = await supabase.rpc(
+                'create_academic_year',
+                { p_year: year }
+            )
+
+            if (error) {
+                if (error.code === '23505') {
+                    return res.status(409).json({
+                        success: false,
+                        message: `Academic year ${year} already exists.`
+                    })
+                }
+
+                throw error
+            }
+
+            return res.status(201).json({
+                success: true,
+                message: `Academic year ${year} created successfully with three terms.`,
+                academicYearId: data
+            })
+
+        } catch (error) {
+            console.error('Academic year creation error:', error)
+
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to create academic year.'
+            })
+        }
+    }
+)
 
 
 // Get available academic years and their terms
 router.get('/academic-years', verifySession, async (req, res) => {
     try {
-        if (req.user?.type !== 'employee') {
-            return res.status(403).json({
-                success: false,
-                message: 'Employee access required.'
-            })
-        }
+        if (!['employee', 'admin'].includes(req.user?.type)) {
+    return res.status(403).json({
+        success: false,
+        message: 'Access denied.'
+    })
+}
 
         const { data: academicYears, error } = await supabase
             .from('academic_years')
