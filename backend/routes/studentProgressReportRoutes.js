@@ -403,14 +403,17 @@ if (!classData) {
 
 
 
-        res.json({
-            success: true,
-            student,
-            class: classData,
-            academicTerm,
-            subjects,
-            marks
-        })
+     res.json({
+    success: true,
+    student,
+    class: classData,
+    academicTerm: {
+        ...academicTerm,
+        academic_year: academicTerm.academic_years
+    },
+    subjects,
+    marks
+})
 
     } catch (error) {
         console.error('Progress report error:', error)
