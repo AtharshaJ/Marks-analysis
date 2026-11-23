@@ -67,11 +67,11 @@ router.post(
 router.get('/academic-years', verifySession, async (req, res) => {
     try {
         if (!['employee', 'admin'].includes(req.user?.type)) {
-    return res.status(403).json({
-        success: false,
-        message: 'Access denied.'
-    })
-}
+            return res.status(403).json({
+                success: false,
+                message: 'Access denied.'
+            })
+        }
 
         const { data: academicYears, error } = await supabase
             .from('academic_years')
@@ -346,69 +346,69 @@ router.get('/:classId/students/:studentId/subjects', verifySession, async (req, 
                 }))
         }
 
-       // Grades 12–13: Common A/L subjects + student's selected Choice subjects
-else if (grade >= 12 && grade <= 13) {
+        // Grades 12–13: Common A/L subjects + student's selected Choice subjects
+        else if (grade >= 12 && grade <= 13) {
 
-    // Get the student's selected A/L subjects
-    const { data: selectedSubjects, error: selectedError } = await supabase
-        .from('al_student_subjects')
-        .select('subject_no')
-        .eq('student_id', studentId)
+            // Get the student's selected A/L subjects
+            const { data: selectedSubjects, error: selectedError } = await supabase
+                .from('al_student_subjects')
+                .select('subject_no')
+                .eq('student_id', studentId)
 
-    if (selectedError) throw selectedError
+            if (selectedError) throw selectedError
 
-    const selectedSubjectNumbers = (selectedSubjects || []).map(item =>
-        String(item.subject_no).trim()
-    )
+            const selectedSubjectNumbers = (selectedSubjects || []).map(item =>
+                String(item.subject_no).trim()
+            )
 
-    // Retrieve all Common subjects
-    const { data: commonSubjects, error: commonError } = await supabase
-        .from('al_subjects')
-        .select('subject_no, subject_name, subject_type')
-        .eq('subject_type', 'Common')
+            // Retrieve all Common subjects
+            const { data: commonSubjects, error: commonError } = await supabase
+                .from('al_subjects')
+                .select('subject_no, subject_name, subject_type')
+                .eq('subject_type', 'Common')
 
-    if (commonError) throw commonError
+            if (commonError) throw commonError
 
-    // Retrieve the student's selected Choice subjects
-    let choiceSubjects = []
+            // Retrieve the student's selected Choice subjects
+            let choiceSubjects = []
 
-    if (selectedSubjectNumbers.length > 0) {
-        const { data, error } = await supabase
-            .from('al_subjects')
-            .select('subject_no, subject_name, subject_type')
-            .in('subject_no', selectedSubjectNumbers)
-            .eq('subject_type', 'Choice')
+            if (selectedSubjectNumbers.length > 0) {
+                const { data, error } = await supabase
+                    .from('al_subjects')
+                    .select('subject_no, subject_name, subject_type')
+                    .in('subject_no', selectedSubjectNumbers)
+                    .eq('subject_type', 'Choice')
 
-        if (error) throw error
+                if (error) throw error
 
-        choiceSubjects = data || []
-    }
+                choiceSubjects = data || []
+            }
 
-    // Combine Common and selected Choice subjects
-    const allALSubjects = [
-        ...(commonSubjects || []),
-        ...choiceSubjects
-    ]
+            // Combine Common and selected Choice subjects
+            const allALSubjects = [
+                ...(commonSubjects || []),
+                ...choiceSubjects
+            ]
 
-    // Remove any accidental duplicates
-    const uniqueSubjects = [
-        ...new Map(
-            allALSubjects.map(subject => [
-                String(subject.subject_no).trim(),
-                subject
-            ])
-        ).values()
-    ]
+            // Remove any accidental duplicates
+            const uniqueSubjects = [
+                ...new Map(
+                    allALSubjects.map(subject => [
+                        String(subject.subject_no).trim(),
+                        subject
+                    ])
+                ).values()
+            ]
 
-    subjects = uniqueSubjects.map(subject => ({
-        subject_id: null,
-        al_subject_no: subject.subject_no,
-        subject_name: subject.subject_name,
-        subject_type: 'al',
-        al_subject_type: subject.subject_type
-    }))
-}
-        
+            subjects = uniqueSubjects.map(subject => ({
+                subject_id: null,
+                al_subject_no: subject.subject_no,
+                subject_name: subject.subject_name,
+                subject_type: 'al',
+                al_subject_type: subject.subject_type
+            }))
+        }
+
 
         else {
             return res.status(400).json({
@@ -620,65 +620,65 @@ router.get('/:classId/subjects', verifySession, async (req, res) => {
             }
 
             // Grades 12–13: Common A/L subjects + students' selected Choice subjects
-else if (grade >= 12 && grade <= 13) {
+            else if (grade >= 12 && grade <= 13) {
 
-    // Get all students' selected A/L subjects
-    const { data: selections, error: selectionError } = await supabase
-        .from('al_student_subjects')
-        .select('student_id, subject_no')
-        .in('student_id', studentIds)
+                // Get all students' selected A/L subjects
+                const { data: selections, error: selectionError } = await supabase
+                    .from('al_student_subjects')
+                    .select('student_id, subject_no')
+                    .in('student_id', studentIds)
 
-    if (selectionError) throw selectionError
+                if (selectionError) throw selectionError
 
-    // Retrieve the complete A/L subject catalogue
-    const { data: alSubjects, error: alSubjectsError } = await supabase
-        .from('al_subjects')
-        .select('subject_no, subject_name, subject_type')
+                // Retrieve the complete A/L subject catalogue
+                const { data: alSubjects, error: alSubjectsError } = await supabase
+                    .from('al_subjects')
+                    .select('subject_no, subject_name, subject_type')
 
-    if (alSubjectsError) throw alSubjectsError
+                if (alSubjectsError) throw alSubjectsError
 
-    // Build the class subject list
-    subjects = (alSubjects || [])
-        .filter(subject => {
-            const subjectType = String(subject.subject_type).trim()
+                // Build the class subject list
+                subjects = (alSubjects || [])
+                    .filter(subject => {
+                        const subjectType = String(subject.subject_type).trim()
 
-            // Common subjects are included for everyone
-            if (subjectType === 'Common') return true
+                        // Common subjects are included for everyone
+                        if (subjectType === 'Common') return true
 
-            // Choice subjects are included only if selected
-            return (selections || []).some(item =>
-                String(item.subject_no).trim() ===
-                String(subject.subject_no).trim()
-            )
-        })
-        .map(subject => {
-
-            const isCommon =
-                String(subject.subject_type).trim() === 'Common'
-
-            return {
-                subject_id: null,
-                al_subject_no: subject.subject_no,
-                subject_name: subject.subject_name,
-
-                // Keep this as 'al' because the frontend uses it
-                // to distinguish A/L subjects from regular subjects.
-                subject_type: 'al',
-
-                // Preserve the actual catalogue category separately
-                al_subject_type: subject.subject_type,
-
-                registered_student_ids: isCommon
-                    ? studentIds
-                    : (selections || [])
-                        .filter(item =>
+                        // Choice subjects are included only if selected
+                        return (selections || []).some(item =>
                             String(item.subject_no).trim() ===
                             String(subject.subject_no).trim()
                         )
-                        .map(item => item.student_id)
+                    })
+                    .map(subject => {
+
+                        const isCommon =
+                            String(subject.subject_type).trim() === 'Common'
+
+                        return {
+                            subject_id: null,
+                            al_subject_no: subject.subject_no,
+                            subject_name: subject.subject_name,
+
+                            // Keep this as 'al' because the frontend uses it
+                            // to distinguish A/L subjects from regular subjects.
+                            subject_type: 'al',
+
+                            // Preserve the actual catalogue category separately
+                            al_subject_type: subject.subject_type,
+
+                            registered_student_ids: isCommon
+                                ? studentIds
+                                : (selections || [])
+                                    .filter(item =>
+                                        String(item.subject_no).trim() ===
+                                        String(subject.subject_no).trim()
+                                    )
+                                    .map(item => item.student_id)
+                        }
+                    })
             }
-        })
-}
 
             else {
                 return res.status(400).json({
@@ -849,16 +849,36 @@ router.post('/:classId/students/:studentId/marks', verifySession, async (req, re
             })
         }
 
-        // Verify student belongs to the selected class
-        const { data: student, error: studentError } = await supabase
-            .from('students')
-            .select('id')
-            .eq('id', studentId)
-            .eq('class_id', classId)
-            .eq('is_active', true)
-            .maybeSingle()
+        // Verify student, academic term and class simultaneously
+        const [
+            { data: student, error: studentError },
+            { data: academicTerm, error: termError },
+            { data: classInfo, error: classInfoError }
+        ] = await Promise.all([
+            supabase
+                .from('students')
+                .select('id')
+                .eq('id', studentId)
+                .eq('class_id', classId)
+                .eq('is_active', true)
+                .maybeSingle(),
+
+            supabase
+                .from('academic_terms')
+                .select('id')
+                .eq('id', Number(termId))
+                .maybeSingle(),
+
+            supabase
+                .from('class_divisions')
+                .select('grade')
+                .eq('id', classId)
+                .maybeSingle()
+        ])
 
         if (studentError) throw studentError
+        if (termError) throw termError
+        if (classInfoError) throw classInfoError
 
         if (!student) {
             return res.status(404).json({
@@ -867,15 +887,6 @@ router.post('/:classId/students/:studentId/marks', verifySession, async (req, re
             })
         }
 
-        // Verify academic term
-        const { data: academicTerm, error: termError } = await supabase
-            .from('academic_terms')
-            .select('id')
-            .eq('id', Number(termId))
-            .maybeSingle()
-
-        if (termError) throw termError
-
         if (!academicTerm) {
             return res.status(404).json({
                 success: false,
@@ -883,123 +894,113 @@ router.post('/:classId/students/:studentId/marks', verifySession, async (req, re
             })
         }
 
+        if (!classInfo) {
+            return res.status(404).json({
+                success: false,
+                message: 'Class not found.'
+            })
+        }
 
-// Verify the student's registered subjects
-const { data: classInfo, error: classInfoError } = await supabase
-    .from('class_divisions')
-    .select('grade')
-    .eq('id', classId)
-    .maybeSingle()
+        const grade = Number(classInfo.grade)
 
-if (classInfoError) throw classInfoError
+        const allowedRegularSubjectIds = new Set()
+        const allowedALSubjectNos = new Set()
 
-if (!classInfo) {
-    return res.status(404).json({
-        success: false,
-        message: 'Class not found.'
-    })
-}
+        if (grade >= 1 && grade <= 5) {
 
-const grade = Number(classInfo.grade)
-
-const allowedRegularSubjectIds = new Set()
-const allowedALSubjectNos = new Set()
-
-if (grade >= 1 && grade <= 5) {
-
-    // Primary subjects
-    const { data, error } = await supabase
-        .from('subjects')
-        .select('id')
-        .eq('subject_group', 'Primary')
-
-    if (error) throw error
-
-    data.forEach(subject => {
-        allowedRegularSubjectIds.add(Number(subject.id))
-    })
-
-} else if (grade >= 6 && grade <= 11) {
-
-    const subjectGroup = grade <= 9
-        ? 'Junior Secondary'
-        : 'OL'
-
-    // Get compulsory/core subjects
-    const { data: coreSubjects, error: coreError } = await supabase
-        .from('subjects')
-        .select('id')
-        .eq('subject_group', subjectGroup)
-        .is('basket_id', null)
-
-    if (coreError) throw coreError
-
-    coreSubjects.forEach(subject => {
-        allowedRegularSubjectIds.add(Number(subject.id))
-    })
-
-    // Get subjects selected by this student
-    const { data: selectedSubjects, error: selectedError } =
-        await supabase
-            .from('student_basket_subjects')
-            .select('subject_id')
-            .eq('student_id', studentId)
-
-    if (selectedError) throw selectedError
-
-    const selectedSubjectIds = selectedSubjects.map(
-        subject => subject.subject_id
-    )
-
-    if (selectedSubjectIds.length > 0) {
-
-        const { data: validSelectedSubjects, error: validError } =
-            await supabase
+            // Primary subjects
+            const { data, error } = await supabase
                 .from('subjects')
                 .select('id')
-                .in('id', selectedSubjectIds)
+                .eq('subject_group', 'Primary')
+
+            if (error) throw error
+
+            data.forEach(subject => {
+                allowedRegularSubjectIds.add(Number(subject.id))
+            })
+
+        } else if (grade >= 6 && grade <= 11) {
+
+            const subjectGroup = grade <= 9
+                ? 'Junior Secondary'
+                : 'OL'
+
+            // Get compulsory/core subjects
+            const { data: coreSubjects, error: coreError } = await supabase
+                .from('subjects')
+                .select('id')
                 .eq('subject_group', subjectGroup)
+                .is('basket_id', null)
 
-        if (validError) throw validError
+            if (coreError) throw coreError
 
-        validSelectedSubjects.forEach(subject => {
-            allowedRegularSubjectIds.add(Number(subject.id))
-        })
-    }
+            coreSubjects.forEach(subject => {
+                allowedRegularSubjectIds.add(Number(subject.id))
+            })
 
-} else if (grade >= 12 && grade <= 13) {
+            // Get subjects selected by this student
+            const { data: selectedSubjects, error: selectedError } =
+                await supabase
+                    .from('student_basket_subjects')
+                    .select('subject_id')
+                    .eq('student_id', studentId)
 
-    // Get the student's selected Choice subjects
-    const { data: selectedSubjects, error: selectedError } = await supabase
-        .from('al_student_subjects')
-        .select('subject_no')
-        .eq('student_id', studentId)
+            if (selectedError) throw selectedError
 
-    if (selectedError) throw selectedError
+            const selectedSubjectIds = selectedSubjects.map(
+                subject => subject.subject_id
+            )
 
-    selectedSubjects.forEach(subject => {
-        allowedALSubjectNos.add(String(subject.subject_no).trim())
-    })
+            if (selectedSubjectIds.length > 0) {
 
-    // Get all Common A/L subjects
-    const { data: commonSubjects, error: commonError } = await supabase
-        .from('al_subjects')
-        .select('subject_no')
-        .eq('subject_type', 'Common')
+                const { data: validSelectedSubjects, error: validError } =
+                    await supabase
+                        .from('subjects')
+                        .select('id')
+                        .in('id', selectedSubjectIds)
+                        .eq('subject_group', subjectGroup)
 
-    if (commonError) throw commonError
+                if (validError) throw validError
 
-    // Allow Common subjects for every A/L student
-    commonSubjects.forEach(subject => {
-        allowedALSubjectNos.add(String(subject.subject_no).trim())
-    })
+                validSelectedSubjects.forEach(subject => {
+                    allowedRegularSubjectIds.add(Number(subject.id))
+                })
+            }
 
-} else {
-    return res.status(400).json({
-        success: false,
-        message: 'Unsupported student grade.'
-    })
-}
+        } else if (grade >= 12 && grade <= 13) {
+
+            // Get the student's selected Choice subjects
+            const { data: selectedSubjects, error: selectedError } = await supabase
+                .from('al_student_subjects')
+                .select('subject_no')
+                .eq('student_id', studentId)
+
+            if (selectedError) throw selectedError
+
+            selectedSubjects.forEach(subject => {
+                allowedALSubjectNos.add(String(subject.subject_no).trim())
+            })
+
+            // Get all Common A/L subjects
+            const { data: commonSubjects, error: commonError } = await supabase
+                .from('al_subjects')
+                .select('subject_no')
+                .eq('subject_type', 'Common')
+
+            if (commonError) throw commonError
+
+            // Allow Common subjects for every A/L student
+            commonSubjects.forEach(subject => {
+                allowedALSubjectNos.add(String(subject.subject_no).trim())
+            })
+
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'Unsupported student grade.'
+            })
+        }
 
 
         // Validate all entries before saving anything
@@ -1055,25 +1056,25 @@ if (grade >= 1 && grade <= 5) {
             }
 
             // Reject subjects not registered for this student
-if (
-    hasRegularSubject &&
-    !allowedRegularSubjectIds.has(identifier)
-) {
-    return res.status(400).json({
-        success: false,
-        message: 'This regular subject is not registered for the student.'
-    })
-}
+            if (
+                hasRegularSubject &&
+                !allowedRegularSubjectIds.has(identifier)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This regular subject is not registered for the student.'
+                })
+            }
 
-if (
-    hasALSubject &&
-    !allowedALSubjectNos.has(identifier)
-) {
-    return res.status(400).json({
-        success: false,
-        message: 'This A/L subject is not registered for the student.'
-    })
-}
+            if (
+                hasALSubject &&
+                !allowedALSubjectNos.has(identifier)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This A/L subject is not registered for the student.'
+                })
+            }
 
             // Explicit clear action
             if (entry.clear === true) {
@@ -1118,33 +1119,40 @@ if (
             })
         }
 
-        
+
         // Save new marks and update existing ones
-        for (const entry of entriesToSave) {
-            let existingQuery = supabase
+        // Fetch all existing marks for this student and academic term
+        const { data: existingMarks, error: existingMarksError } =
+            await supabase
                 .from('student_marks')
-                .select('id')
+                .select('id, subject_id, al_subject_no')
                 .eq('student_id', studentId)
                 .eq('academic_term_id', Number(termId))
 
-            if (entry.subject_id !== null) {
-                existingQuery = existingQuery.eq(
-                    'subject_id',
-                    entry.subject_id
-                )
-            } else {
-                existingQuery = existingQuery.eq(
-                    'al_subject_no',
-                    entry.al_subject_no
-                )
-            }
+        if (existingMarksError) throw existingMarksError
 
-            const { data: existingMark, error: lookupError } =
-                await existingQuery.maybeSingle()
+        // Create a lookup map for existing marks
+        const existingMarksMap = new Map()
 
-            if (lookupError) throw lookupError
+        for (const mark of existingMarks || []) {
+            const key = mark.subject_id !== null
+                ? `subject_${mark.subject_id}`
+                : `al_${mark.al_subject_no}`
+
+            existingMarksMap.set(key, mark)
+        }
+
+        // Save marks
+        for (const entry of entriesToSave) {
+
+            const key = entry.subject_id !== null
+                ? `subject_${entry.subject_id}`
+                : `al_${entry.al_subject_no}`
+
+            const existingMark = existingMarksMap.get(key)
 
             if (existingMark) {
+
                 // Update the existing mark
                 const { error: updateError } = await supabase
                     .from('student_marks')
@@ -1157,6 +1165,7 @@ if (
                 if (updateError) throw updateError
 
             } else {
+
                 // Insert a new mark
                 const { error: insertError } = await supabase
                     .from('student_marks')

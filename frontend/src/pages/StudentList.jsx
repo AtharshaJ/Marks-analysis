@@ -21,142 +21,158 @@ function StudentList() {
     const [search, setSearch] = useState('')
     const [subjectSettings, setSubjectSettings] = useState([])
 
-const [showSubjectSettings, setShowSubjectSettings] = useState(false)    
-const [classSubjects, setClassSubjects] = useState([])
-const [isClassTeacher, setIsClassTeacher] = useState(false)
-const [requiresManualSelection, setRequiresManualSelection] = useState(false)
-const [settingsLoading, setSettingsLoading] = useState(true)
-const [settingsError, setSettingsError] = useState('')
-const [updatingSubjectId, setUpdatingSubjectId] = useState(null)
-const [academicYears, setAcademicYears] = useState([])
-const [selectedYearId, setSelectedYearId] = useState('')
-const [terms, setTerms] = useState([])
-const [selectedTermId, setSelectedTermId] = useState('')
-const [reportLoading, setReportLoading] = useState(false)
+    const [showSubjectSettings, setShowSubjectSettings] = useState(false)
+    const [classSubjects, setClassSubjects] = useState([])
+    const [isClassTeacher, setIsClassTeacher] = useState(false)
+    const [requiresManualSelection, setRequiresManualSelection] = useState(false)
+    const [settingsLoading, setSettingsLoading] = useState(true)
+    const [settingsError, setSettingsError] = useState('')
+    const [updatingSubjectId, setUpdatingSubjectId] = useState(null)
+    const [academicYears, setAcademicYears] = useState([])
+    const [selectedYearId, setSelectedYearId] = useState('')
+    const [terms, setTerms] = useState([])
+    const [selectedTermId, setSelectedTermId] = useState('')
+    const [reportLoading, setReportLoading] = useState(false)
 
     const API_BASE_URL = API_URL;
+
 
     useEffect(() => {
         const fetchStudents = async () => {
             try {
                 setLoading(true)
+                setSettingsLoading(true)
                 setError('')
+                setSettingsError('')
 
-                const response = await fetch(
-                    `${API_BASE_URL}/api/term-tests/${classId}/students`,
-                    { credentials: 'include' }
-                )
+                // Fetch all four resources simultaneously
+                const [
+                    studentsResponse,
+                    yearsResponse,
+                    settingsResponse,
+                    subjectsResponse
+                ] = await Promise.all([
+                    fetch(
+                        `${API_BASE_URL}/api/term-tests/${classId}/students`,
+                        { credentials: 'include' }
+                    ),
+                    fetch(
+                        `${API_BASE_URL}/api/term-tests/academic-years`,
+                        { credentials: 'include' }
+                    ),
+                    fetch(
+                        `${API_BASE_URL}/api/subject-settings/${classId}`,
+                        { credentials: 'include' }
+                    ),
+                    fetch(
+                        `${API_BASE_URL}/api/term-tests/${classId}/subjects`,
+                        { credentials: 'include' }
+                    )
+                ])
 
-                const result = await response.json()
+                // Parse all responses simultaneously
+                const [
+                    studentsResult,
+                    yearsResult,
+                    settingsResult,
+                    subjectsResult
+                ] = await Promise.all([
+                    studentsResponse.json(),
+                    yearsResponse.json(),
+                    settingsResponse.json(),
+                    subjectsResponse.json()
+                ])
 
-                if (!response.ok) {
+                // Check responses
+                if (!studentsResponse.ok) {
                     throw new Error(
-                        result.message || 'Unable to retrieve students.'
+                        studentsResult.message || 'Unable to retrieve students.'
                     )
                 }
 
-                setStudents(result.students || [])
-                setSelectedClass(result.class)
+                if (!yearsResponse.ok) {
+                    throw new Error(
+                        yearsResult.message || 'Unable to load academic years.'
+                    )
+                }
 
-                // Fetch academic years for progress reports
-const yearsResponse = await fetch(
-    `${API_BASE_URL}/api/term-tests/academic-years`,
-    { credentials: 'include' }
-)
+                if (!settingsResponse.ok) {
+                    throw new Error(
+                        settingsResult.message || 'Unable to retrieve subject settings.'
+                    )
+                }
 
-const yearsResult = await yearsResponse.json()
+                if (!subjectsResponse.ok) {
+                    throw new Error(
+                        subjectsResult.message || 'Unable to retrieve class subjects.'
+                    )
+                }
 
-if (!yearsResponse.ok) {
-    throw new Error(
-        yearsResult.message || 'Unable to load academic years.'
-    )
-}
+                // Set student information
+                setStudents(studentsResult.students || [])
+                setSelectedClass(studentsResult.class)
 
-const years = yearsResult.academicYears || []
+                // Set academic years
+                const years = yearsResult.academicYears || []
 
-setAcademicYears(years)
+                setAcademicYears(years)
 
-// Restore previously selected year, otherwise use active year
-const urlYearId = searchParams.get('yearId')
-const urlTermId = searchParams.get('termId')
+                // Restore previously selected year, otherwise use active year
+                const urlYearId = searchParams.get('yearId')
+                const urlTermId = searchParams.get('termId')
 
-const savedYear = years.find(
-    year => String(year.id) === urlYearId
-)
+                const savedYear = years.find(
+                    year => String(year.id) === urlYearId
+                )
 
-const activeYear = years.find(year => year.is_active)
+                const activeYear = years.find(year => year.is_active)
 
-const initialYear = savedYear || activeYear || years[0]
+                const initialYear = savedYear || activeYear || years[0]
 
-if (initialYear) {
-    const yearId = String(initialYear.id)
+                if (initialYear) {
+                    const yearId = String(initialYear.id)
 
-    setSelectedYearId(yearId)
+                    setSelectedYearId(yearId)
 
-    const sortedTerms = [...(initialYear.academic_terms || [])]
-        .sort((a, b) => a.term_number - b.term_number)
+                    const sortedTerms = [
+                        ...(initialYear.academic_terms || [])
+                    ].sort((a, b) => a.term_number - b.term_number)
 
-    setTerms(sortedTerms)
+                    setTerms(sortedTerms)
 
-    const savedTerm = sortedTerms.find(
-        term => String(term.id) === urlTermId
-    )
+                    const savedTerm = sortedTerms.find(
+                        term => String(term.id) === urlTermId
+                    )
 
-    const initialTerm = savedTerm || sortedTerms[0]
+                    const initialTerm = savedTerm || sortedTerms[0]
 
-    if (initialTerm) {
-        setSelectedTermId(String(initialTerm.id))
-    }
+                    if (initialTerm) {
+                        setSelectedTermId(String(initialTerm.id))
+                    }
 
-    setSearchParams({
-        yearId,
-        termId: initialTerm ? String(initialTerm.id) : ''
-    }, { replace: true })
-}
+                    setSearchParams({
+                        yearId,
+                        termId: initialTerm ? String(initialTerm.id) : ''
+                    }, { replace: true })
+                }
 
-                // Fetch subject inclusion settings
-const settingsResponse = await fetch(
-    `${API_BASE_URL}/api/subject-settings/${classId}`,
-    { credentials: 'include' }
-)
+                // Set subject inclusion settings
+                setSubjectSettings(settingsResult.settings || [])
+                setIsClassTeacher(settingsResult.isClassTeacher || false)
+                setRequiresManualSelection(
+                    settingsResult.requiresManualSelection
+                )
 
-const settingsResult = await settingsResponse.json()
-
-if (!settingsResponse.ok) {
-    throw new Error(
-        settingsResult.message || 'Unable to retrieve subject settings.'
-    )
-}
-
-setSubjectSettings(settingsResult.settings || [])
-setIsClassTeacher(settingsResult.isClassTeacher || false)
-setRequiresManualSelection(
-    settingsResult.requiresManualSelection
-)
-
-// Fetch subjects registered in this class
-const subjectsResponse = await fetch(
-    `${API_BASE_URL}/api/term-tests/${classId}/subjects`,
-    { credentials: 'include' }
-)
-
-const subjectsResult = await subjectsResponse.json()
-
-if (!subjectsResponse.ok) {
-    throw new Error(
-        subjectsResult.message || 'Unable to retrieve class subjects.'
-    )
-}
-
-setClassSubjects(subjectsResult.subjects || [])
+                // Set class subjects
+                setClassSubjects(subjectsResult.subjects || [])
 
             } catch (error) {
                 console.error('Student list error:', error)
                 setError(error.message)
             } finally {
-    setLoading(false)
-    setSettingsLoading(false)
-}
+                setLoading(false)
+                setSettingsLoading(false)
+            }
         }
 
         fetchStudents()
@@ -177,75 +193,75 @@ setClassSubjects(subjectsResult.subjects || [])
     })
 
     const handleYearChange = (yearId) => {
-    setSelectedYearId(yearId)
+        setSelectedYearId(yearId)
 
-    const selectedYear = academicYears.find(
-        year => String(year.id) === String(yearId)
-    )
+        const selectedYear = academicYears.find(
+            year => String(year.id) === String(yearId)
+        )
 
-    const sortedTerms = [...(selectedYear?.academic_terms || [])]
-        .sort((a, b) => a.term_number - b.term_number)
+        const sortedTerms = [...(selectedYear?.academic_terms || [])]
+            .sort((a, b) => a.term_number - b.term_number)
 
-    setTerms(sortedTerms)
+        setTerms(sortedTerms)
 
-    const firstTermId = sortedTerms.length > 0
-        ? String(sortedTerms[0].id)
-        : ''
+        const firstTermId = sortedTerms.length > 0
+            ? String(sortedTerms[0].id)
+            : ''
 
-    setSelectedTermId(firstTermId)
+        setSelectedTermId(firstTermId)
 
-    setSearchParams({
-        yearId,
-        termId: firstTermId
-    })
-}
+        setSearchParams({
+            yearId,
+            termId: firstTermId
+        })
+    }
 
     const handleToggleSubjectInclusion = async (subject, includeInTotal) => {
-    if (!isClassTeacher) return
+        if (!isClassTeacher) return
 
-    setUpdatingSubjectId(subject.subject_id)
-    setSettingsError('')
+        setUpdatingSubjectId(subject.subject_id)
+        setSettingsError('')
 
-    try {
-        const response = await fetch(
-            `${API_BASE_URL}/api/subject-settings/${classId}`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    subjectId: subject.subject_id,
-                    includeInTotal
-                })
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/subject-settings/${classId}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        subjectId: subject.subject_id,
+                        includeInTotal
+                    })
+                }
+            )
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || 'Unable to update subject setting.'
+                )
             }
-        )
 
-        const result = await response.json()
-
-        if (!response.ok) {
-            throw new Error(
-                result.message || 'Unable to update subject setting.'
+            setSubjectSettings(previousSettings =>
+                previousSettings.map(setting =>
+                    Number(setting.subject_id) === Number(subject.subject_id)
+                        ? {
+                            ...setting,
+                            include_in_total: result.setting.include_in_total
+                        }
+                        : setting
+                )
             )
+        } catch (error) {
+            setSettingsError(error.message)
+        } finally {
+            setUpdatingSubjectId(null)
         }
-
-        setSubjectSettings(previousSettings =>
-            previousSettings.map(setting =>
-                Number(setting.subject_id) === Number(subject.subject_id)
-                    ? {
-                        ...setting,
-                        include_in_total: result.setting.include_in_total
-                    }
-                    : setting
-            )
-        )
-    } catch (error) {
-        setSettingsError(error.message)
-    } finally {
-        setUpdatingSubjectId(null)
     }
-}
 
     return (
         <div className="student-list-page">
@@ -263,14 +279,14 @@ setClassSubjects(subjectsResult.subjects || [])
                         <p>Teacher Portal</p>
                     </div>
                 </div>
- <button
-                className="subject-analysis-back-btn"
-                onClick={() =>
-                    navigate(`/employee/term-tests/${classId}`)
-                }
-            >
-                ← Back to Term Tests
-            </button>
+                <button
+                    className="subject-analysis-back-btn"
+                    onClick={() =>
+                        navigate(`/employee/term-tests/${classId}`)
+                    }
+                >
+                    ← Back to Term Tests
+                </button>
             </header>
 
             {/* Main Content */}
@@ -303,177 +319,177 @@ setClassSubjects(subjectsResult.subjects || [])
                                 : 'Student information'}
                         </p>
 
-                       <div className="student-list-actions">
+                        <div className="student-list-actions">
 
-    <button
-        className="student-list-subjects-btn"
-        onClick={() =>
-            navigate(
-    `/employee/term-tests/${classId}/subjects?yearId=${selectedYearId}&termId=${selectedTermId}`
-)
-        }
-    >
-        View Subjects →
-    </button>
+                            <button
+                                className="student-list-subjects-btn"
+                                onClick={() =>
+                                    navigate(
+                                        `/employee/term-tests/${classId}/subjects?yearId=${selectedYearId}&termId=${selectedTermId}`
+                                    )
+                                }
+                            >
+                                View Subjects →
+                            </button>
 
-</div>
-
-{/* Progress Report Selection */}
-<div className="progress-report-selection">
-
-    <h3>Student Progress Reports</h3>
-
-    <p>
-        Select an academic year and term to view or print student reports.
-    </p>
-
-    
-<div className="student-report-controls">
-
-    <div className="student-report-controls-header">
-        <h3>Student Progress Reports</h3>
-        <p>
-            Select an academic year and term to view or print student progress reports.
-        </p>
-    </div>
-
-    <div className="student-report-selectors">
-
-        <div>
-            <label>Academic Year</label>
-
-            <CustomDropdown
-                value={selectedYearId}
-                onChange={handleYearChange}
-                placeholder="Select Academic Year"
-                options={academicYears.map(year => ({
-                    value: String(year.id),
-                    label: String(year.year)
-                }))}
-            />
-        </div>
-
-        <div>
-            <label>Academic Term</label>
-
-            <CustomDropdown
-                value={selectedTermId}
-                onChange={(termId) => {
-    setSelectedTermId(termId)
-
-    setSearchParams({
-        yearId: selectedYearId,
-        termId
-    })
-}}
-                placeholder="Select Academic Term"
-                disabled={!terms.length}
-                options={terms.map(term => ({
-                    value: String(term.id),
-                    label: term.term_name
-                }))}
-            />
-        </div>
-
-    </div>
-
-    <div className="student-report-actions">
-        <button
-            type="button"
-            className="student-report-print-all-btn"
-            disabled={!selectedTermId || students.length === 0 || reportLoading}
-            onClick={() =>
-    navigate(
-        `/employee/term-tests/${classId}/reports/print-all?yearId=${selectedYearId}&termId=${selectedTermId}`
-    )
-}
-        >
-            {reportLoading ? 'Preparing Reports...' : 'Print All Reports'}
-        </button>
-    </div>
-
-</div>
-
-
-</div>
-
-{/* Subject Inclusion Settings Dropdown */}
-{requiresManualSelection && !loading && !error && (
-    <div className="student-inclusion-settings">
-
-        <button
-            type="button"
-            className="student-inclusion-toggle"
-            onClick={() =>
-                setShowSubjectSettings(previous => !previous)
-            }
-        >
-            <span>
-                <strong>Subject Inclusion Settings</strong>
-                <small>
-                    Manage subjects included in totals and averages
-                </small>
-            </span>
-
-            <span className="student-inclusion-arrow">
-                {showSubjectSettings ? '▲' : '▼'}
-            </span>
-        </button>
-
-        {showSubjectSettings && (
-            <div className="student-inclusion-panel">
-
-                {settingsLoading ? (
-                    <p>Loading subject settings...</p>
-                ) : settingsError ? (
-                    <p className="student-inclusion-error">
-                        {settingsError}
-                    </p>
-                ) : (
-                    <>
-                        <div className="student-inclusion-list">
-                            {classSubjects.map(subject => {
-                                const setting = subjectSettings.find(item =>
-                                    Number(item.subject_id) === Number(subject.subject_id)
-                                )
-
-                                return (
-                                    <label
-                                        key={subject.subject_id}
-                                        className="student-inclusion-item"
-                                    >
-                                        <span>{subject.subject_name}</span>
-
-                                        <input
-                                            type="checkbox"
-                                            checked={setting?.include_in_total ?? true}
-                                            disabled={
-                                                !isClassTeacher ||
-                                                updatingSubjectId === subject.subject_id
-                                            }
-                                            onChange={event =>
-                                                handleToggleSubjectInclusion(
-                                                    subject,
-                                                    event.target.checked
-                                                )
-                                            }
-                                        />
-                                    </label>
-                                )
-                            })}
                         </div>
 
-                        {!isClassTeacher && (
-                            <p className="student-inclusion-note">
-                                Only the assigned Class Teacher can change these settings.
+                        {/* Progress Report Selection */}
+                        <div className="progress-report-selection">
+
+                            <h3>Student Progress Reports</h3>
+
+                            <p>
+                                Select an academic year and term to view or print student reports.
                             </p>
+
+
+                            <div className="student-report-controls">
+
+                                <div className="student-report-controls-header">
+                                    <h3>Student Progress Reports</h3>
+                                    <p>
+                                        Select an academic year and term to view or print student progress reports.
+                                    </p>
+                                </div>
+
+                                <div className="student-report-selectors">
+
+                                    <div>
+                                        <label>Academic Year</label>
+
+                                        <CustomDropdown
+                                            value={selectedYearId}
+                                            onChange={handleYearChange}
+                                            placeholder="Select Academic Year"
+                                            options={academicYears.map(year => ({
+                                                value: String(year.id),
+                                                label: String(year.year)
+                                            }))}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label>Academic Term</label>
+
+                                        <CustomDropdown
+                                            value={selectedTermId}
+                                            onChange={(termId) => {
+                                                setSelectedTermId(termId)
+
+                                                setSearchParams({
+                                                    yearId: selectedYearId,
+                                                    termId
+                                                })
+                                            }}
+                                            placeholder="Select Academic Term"
+                                            disabled={!terms.length}
+                                            options={terms.map(term => ({
+                                                value: String(term.id),
+                                                label: term.term_name
+                                            }))}
+                                        />
+                                    </div>
+
+                                </div>
+
+                                <div className="student-report-actions">
+                                    <button
+                                        type="button"
+                                        className="student-report-print-all-btn"
+                                        disabled={!selectedTermId || students.length === 0 || reportLoading}
+                                        onClick={() =>
+                                            navigate(
+                                                `/employee/term-tests/${classId}/reports/print-all?yearId=${selectedYearId}&termId=${selectedTermId}`
+                                            )
+                                        }
+                                    >
+                                        {reportLoading ? 'Preparing Reports...' : 'Print All Reports'}
+                                    </button>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                        {/* Subject Inclusion Settings Dropdown */}
+                        {requiresManualSelection && !loading && !error && (
+                            <div className="student-inclusion-settings">
+
+                                <button
+                                    type="button"
+                                    className="student-inclusion-toggle"
+                                    onClick={() =>
+                                        setShowSubjectSettings(previous => !previous)
+                                    }
+                                >
+                                    <span>
+                                        <strong>Subject Inclusion Settings</strong>
+                                        <small>
+                                            Manage subjects included in totals and averages
+                                        </small>
+                                    </span>
+
+                                    <span className="student-inclusion-arrow">
+                                        {showSubjectSettings ? '▲' : '▼'}
+                                    </span>
+                                </button>
+
+                                {showSubjectSettings && (
+                                    <div className="student-inclusion-panel">
+
+                                        {settingsLoading ? (
+                                            <p>Loading subject settings...</p>
+                                        ) : settingsError ? (
+                                            <p className="student-inclusion-error">
+                                                {settingsError}
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <div className="student-inclusion-list">
+                                                    {classSubjects.map(subject => {
+                                                        const setting = subjectSettings.find(item =>
+                                                            Number(item.subject_id) === Number(subject.subject_id)
+                                                        )
+
+                                                        return (
+                                                            <label
+                                                                key={subject.subject_id}
+                                                                className="student-inclusion-item"
+                                                            >
+                                                                <span>{subject.subject_name}</span>
+
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={setting?.include_in_total ?? true}
+                                                                    disabled={
+                                                                        !isClassTeacher ||
+                                                                        updatingSubjectId === subject.subject_id
+                                                                    }
+                                                                    onChange={event =>
+                                                                        handleToggleSubjectInclusion(
+                                                                            subject,
+                                                                            event.target.checked
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </label>
+                                                        )
+                                                    })}
+                                                </div>
+
+                                                {!isClassTeacher && (
+                                                    <p className="student-inclusion-note">
+                                                        Only the assigned Class Teacher can change these settings.
+                                                    </p>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         )}
-                    </>
-                )}
-            </div>
-        )}
-    </div>
-)}
                         {loading ? (
                             <div className="student-list-message">
                                 Loading student records...
@@ -518,35 +534,35 @@ setClassSubjects(subjectsResult.subjects || [])
                                         <table className="student-list-table">
 
                                             <thead>
-    <tr>
-        <th>No.</th>
-        <th>Index Number</th>
-        <th>Student Name</th>
-    </tr>
-</thead>
+                                                <tr>
+                                                    <th>No.</th>
+                                                    <th>Index Number</th>
+                                                    <th>Student Name</th>
+                                                </tr>
+                                            </thead>
 
-                                         <tbody>
-    {filteredStudents.map((student, index) => (
-        <tr
-            key={student.id}
-            className="student-clickable-row"
-            onClick={() => {
-                if (!selectedTermId || !selectedYearId) {
-                    alert('Please select an academic year and term first.')
-                    return
-                }
+                                            <tbody>
+                                                {filteredStudents.map((student, index) => (
+                                                    <tr
+                                                        key={student.id}
+                                                        className="student-clickable-row"
+                                                        onClick={() => {
+                                                            if (!selectedTermId || !selectedYearId) {
+                                                                alert('Please select an academic year and term first.')
+                                                                return
+                                                            }
 
-                navigate(
-                    `/employee/term-tests/${classId}/students/${student.id}?yearId=${selectedYearId}&termId=${selectedTermId}`
-                )
-            }}
-        >
-            <td>{index + 1}</td>
-            <td>{student.index_number}</td>
-            <td>{student.student_name}</td>
-        </tr>
-    ))}
-</tbody>
+                                                            navigate(
+                                                                `/employee/term-tests/${classId}/students/${student.id}?yearId=${selectedYearId}&termId=${selectedTermId}`
+                                                            )
+                                                        }}
+                                                    >
+                                                        <td>{index + 1}</td>
+                                                        <td>{student.index_number}</td>
+                                                        <td>{student.student_name}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
 
                                         </table>
 

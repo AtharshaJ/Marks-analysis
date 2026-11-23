@@ -78,15 +78,37 @@ router.get(
                 })
             }
 
-            // Verify the selected class
-            const { data: selectedClass, error: classError } =
-                await supabase
+
+            // Verify class, student and academic term simultaneously
+            const [
+                { data: selectedClass, error: classError },
+                { data: selectedStudent, error: selectedStudentError },
+                { data: academicTerm, error: termError }
+            ] = await Promise.all([
+                supabase
                     .from('class_divisions')
                     .select('id, grade')
                     .eq('id', classId)
+                    .maybeSingle(),
+
+                supabase
+                    .from('students')
+                    .select('id, class_id, al_stream_id')
+                    .eq('id', studentId)
+                    .eq('class_id', classId)
+                    .eq('is_active', true)
+                    .maybeSingle(),
+
+                supabase
+                    .from('academic_terms')
+                    .select('id')
+                    .eq('id', termId)
                     .maybeSingle()
+            ])
 
             if (classError) throw classError
+            if (selectedStudentError) throw selectedStudentError
+            if (termError) throw termError
 
             if (!selectedClass) {
                 return res.status(404).json({
@@ -104,18 +126,6 @@ router.get(
                 })
             }
 
-            // Verify the selected student
-            const { data: selectedStudent, error: selectedStudentError } =
-                await supabase
-                    .from('students')
-                    .select('id, class_id, al_stream_id')
-                    .eq('id', studentId)
-                    .eq('class_id', classId)
-                    .eq('is_active', true)
-                    .maybeSingle()
-
-            if (selectedStudentError) throw selectedStudentError
-
             if (!selectedStudent) {
                 return res.status(404).json({
                     success: false,
@@ -123,22 +133,13 @@ router.get(
                 })
             }
 
-            // Verify the academic term
-            const { data: academicTerm, error: termError } =
-                await supabase
-                    .from('academic_terms')
-                    .select('id')
-                    .eq('id', termId)
-                    .maybeSingle()
-
-            if (termError) throw termError
-
             if (!academicTerm) {
                 return res.status(404).json({
                     success: false,
                     message: 'Academic term not found.'
                 })
             }
+
 
             // Get all class divisions belonging to this grade
             const { data: gradeClasses, error: gradeClassesError } =
@@ -212,48 +213,48 @@ router.get(
 
 
             // GRADES 6–11: Core + selected basket subjects,
-            // respecting class-wide subject inclusion settings.
+
             else if (grade >= 6 && grade <= 11) {
                 const subjectGroup =
                     grade <= 9 ? 'Junior Secondary' : 'OL'
 
-                const { data: subjects, error: subjectsError } =
-                    await supabase
+                const [
+                    { data: subjects, error: subjectsError },
+                    { data: basketSelections, error: basketError },
+                    { data: settings, error: settingsError }
+                ] = await Promise.all([
+                    supabase
                         .from('subjects')
                         .select('id, basket_id')
-                        .eq('subject_group', subjectGroup)
+                        .eq('subject_group', subjectGroup),
+
+                    supabase
+                        .from('student_basket_subjects')
+                        .select('student_id, subject_id')
+                        .in('student_id', studentIds),
+
+                    supabase
+                        .from('class_subject_settings')
+                        .select('class_id, subject_id, include_in_total')
+                        .in('class_id', classIds)
+                ])
 
                 if (subjectsError) throw subjectsError
+                if (basketError) throw basketError
+                if (settingsError) throw settingsError
 
                 const coreSubjectIds = (subjects || [])
                     .filter(subject => subject.basket_id === null)
                     .map(subject => Number(subject.id))
 
-                const { data: basketSelections, error: basketError } =
-                    await supabase
-                        .from('student_basket_subjects')
-                        .select('student_id, subject_id')
-                        .in('student_id', studentIds)
-
-                if (basketError) throw basketError
-
-                // Get the class-wide inclusion settings
-                const { data: settings, error: settingsError } =
-                    await supabase
-                        .from('class_subject_settings')
-                        .select('class_id, subject_id, include_in_total')
-                        .in('class_id', classIds)
-
-                if (settingsError) throw settingsError
-
                 const settingsMap = new Map()
 
-                ;(settings || []).forEach(setting => {
-                    settingsMap.set(
-                        `${setting.class_id}-${setting.subject_id}`,
-                        setting.include_in_total
-                    )
-                })
+                    ; (settings || []).forEach(setting => {
+                        settingsMap.set(
+                            `${setting.class_id}-${setting.subject_id}`,
+                            setting.include_in_total
+                        )
+                    })
 
                 students.forEach(student => {
                     const selectedBasketIds = (basketSelections || [])
@@ -271,7 +272,6 @@ router.get(
                         const settingKey =
                             `${student.class_id}-${subjectId}`
 
-                        // If no setting exists, include the subject by default.
                         return settingsMap.has(settingKey)
                             ? settingsMap.get(settingKey) === true
                             : true
@@ -283,6 +283,7 @@ router.get(
                     )
                 })
             }
+
 
 
             // GRADES 12–13: Only each student's three selected Choice subjects.
@@ -347,13 +348,13 @@ router.get(
                 marksMap.set(student.id, new Map())
             })
 
-            ;(allMarks || []).forEach(mark => {
-                const key = mark.subject_id !== null
-                    ? `regular-${mark.subject_id}`
-                    : `al-${String(mark.al_subject_no).trim()}`
+                ; (allMarks || []).forEach(mark => {
+                    const key = mark.subject_id !== null
+                        ? `regular-${mark.subject_id}`
+                        : `al-${String(mark.al_subject_no).trim()}`
 
-                marksMap.get(mark.student_id)?.set(key, mark.marks)
-            })
+                    marksMap.get(mark.student_id)?.set(key, mark.marks)
+                })
 
 
             // Calculate totals and averages
