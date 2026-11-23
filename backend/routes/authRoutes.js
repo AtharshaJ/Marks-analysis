@@ -80,9 +80,9 @@ router.post('/login', async (req, res) => {
             // Check Employee account
             const { data: employee, error: employeeError } = await supabase
                 .from('employees')
-              .select('id, teacher_id, full_name, designation, password, is_active')
-.eq('teacher_id', cleanLoginId)
-.maybeSingle();
+                .select('id, teacher_id, full_name, designation, password, is_active')
+                .eq('teacher_id', cleanLoginId)
+                .maybeSingle();
 
             if (employeeError) throw employeeError;
 
@@ -94,12 +94,12 @@ router.post('/login', async (req, res) => {
             }
 
             // Reject inactive employee accounts
-if (!employee.is_active) {
-    return res.status(403).json({
-        success: false,
-        message: 'Your account is inactive. Please contact the Administrator.'
-    });
-}
+            if (!employee.is_active) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Your account is inactive. Please contact the Administrator.'
+                });
+            }
 
             user = {
                 id: employee.id,
@@ -155,7 +155,7 @@ if (!employee.is_active) {
         if (sessionError) throw sessionError;
 
         // Send session token in an HttpOnly cookie
-     res.cookie('sessionToken', sessionToken, SESSION_COOKIE_OPTIONS);
+        res.cookie('sessionToken', sessionToken, SESSION_COOKIE_OPTIONS);
         return res.json({
             success: true,
             message: 'Login successful.',
@@ -198,39 +198,41 @@ router.get('/me', verifySession, async (req, res) => {
                 role: 'admin'
             };
 
-       } else {
-    // Step 1: Get employee details
-    const { data, error } = await supabase
-        .from('employees')
-        .select('id, teacher_id, full_name, designation')
-        .eq('id', req.user.id)
-        .maybeSingle();
+        } else {
+            // Fetch employee details and class assignment in parallel
+            const [employeeResult, classResult] = await Promise.all([
+                supabase
+                    .from('employees')
+                    .select('id, teacher_id, full_name, designation')
+                    .eq('id', req.user.id)
+                    .maybeSingle(),
 
-    if (error) throw error;
+                supabase
+                    .from('class_divisions')
+                    .select('id, class_name, grade')
+                    .eq('class_teacher_id', req.user.id)
+                    .maybeSingle()
+            ]);
 
-    if (!data) {
-        return res.status(401).json({
-            success: false,
-            message: 'Account not found.'
-        });
-    }
+            const { data, error } = employeeResult;
+            const { data: assignedClass, error: classError } = classResult;
 
-    // Step 2: Check whether this employee is a Class Teacher
-    const { data: assignedClass, error: classError } = await supabase
-        .from('class_divisions')
-        .select('id, class_name, grade')
-        .eq('class_teacher_id', data.id)
-        .maybeSingle();
+            if (error) throw error;
+            if (classError) throw classError;
 
-    if (classError) throw classError;
+            if (!data) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Account not found.'
+                });
+            }
 
-    // Step 3: Prepare employee information
-    user = {
-        ...data,
-        role: 'employee',
-        class_assignment: assignedClass || null
-    };
-}
+            user = {
+                ...data,
+                role: 'employee',
+                class_assignment: assignedClass || null
+            };
+        }
 
         return res.json({
             success: true,
@@ -264,11 +266,11 @@ router.post('/logout', async (req, res) => {
             if (error) throw error;
         }
 
-      res.clearCookie('sessionToken', {
-    httpOnly: true,
-    sameSite: 'lax',
-    path: '/'
-});
+        res.clearCookie('sessionToken', {
+            httpOnly: true,
+            sameSite: 'lax',
+            path: '/'
+        });
 
         return res.json({
             success: true,

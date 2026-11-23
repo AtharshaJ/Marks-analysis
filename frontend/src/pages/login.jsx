@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Login.css'
 import API_URL from '../config';
+import { useAuth } from '../AuthContext'
 
 function Login() {
   const [loginId, setLoginId] = useState('')
@@ -19,6 +20,7 @@ function Login() {
   const [resetLoading, setResetLoading] = useState(false)
   const [resetMessage, setResetMessage] = useState('')
   const [resetError, setResetError] = useState('')
+  const { login } = useAuth()
 
   const navigate = useNavigate()
 
@@ -50,6 +52,8 @@ function Login() {
       if (!response.ok) {
         throw new Error(result.message || 'Login failed.')
       }
+
+      login(result.user)
 
       if (result.user.role === 'admin') {
         navigate('/admin')
