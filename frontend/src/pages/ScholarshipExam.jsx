@@ -2,13 +2,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './ScholarshipExam.css'
+import API_URL from '../config'
 
 function ScholarshipExam({ user }) {
     const navigate = useNavigate()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL ||
-        (import.meta.env.DEV ? 'http://localhost:5000' : '')
+
 
     const [examYear, setExamYear] = useState(new Date().getFullYear())
     const [results, setResults] = useState([])
@@ -27,7 +26,7 @@ function ScholarshipExam({ user }) {
                 setError('')
 
                 const response = await fetch(
-                    `${API_BASE_URL}/api/scholarship-exams/${examYear}`,
+                    `${API_URL}/api/scholarship-exams/${examYear}`,
                     { credentials: 'include' }
                 )
 
@@ -73,7 +72,7 @@ function ScholarshipExam({ user }) {
             setSaving(true)
 
             const response = await fetch(
-                `${API_BASE_URL}/api/scholarship-exams`,
+                `${API_URL}/api/scholarship-exams`,
                 {
                     method: 'POST',
                     headers: {

@@ -3,13 +3,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './ScholarshipAnalysis.css'
 import CustomDropdown from '../components/CustomDropdown'
+import API_URL from '../config'
 
 function ScholarshipAnalysis({ user }) {
     const navigate = useNavigate()
 
-    const API_BASE_URL =
-        import.meta.env.VITE_API_URL ||
-        (import.meta.env.DEV ? 'http://localhost:5000' : '')
+
     const [examYear, setExamYear] = useState(new Date().getFullYear())
     const [results, setResults] = useState([])
     const [loading, setLoading] = useState(true)
@@ -76,7 +75,7 @@ function ScholarshipAnalysis({ user }) {
                 setError('')
 
                 const response = await fetch(
-                    `${API_BASE_URL}/api/scholarship-exams/${examYear}`,
+                    `${API_URL}/api/scholarship-exams/${examYear}`,
                     { credentials: 'include' }
                 )
 
