@@ -1642,17 +1642,28 @@ function AdminDashboard({ user }) {
                                     </div>
                                 )}
 
+
                                 {examDeleteSummary && (
                                     <div className="exam-delete-summary">
                                         <h4>Deletion Summary</h4>
 
-                                        {Object.entries(examDeleteSummary)
-                                            .filter(([key]) => key.endsWith('_deleted'))
-                                            .map(([key, value]) => (
-                                                <p key={key}>
-                                                    {key.replaceAll('_', ' ')}: <strong>{value}</strong>
-                                                </p>
-                                            ))}
+                                        {examDeleteSummary.deleted_count !== undefined && (
+                                            <p>
+                                                Records deleted: <strong>{examDeleteSummary.deleted_count}</strong>
+                                            </p>
+                                        )}
+
+                                        {examDeleteSummary.deleted_students !== undefined && (
+                                            <p>
+                                                Students deleted: <strong>{examDeleteSummary.deleted_students}</strong>
+                                            </p>
+                                        )}
+
+                                        {examDeleteSummary.deleted_results !== undefined && (
+                                            <p>
+                                                Results deleted: <strong>{examDeleteSummary.deleted_results}</strong>
+                                            </p>
+                                        )}
                                     </div>
                                 )}
 
