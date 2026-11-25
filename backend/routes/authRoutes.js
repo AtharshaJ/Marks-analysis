@@ -133,6 +133,19 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // Fetch assigned class for employees
+        if (userType === 'employee') {
+            const { data: assignedClass, error: classError } = await supabase
+                .from('class_divisions')
+                .select('id, class_name, grade')
+                .eq('class_teacher_id', user.id)
+                .maybeSingle()
+
+            if (classError) throw classError
+
+            user.class_assignment = assignedClass || null
+        }
+
         // Generate session token
         const sessionToken = generateSessionToken();
 
