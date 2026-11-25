@@ -6,6 +6,7 @@ import CustomDropdown from '../components/CustomDropdown'
 import API_URL from '../config';
 
 // Searchable A/L subject selector
+// Searchable A/L subject selector
 function SearchableSubjectSelect({
     subjects,
     selectedSubject,
@@ -21,21 +22,20 @@ function SearchableSubjectSelect({
     )
 
     const filteredSubjects = subjects.filter(subject => {
-    // Exclude Common subjects
-    if (subject.subject_type !== 'Choice') {
-        return false
-    }
+        if (subject.subject_type !== 'Choice') {
+            return false
+        }
 
-    const alreadySelected =
-        unavailableSubjects.includes(subject.subject_no) &&
-        subject.subject_no !== selectedSubject
+        const alreadySelected =
+            unavailableSubjects.includes(subject.subject_no) &&
+            subject.subject_no !== selectedSubject
 
-    const matchesSearch =
-        subject.subject_name.toLowerCase().includes(search.toLowerCase()) ||
-        subject.subject_no.toLowerCase().includes(search.toLowerCase())
+        const matchesSearch =
+            subject.subject_name.toLowerCase().includes(search.toLowerCase()) ||
+            subject.subject_no.toLowerCase().includes(search.toLowerCase())
 
-    return !alreadySelected && matchesSearch
-})
+        return !alreadySelected && matchesSearch
+    })
 
     const handleSelect = subject => {
         onChange(subject.subject_no)
@@ -47,18 +47,18 @@ function SearchableSubjectSelect({
         setSearch(value)
         setIsOpen(true)
 
-        // Typing a new search clears the previous selection
         if (selectedSubject) {
             onChange('')
         }
     }
 
     return (
-        <div className="add-student-basket">
+        <div className="add-student-basket add-student-al-subject">
             <label>{label}</label>
 
-            <div style={{ position: 'relative' }}>
+            <div className="al-subject-search-wrapper">
                 <input
+                    className="al-subject-search-input"
                     type="text"
                     value={search}
                     placeholder="Search for a subject..."
@@ -69,47 +69,21 @@ function SearchableSubjectSelect({
                 />
 
                 {isOpen && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            right: 0,
-                            maxHeight: '220px',
-                            overflowY: 'auto',
-                            background: '#fff',
-                            border: '1px solid #ccc',
-                            borderRadius: '6px',
-                            zIndex: 20,
-                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                        }}
-                    >
+                    <div className="al-subject-dropdown">
                         {filteredSubjects.length > 0 ? (
                             filteredSubjects.map(subject => (
                                 <button
                                     type="button"
                                     key={subject.subject_no}
+                                    className="al-subject-option"
                                     onClick={() => handleSelect(subject)}
-                                    style={{
-                                        display: 'block',
-                                        width: '100%',
-                                        padding: '10px 12px',
-                                        border: 'none',
-                                        borderBottom: '1px solid #eee',
-                                        background: '#fff',
-                                        textAlign: 'left',
-                                        cursor: 'pointer',
-                                        color: '#222'
-                                    }}
                                 >
-                                    {subject.subject_name}
-                                    <small style={{ marginLeft: '8px', color: '#777' }}>
-                                        ({subject.subject_no})
-                                    </small>
+                                    <span>{subject.subject_name}</span>
+                                    <small>{subject.subject_no}</small>
                                 </button>
                             ))
                         ) : (
-                            <p style={{ padding: '10px', margin: 0 }}>
+                            <p className="al-subject-no-results">
                                 No matching subjects found.
                             </p>
                         )}
@@ -118,9 +92,12 @@ function SearchableSubjectSelect({
             </div>
 
             {selected && (
-                <small style={{ color: '#16804a', display: 'block', marginTop: '5px' }}>
-                    Selected: {selected.subject_name}
-                </small>
+                <div className="al-subject-selected">
+                    <span className="al-subject-selected-icon">✓</span>
+                    <span>
+                        Selected: <strong>{selected.subject_name}</strong>
+                    </span>
+                </div>
             )}
         </div>
     )
@@ -148,7 +125,7 @@ function AddStudent({ user }) {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-   const API_BASE_URL = API_URL;
+    const API_BASE_URL = API_URL;
 
     const grade = Number(user.class_assignment.grade)
     const isAL = grade === 12 || grade === 13
@@ -368,9 +345,9 @@ function AddStudent({ user }) {
                                 three subjects.
                             </p>
 
-                            <div className="add-student-baskets">
+                            <div className="add-student-baskets add-student-al-baskets">
 
-                                <div className="add-student-basket">
+                                <div className="add-student-basket add-student-stream">
                                     <label>A/L Stream</label>
 
                                     <select
@@ -431,23 +408,23 @@ function AddStudent({ user }) {
                                             {basket.basket_name}
                                         </label>
 
-                                        
-<CustomDropdown
-    value={selectedSubjects[basket.basket_name] || ''}
-    options={basket.subjects.map(subject => ({
-        value: String(subject.id),
-        label: subject.subject_name
-    }))}
-    onChange={value =>
-        handleSubjectChange(
-            basket.basket_name,
-            value
-        )
-    }
-    placeholder="Select a subject"
-    searchable={true}
-    searchPlaceholder="Search subjects..."
-/>
+
+                                        <CustomDropdown
+                                            value={selectedSubjects[basket.basket_name] || ''}
+                                            options={basket.subjects.map(subject => ({
+                                                value: String(subject.id),
+                                                label: subject.subject_name
+                                            }))}
+                                            onChange={value =>
+                                                handleSubjectChange(
+                                                    basket.basket_name,
+                                                    value
+                                                )
+                                            }
+                                            placeholder="Select a subject"
+                                            searchable={true}
+                                            searchPlaceholder="Search subjects..."
+                                        />
 
                                     </div>
                                 ))}

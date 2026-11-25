@@ -1,4 +1,3 @@
-
 /* ================================
    ADD STUDENT PAGE
 ================================ */
@@ -7,10 +6,8 @@
     min-height: 100vh;
     width: 100%;
     background-image:
-        linear-gradient(
-            rgba(225, 239, 252, 0.78),
-            rgba(225, 239, 252, 0.78)
-        ),
+        linear-gradient(rgba(225, 239, 252, 0.78),
+            rgba(225, 239, 252, 0.78)),
         url('/background.jpg');
     background-size: cover;
     background-position: center;
@@ -24,6 +21,7 @@
 .add-student-page * {
     box-sizing: border-box;
 }
+
 /* ================================
    HEADER
 ================================ */
@@ -110,7 +108,7 @@
     margin-bottom: 25px;
 }
 
-.add-student-title > span {
+.add-student-title>span {
     color: #168b91;
     font-size: 12px;
     font-weight: 700;
@@ -184,7 +182,7 @@
     font-size: 19px;
 }
 
-.add-student-section > p {
+.add-student-section>p {
     margin: 0 0 22px;
     color: #8491a3;
     font-size: 13px;
@@ -403,5 +401,212 @@
     .add-student-cancel-btn,
     .add-student-save-btn {
         width: 100%;
+    }
+}
+
+/* ================================
+   A/L SUBJECT SELECTION DESIGN
+================================ */
+
+.add-student-al-baskets {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+/* A/L Stream - Full Width */
+
+.add-student-al-baskets .add-student-stream {
+    grid-column: 1 / -1;
+    background: #edf5fc;
+    border-color: #d5e5f3;
+}
+
+.add-student-stream select {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid #cbdbea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #263c56;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.add-student-stream select:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 3px rgba(22, 139, 145, 0.12);
+    outline: none;
+}
+
+/* Individual Subject Cards */
+
+.add-student-al-subject {
+    min-width: 0;
+    background: #ffffff;
+    border: 1px solid #dce7f2;
+    border-top: 3px solid #168b91;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 3px 12px rgba(23, 62, 112, 0.04);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.add-student-al-subject:hover {
+    box-shadow: 0 5px 16px rgba(23, 62, 112, 0.09);
+    transform: translateY(-2px);
+}
+
+.add-student-al-subject label {
+    color: #173e70;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Search Input */
+
+.al-subject-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.al-subject-search-input {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 13px;
+    border: 1px solid #d6dfeb;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #263445;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.al-subject-search-input::placeholder {
+    color: #a5afbd;
+}
+
+.al-subject-search-input:focus {
+    border-color: #168b91;
+    box-shadow: 0 0 0 3px rgba(22, 139, 145, 0.1);
+}
+
+/* Search Results Dropdown */
+
+.al-subject-dropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #d6e3ef;
+    border-radius: 8px;
+    z-index: 30;
+    box-shadow: 0 8px 22px rgba(23, 62, 112, 0.15);
+}
+
+.al-subject-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-bottom: 1px solid #edf1f6;
+    background: #ffffff;
+    color: #34445a;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.al-subject-option:last-child {
+    border-bottom: none;
+}
+
+.al-subject-option:hover {
+    background: #edf7f8;
+    color: #087d83;
+}
+
+.al-subject-option small {
+    flex-shrink: 0;
+    color: #8491a3;
+    font-size: 11px;
+}
+
+.al-subject-no-results {
+    padding: 13px;
+    margin: 0;
+    color: #8491a3;
+    font-size: 13px;
+}
+
+/* Selected Subject Indicator */
+
+.al-subject-selected {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-top: 12px;
+    padding: 9px 10px;
+    border: 1px solid #c7efd7;
+    border-radius: 7px;
+    background: #edfaf3;
+    color: #237a49;
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.al-subject-selected-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #237a49;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.al-subject-selected strong {
+    color: #17643b;
+}
+
+/* Responsive A/L Layout */
+
+@media (max-width: 800px) {
+    .add-student-al-baskets {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .add-student-al-baskets .add-student-stream {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .add-student-al-baskets {
+        grid-template-columns: 1fr;
+    }
+
+    .add-student-al-baskets .add-student-stream {
+        grid-column: auto;
+    }
+
+    .add-student-al-subject {
+        padding: 16px;
     }
 }
