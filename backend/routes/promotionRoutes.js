@@ -92,70 +92,6 @@ router.post('/execute', verifySession, requireAdmin, async (req, res) => {
 // Delete Scholarship examination records
 router.delete('/clear-scholarship', verifySession, requireAdmin, async (req, res) => {
     try {
-        // TODO: Add Scholarship deletion logic here
-
-        return res.status(501).json({
-            success: false,
-            message: 'Scholarship deletion is not implemented yet.'
-        })
-
-    } catch (error) {
-        console.error('Scholarship deletion error:', error)
-
-        return res.status(500).json({
-            success: false,
-            message: 'Unable to delete Scholarship records.'
-        })
-    }
-})
-
-// Delete O/L examination records
-router.delete('/clear-ol', verifySession, requireAdmin, async (req, res) => {
-    try {
-        // TODO: Add O/L deletion logic here
-
-        return res.status(501).json({
-            success: false,
-            message: 'O/L deletion is not implemented yet.'
-        })
-
-    } catch (error) {
-        console.error('O/L deletion error:', error)
-
-        return res.status(500).json({
-            success: false,
-            message: 'Unable to delete O/L records.'
-        })
-    }
-})
-
-// Delete A/L examination records
-router.delete('/clear-al', verifySession, requireAdmin, async (req, res) => {
-    try {
-        // TODO: Add A/L deletion logic here
-
-        return res.status(501).json({
-            success: false,
-            message: 'A/L deletion is not implemented yet.'
-        })
-
-    } catch (error) {
-        console.error('A/L deletion error:', error)
-
-        return res.status(500).json({
-            success: false,
-            message: 'Unable to delete A/L records.'
-        })
-    }
-})
-
-
-// ========================================
-// CLEAR SCHOLARSHIP EXAMINATION DATA
-// ========================================
-
-router.delete('/clear-scholarship', verifySession, requireAdmin, async (req, res) => {
-    try {
         const { data: deletedRecords, error } = await supabase
             .from('scholarship_exam_results')
             .delete()
@@ -181,11 +117,7 @@ router.delete('/clear-scholarship', verifySession, requireAdmin, async (req, res
     }
 })
 
-
-// ========================================
-// CLEAR O/L EXAMINATION DATA
-// ========================================
-
+// Delete O/L examination records
 router.delete('/clear-ol', verifySession, requireAdmin, async (req, res) => {
     try {
         // Get all O/L examination student IDs
@@ -244,9 +176,20 @@ router.delete('/clear-ol', verifySession, requireAdmin, async (req, res) => {
 })
 
 
-// ========================================
+
+
+
+
+
+
+
+
+
+
+
+
 // CLEAR A/L EXAMINATION DATA
-// ========================================
+
 
 router.delete('/clear-al', verifySession, requireAdmin, async (req, res) => {
     try {
