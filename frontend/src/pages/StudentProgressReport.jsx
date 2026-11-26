@@ -118,10 +118,18 @@ function StudentProgressReport({ user }) {
 
             <article className="progress-report-paper">
                 <header className="progress-report-heading">
-                    <h1>Thondaimanaru Veerakaththipillai Maha Vidyalayam</h1>
-                    <h2>STUDENT PROGRESS REPORT</h2>
-                </header>
 
+                    <img
+                        src="/school-logo.jpg"
+                        alt="School Logo"
+                        className="progress-report-logo"
+                    />
+
+                    <h1>Thondaimanaru Veerakaththipillai Maha Vidyalayam</h1>
+
+                    <h2>STUDENT PROGRESS REPORT</h2>
+
+                </header>
                 <section className="progress-report-student-info">
                     <div>
                         <strong>Student Name:</strong> {student.student_name}
